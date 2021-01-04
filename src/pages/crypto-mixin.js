@@ -1,4 +1,18 @@
 
+
+// NOTE: let f = (n)=> Math.ceil(n/3)*4; can be used to calculate size inflation for base64
+const splitStringIntoChunks = (sourceString, ...chunkSizeList) => {
+  let extractedLength = 0;
+  let extractedList = [];
+  for (let chunkSize of chunkSizeList) {
+    let chunk = sourceString.slice(extractedLength, extractedLength + chunkSize);
+    extractedList.push(chunk);
+    extractedLength += chunkSize;
+  }
+  extractedList.push(sourceString.slice(extractedLength));
+  return extractedList;
+}
+
 export let CryptoMixin = {
 
   data() {
@@ -9,10 +23,17 @@ export let CryptoMixin = {
 
   methods: {
 
-    async __getEncryptionKey() {
-      const salt = new Uint8Array([124, 92, 118, 197, 187, 142, 84, 34, 182, 251, 29, 71, 30, 56, 90, 48]);
-      // TODO: At a later version, create salt for individual users and store on server.
+    // ---------------------------------------- salt, iv, key-gen
 
+    __generateSalt() {
+      return window.crypto.getRandomValues(new Uint8Array(16));
+    },
+
+    __geenrateIv() {
+      return window.crypto.getRandomValues(new Uint8Array(12));
+    },
+
+    async __getEncryptionKey(salt) {
       let passphrase = sessionStorage.getItem('nkrypt-xyz-passphrase');
       let encodedPassphrase = (new TextEncoder()).encode(passphrase);
 
@@ -38,18 +59,17 @@ export let CryptoMixin = {
       );
 
       return key;
-
     },
 
-    // ======================= Text
+    // ---------------------------------------- encoding and decoding
 
-    __pack(buffer) {
+    __ArrayBufferToBase64Sync(buffer) {
       return window.btoa(
         String.fromCharCode.apply(null, new Uint8Array(buffer))
       )
     },
 
-    __unpack(packed) {
+    __Base64ToArrayBufferSync(packed) {
       const string = window.atob(packed)
       const buffer = new ArrayBuffer(string.length)
       const bufferView = new Uint8Array(buffer)
@@ -61,44 +81,7 @@ export let CryptoMixin = {
       return buffer;
     },
 
-    async encryptText(data) {
-      const encoder = new TextEncoder();
-      let encodedData = encoder.encode(data);
-
-      let iv = window.crypto.getRandomValues(new Uint8Array(12));
-
-      let key = await this.__getEncryptionKey();
-
-      const cipher = await window.crypto.subtle.encrypt({
-        name: 'AES-GCM',
-        iv: iv,
-      }, key, encodedData);
-
-      return {
-        cipher: this.__pack(cipher),
-        iv: this.__pack(iv)
-      };
-    },
-
-    async decryptText({ cipher, iv }) {
-      cipher = this.__unpack(cipher);
-      iv = this.__unpack(iv);
-
-      let key = await this.__getEncryptionKey();
-
-      const encodedData = await window.crypto.subtle.decrypt({
-        name: 'AES-GCM',
-        iv: iv,
-      }, key, cipher);
-
-      let data = (new TextDecoder()).decode(encodedData);
-
-      return data;
-    },
-
-    // ======================= Binary
-
-    __packFromUnicode(arrayBuffer) {
+    __ArrayBufferToBase64(arrayBuffer) {
       return new Promise(accept => {
 
         var blob = new Blob([arrayBuffer])
@@ -115,38 +98,64 @@ export let CryptoMixin = {
       });
     },
 
-    async encryptArrayBuffer(encodedData) {
-      let iv = window.crypto.getRandomValues(new Uint8Array(12));
+    // ---------------------------------------- encrypt & decrypt (text)
 
-      let key = await this.__getEncryptionKey();
+    async encryptText(text) {
+      // utf8 to arraybuffer
+      let sourceArrayBuffer = (new TextEncoder()).encode(text);
 
-      const cipher = await window.crypto.subtle.encrypt({
-        name: 'AES-GCM',
-        iv: iv,
-      }, key, encodedData);
-
-      return {
-        cipher: (await this.__packFromUnicode(cipher)),
-        iv: this.__pack(iv)
-      };
+      return await this.encryptArrayBuffer(sourceArrayBuffer);
     },
 
-    async decryptToArrayBuffer({ cipher, iv }) {
-      cipher = this.__unpack(cipher);
-      iv = this.__unpack(iv);
+    async decryptText(encryptedBase64) {
+      let decryptedArrayBuffer = await this.decryptToArrayBuffer(encryptedBase64)
 
-      let key = await this.__getEncryptionKey();
+      // arraybuffer to utf8
+      let text = (new TextDecoder()).decode(decryptedArrayBuffer);
 
-      const encodedData = await window.crypto.subtle.decrypt({
+      return text;
+    },
+
+    // ---------------------------------------- encrypt & decrypt (binary)
+
+    async encryptArrayBuffer(sourceArrayBuffer) {
+      let salt = this.__generateSalt();
+      let key = await this.__getEncryptionKey(salt);
+      let iv = this.__geenrateIv();
+
+      let cipher = await window.crypto.subtle.encrypt({
+        name: 'AES-GCM',
+        iv: iv,
+      }, key, sourceArrayBuffer);
+
+      salt = this.__ArrayBufferToBase64Sync(salt);
+      iv = this.__ArrayBufferToBase64Sync(iv);
+      cipher = await this.__ArrayBufferToBase64(cipher);
+
+      let encryptedBase64 = [
+        salt, iv, cipher
+      ].join('');
+
+      return encryptedBase64;
+    },
+
+    async decryptToArrayBuffer(encryptedBase64) {
+      let [salt, iv, cipher] = splitStringIntoChunks(encryptedBase64, 24, 16);
+
+      salt = this.__Base64ToArrayBufferSync(salt);
+      cipher = this.__Base64ToArrayBufferSync(cipher);
+      iv = this.__Base64ToArrayBufferSync(iv);
+
+      let key = await this.__getEncryptionKey(salt);
+
+      const decryptedArrayBuffer = await window.crypto.subtle.decrypt({
         name: 'AES-GCM',
         iv: iv,
       }, key, cipher);
 
-      // let data = (new TextDecoder()).decode(encodedData);
-
-      return encodedData;
+      return decryptedArrayBuffer;
     }
 
+    // -x- methods
   }
-
 }
