@@ -1,0 +1,11 @@
+{
+    "editor.wordWrapColumn": 160,
+    "html.format.wrapLineLength": 160,
+    "scssFormatter.printWidth": 160,
+    "vetur.format.defaultFormatterOptions": {
+        "prettier": {
+            "tabWidth": 2, 
+            "printWidth": 160
+        }
+    },
+}

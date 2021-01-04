@@ -1,0 +1,39 @@
+// app global css in SCSS form
+
+*, body{
+    font-family: 'Roboto';
+  }
+  
+  .std-page {
+    background: $pageColor;
+  }
+  
+  .std-small-page {
+    background: $pageColor;
+  }
+  
+  .std-card {
+    max-width: $pageWidth;
+    margin-left: auto;
+    margin-right: auto;
+  
+    &.mt{
+      margin-top: 12px;
+    }
+  }
+  
+  .std-small-card {
+    width: 360px;
+  
+    @media (max-width: 480px) {
+      width: calc(100vw - 12px);
+    }
+  }
+  
+  .std-link {
+    color: $secondary;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  
