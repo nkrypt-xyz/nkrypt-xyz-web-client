@@ -7,29 +7,35 @@
   import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
   import { defaultServerToShow } from "../store/cache.js";
+  import { form, field } from "svelte-forms";
+  import { required, min } from "svelte-forms/validators";
+  import { callUserLoginApi } from "../integration/user-apis.js";
+  import { minlength } from "../lib/validators.js";
+  import { standardField } from "../lib/validations.js";
+  import { extract } from "../utility/misc-utils.js";
 
-  const loginClicked = () => {
-    console.log("Hi");
+  const loginClicked = async () => {
+    let payload = extract($finalForm.summary, ["userName", "password"]);
+    let response = await callUserLoginApi($server.value, payload);
   };
 
-  let form = {
-    server: $defaultServerToShow,
-    userName: "",
-    password: "",
-  };
+  const server = standardField("server", $defaultServerToShow, [minlength(4)]);
+  const userName = standardField("userName", "", [minlength(4)]);
+  const password = standardField("password", "", [minlength(8)]);
+  const finalForm = form(server, userName, password);
 </script>
 
 <div class="login-page">
   <Card>
     <Content class="content">
-      <Textfield bind:value={form.server} label="Server Address">
+      <Textfield bind:value={$server.value} label="Server Address" type="text">
         <Icon class="material-icons" slot="leadingIcon">dns</Icon>
         <!-- <HelperText slot="helper">Helper Text</HelperText> -->
       </Textfield>
 
       <br />
 
-      <Textfield bind:value={form.userName} label="User Name">
+      <Textfield bind:value={$userName.value} label="User Name" type="text">
         <Icon class="material-icons" slot="leadingIcon">person</Icon>
         <!-- <HelperText slot="helper">Helper Text</HelperText> -->
       </Textfield>
@@ -37,7 +43,7 @@
       <br />
 
       <Textfield
-        bind:value={form.password}
+        bind:value={$password.value}
         label="Account Password"
         type="password"
         required
@@ -49,7 +55,12 @@
       <br />
 
       <div style="text-align: center;">
-        <Button on:click={loginClicked} variant="raised" class="hero-button">
+        <Button
+          disabled={!($finalForm.dirty && $finalForm.valid)}
+          on:click={loginClicked}
+          variant="raised"
+          class="hero-button"
+        >
           <Icon class="material-icons">login</Icon>
           <Label>Login</Label>
         </Button>
