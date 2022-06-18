@@ -1,0 +1,27 @@
+<script lang="ts">
+  import Dialog, { Title, Content, Actions } from "@smui/dialog";
+  import Button, { Label } from "@smui/button";
+  import CircularProgress from "@smui/circular-progress";
+
+  import { activeGlobalObtrusiveTaskCount } from "../store/ui.js";
+
+  let isOpen = false;
+  activeGlobalObtrusiveTaskCount.subscribe((value) => {
+    isOpen = value > 0;
+  });
+</script>
+
+<Dialog
+  bind:open={isOpen}
+  scrimClickAction=""
+  escapeKeyAction=""
+  aria-labelledby="mandatory-title"
+  aria-describedby="mandatory-content"
+  surface$style="width: 64px; max-width: 64px; background-color: transparent !important; box-shadow: none;"
+>
+  <Content id="mandatory-content">
+    <div style="display: flex; justify-content: center">
+      <CircularProgress style="height: 32px; width: 32px;" indeterminate />
+    </div>
+  </Content>
+</Dialog>
