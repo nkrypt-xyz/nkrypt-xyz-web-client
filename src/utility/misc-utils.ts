@@ -32,4 +32,14 @@ function strip(object: any, keyList: string[]): void {
   return;
 }
 
-export { extract, strip };
+function createDebouncedMethod(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
+export { extract, strip, createDebouncedMethod };
