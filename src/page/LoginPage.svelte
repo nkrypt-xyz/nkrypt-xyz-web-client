@@ -1,33 +1,58 @@
 <script lang="ts">
+  // UI
   import Button, { Label, Icon as ButtonIcon } from "@smui/button";
-  import { CommonConstant } from "../constant/common-constants.js";
   import Card, { Content } from "@smui/card";
   import Footer from "../lib/Footer.svelte";
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
-  import { defaultServerToShow } from "../store/cache.js";
+  // Extern
   import { form, field } from "svelte-forms";
   import { required, min } from "svelte-forms/validators";
+  import { replace } from "svelte-spa-router";
+  // Intern
+  import { standardField } from "../lib/validations.js";
+  import { CommonConstant } from "../constant/common-constants.js";
+  import { defaultServerToShow } from "../store/cache.js";
   import { callUserLoginApi } from "../integration/user-apis.js";
   import { minlength } from "../lib/validators.js";
-  import { standardField } from "../lib/validations.js";
   import { extract } from "../utility/misc-utils.js";
+  import { currentUser } from "../store/user.js";
+  import { currentSession } from "../store/session.js";
+  import {
+    decrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount,
+  } from "../store/ui.js";
 
   const loginClicked = async () => {
     let payload = extract($finalForm.summary, ["userName", "password"]);
+    incrementActiveGlobalObtrusiveTaskCount();
     let response = await callUserLoginApi($server.value, payload);
+    decrementActiveGlobalObtrusiveTaskCount();
+
+    let { apiKey } = response;
+    let { userName, displayName, _id: userId } = response.user;
+
+    currentUser.set({ userName, displayName, userId });
+    currentSession.set({ apiKey, serverUrl: $server.value });
+
+    replace("/dashboard");
   };
 
   const server = standardField("server", $defaultServerToShow, [minlength(4)]);
-  const userName = standardField("userName", "", [minlength(4)]);
-  const password = standardField("password", "", [minlength(8)]);
+  const userName = standardField("userName", "admin", [minlength(4)]);
+  const password = standardField(
+    "password",
+    "PleaseChangeMe@YourEarliest2Day",
+    [minlength(8)]
+  );
   const finalForm = form(server, userName, password);
 </script>
 
 <div class="login-page">
   <Card>
     <Content class="content">
+      <h3>Welcome to nkrypt.xyz</h3>
       <Textfield bind:value={$server.value} label="Server Address" type="text">
         <Icon class="material-icons" slot="leadingIcon">dns</Icon>
         <!-- <HelperText slot="helper">Helper Text</HelperText> -->
