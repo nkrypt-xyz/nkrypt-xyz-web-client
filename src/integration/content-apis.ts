@@ -2,21 +2,28 @@ import type { Session } from "src/model/common.js";
 import { currentSession } from "../store/session.js";
 import { callPostJsonApi } from "../utility/api-utils.js";
 
-export const callUserLoginApi = async (
-  serverBaseUrl: string,
-  data: { userName; password }
-) => {
-  return await callPostJsonApi(serverBaseUrl, null, "/api/user/login", data);
-};
-
 let _currentSession: Session = null;
 currentSession.subscribe((value) => (_currentSession = value));
 
-export const callUserLogoutApi = async (data: { message }) => {
+export const callBucketListApi = async (data: {}) => {
   return await callPostJsonApi(
     _currentSession.serverUrl,
     _currentSession.apiKey,
-    "/api/user/logout",
+    "/api/bucket/list",
+    data
+  );
+};
+
+export const callBucketCreateApi = async (data: {
+  name: string;
+  cryptSpec: string;
+  cryptData: string;
+  metaData: Record<string, any>;
+}) => {
+  return await callPostJsonApi(
+    _currentSession.serverUrl,
+    _currentSession.apiKey,
+    "/api/bucket/create",
     data
   );
 };
