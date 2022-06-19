@@ -13,7 +13,6 @@
   // Intern
   import { standardField } from "../lib/validations.js";
   import { CommonConstant } from "../constant/common-constants.js";
-  import { defaultServerToShow } from "../store/cache.js";
   import { callUserLoginApi } from "../integration/user-apis.js";
   import { minlength } from "../lib/validators.js";
   import { extract } from "../utility/misc-utils.js";
@@ -30,6 +29,7 @@
   import { encryptText } from "../utility/crypto-utils.js";
   import { BUCKET_CRYPTO_SPEC } from "../lib/crypto.js";
   import { bucketList } from "../store/content.js";
+  import { handleErrorIfAny } from "../lib/error-handling.js";
 
   const NEW_BUCKET_ID = "new";
 
@@ -42,12 +42,11 @@
   const finalForm = form(name, encryptionPassword);
 
   const saveClicked = async () => {
+    let bucketPassword = $encryptionPassword.value;
+
     incrementActiveGlobalObtrusiveTaskCount();
 
-    let cryptDataObject = await encryptText(
-      BUCKET_CRYPTO_SPEC,
-      $encryptionPassword.value
-    );
+    let cryptDataObject = await encryptText(BUCKET_CRYPTO_SPEC, bucketPassword);
 
     let cryptData = JSON.stringify(cryptDataObject);
 
@@ -59,10 +58,11 @@
         createFrom: "nkrypt.xyz app",
       },
     });
+    if (await handleErrorIfAny(response)) return;
 
-    // handle error
     let response2 = await callBucketListApi({});
-    // handle error
+    if (await handleErrorIfAny(response)) return;
+
     bucketList.set(response2.bucketList);
 
     replace("/dashboard");
@@ -81,7 +81,6 @@
         type="text"
       >
         <Icon class="material-icons" slot="leadingIcon">takeout_dining</Icon>
-        <!-- <HelperText slot="helper">Helper Text</HelperText> -->
       </Textfield>
 
       <br />
