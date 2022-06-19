@@ -10,8 +10,6 @@ export const callPostJsonApi = async (
 ) => {
   const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
-  console.log("POST " + url);
-
   let headers = {
     Accept: "application/json",
     "Content-Type": "application/json;charset=UTF-8",
@@ -25,8 +23,6 @@ export const callPostJsonApi = async (
     headers,
     body: JSON.stringify(data),
   };
-
-  console.log(options);
 
   let responseJson = null;
   let responseObject = null;
