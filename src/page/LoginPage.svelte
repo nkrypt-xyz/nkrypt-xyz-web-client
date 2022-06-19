@@ -13,7 +13,7 @@
   // Intern
   import { standardField } from "../lib/validations.js";
   import { CommonConstant } from "../constant/common-constants.js";
-  import { defaultServerToShow } from "../store/cache.js";
+  import { suggestedServerUrl } from "../store/cache.js";
   import { callUserLoginApi } from "../integration/user-apis.js";
   import { minlength } from "../lib/validators.js";
   import { extract } from "../utility/misc-utils.js";
@@ -23,11 +23,13 @@
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
   } from "../store/ui.js";
+  import { handleErrorIfAny } from "../lib/error-handling.js";
 
   const loginClicked = async () => {
     let payload = extract($finalForm.summary, ["userName", "password"]);
     incrementActiveGlobalObtrusiveTaskCount();
     let response = await callUserLoginApi($server.value, payload);
+    if (await handleErrorIfAny(response)) return;
     decrementActiveGlobalObtrusiveTaskCount();
 
     let { apiKey } = response;
@@ -36,10 +38,12 @@
     currentUser.set({ userName, displayName, userId });
     currentSession.set({ apiKey, serverUrl: $server.value });
 
+    suggestedServerUrl.set($server.value);
+
     replace("/dashboard");
   };
 
-  const server = standardField("server", $defaultServerToShow, [minlength(4)]);
+  const server = standardField("server", $suggestedServerUrl, [minlength(4)]);
   const userName = standardField("userName", "admin", [minlength(4)]);
   const password = standardField(
     "password",

@@ -3,16 +3,15 @@ import {
   setLocalStorageItem,
 } from "../utility/store-utils.js";
 import { Writable, writable } from "svelte/store";
-
-const DEFAULT_SERVER_URL = "http://localhost:9041";
+import { CommonConstant } from "../constant/common-constants.js";
 
 const LAST_USED_SERVER_URL_LOCALSTORAGE_KEY = "--cache--lastUsedServerUrl";
 
-export const defaultServerToShow: Writable<string> = writable(
+export const suggestedServerUrl: Writable<string> = writable(
   getLocalStorageItem(LAST_USED_SERVER_URL_LOCALSTORAGE_KEY) ||
-    DEFAULT_SERVER_URL
+    CommonConstant.DEFAULT_SERVER_URL
 );
 
-defaultServerToShow.subscribe((value) => {
+suggestedServerUrl.subscribe((value) => {
   setLocalStorageItem(LAST_USED_SERVER_URL_LOCALSTORAGE_KEY, value);
 });
