@@ -23,5 +23,7 @@
     <div style="display: flex; justify-content: center">
       <CircularProgress style="height: 32px; width: 32px;" indeterminate />
     </div>
+    <!-- Note: The following has no function. It's just to suppress a strange mdc error -->
+    <div tabindex="0" />
   </Content>
 </Dialog>
