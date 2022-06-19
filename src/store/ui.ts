@@ -52,3 +52,21 @@ export let showAlert = (title, message) => {
     alertDialog.set({ title, message });
   });
 };
+
+export let bucketPasswordDialog: Writable<{ bucketName: string }> =
+  writable(null);
+
+export let bucketPasswordDialogResponse: Writable<{ bucketPassword: string }> =
+  writable(null);
+
+export let showBucketPasswordDialog = (bucketName) => {
+  return new Promise((accept) => {
+    bucketPasswordDialogResponse.set(null);
+    let unsubscribe = bucketPasswordDialogResponse.subscribe((value) => {
+      if (value === null) return;
+      accept(value);
+      unsubscribe();
+    });
+    bucketPasswordDialog.set({ bucketName });
+  });
+};
