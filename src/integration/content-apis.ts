@@ -27,3 +27,27 @@ export const callBucketCreateApi = async (data: {
     data
   );
 };
+
+export const callDirectoryGetApi = async (data: { bucketId; directoryId }) => {
+  return await callPostJsonApi(
+    _currentSession.serverUrl,
+    _currentSession.apiKey,
+    "/api/directory/get",
+    data
+  );
+};
+
+export const callDirectoryCreateApi = async (data: {
+  name: string;
+  bucketId: string;
+  parentDirectoryId: string;
+  metaData: Record<string, any>;
+  encryptedMetaData: string;
+}) => {
+  return await callPostJsonApi(
+    _currentSession.serverUrl,
+    _currentSession.apiKey,
+    "/api/directory/create",
+    data
+  );
+};
