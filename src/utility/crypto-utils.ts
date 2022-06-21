@@ -111,3 +111,23 @@ export const decryptText = async (
 
   return data;
 };
+
+// For encrypting small (<10mb) amount of data
+export const encryptObject = async (
+  object: Record<string, any>,
+  encryptionPassword: string
+): Promise<string> => {
+  let text = JSON.stringify(object);
+  let encryped = await encryptText(text, encryptionPassword);
+  return JSON.stringify(encryped);
+};
+
+// For decrypting small (<10mb) amount of data
+export const decryptToObject = async (
+  encryptedText: string,
+  encryptionPassword: string
+) => {
+  let encrypted = JSON.parse(encryptedText);
+  let decrypted = await decryptText(encrypted, encryptionPassword);
+  return JSON.parse(decrypted);
+};
