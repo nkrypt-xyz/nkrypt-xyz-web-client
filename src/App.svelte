@@ -122,7 +122,7 @@
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
   function conditionsFailed(event) {
-    console.error("conditionsFailed:", event.detail);
+    console.debug("conditionsFailed:", event.detail);
     let data = event.detail.userData as any;
 
     if (data.requiresAuthentication && !data.isUserLoggedIn) {
@@ -134,7 +134,7 @@
   // Handles the "routeLoaded" event dispatched by the router when a component was loaded
   function routeLoaded(event) {
     let { detail } = event;
-    console.log("routeLoaded:", event);
+    console.debug("routeLoaded:", event);
 
     // housekeeping
     if (detail.route !== "/explore/*") {
@@ -165,7 +165,7 @@
   };
 </script>
 
-<main>
+<main class="nk-main">
   <ObtrusiveLoader />
   <ConfirmationDialog />
   <AlertDialog />
@@ -223,8 +223,7 @@
           <IconButton
             class="material-icons"
             on:click={() => (isLeftDrawerOpen = !isLeftDrawerOpen)}
-            tabindex="-1"
-            >menu</IconButton
+            tabindex="-1">menu</IconButton
           >
           <Title>nkrypt.xyz</Title>
         </Section>
