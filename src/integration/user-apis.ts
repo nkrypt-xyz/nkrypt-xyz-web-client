@@ -1,5 +1,5 @@
 import type { Session } from "src/model/common.js";
-import { currentSession } from "../store/session.js";
+import { storedSession } from "../store/session.js";
 import { callPostJsonApi } from "../utility/api-utils.js";
 
 export const callUserLoginApi = async (
@@ -9,13 +9,13 @@ export const callUserLoginApi = async (
   return await callPostJsonApi(serverBaseUrl, null, "/api/user/login", data);
 };
 
-let _currentSession: Session = null;
-currentSession.subscribe((value) => (_currentSession = value));
+let _storedSession: Session = null;
+storedSession.subscribe((value) => (_storedSession = value));
 
 export const callUserLogoutApi = async (data: { message }) => {
   return await callPostJsonApi(
-    _currentSession.serverUrl,
-    _currentSession.apiKey,
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
     "/api/user/logout",
     data
   );

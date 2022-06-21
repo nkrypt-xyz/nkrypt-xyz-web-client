@@ -16,8 +16,8 @@
   import { callUserLoginApi } from "../integration/user-apis.js";
   import { minlength } from "../lib/validators.js";
   import { extract } from "../utility/misc-utils.js";
-  import { currentUser } from "../store/user.js";
-  import { currentSession } from "../store/session.js";
+  import { storedUser } from "../store/user.js";
+  import { storedSession } from "../store/session.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
