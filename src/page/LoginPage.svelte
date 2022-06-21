@@ -17,8 +17,8 @@
   import { callUserLoginApi } from "../integration/user-apis.js";
   import { minlength } from "../lib/validators.js";
   import { extract } from "../utility/misc-utils.js";
-  import { currentUser } from "../store/user.js";
-  import { currentSession } from "../store/session.js";
+  import { storedUser } from "../store/user.js";
+  import { storedSession } from "../store/session.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
@@ -35,8 +35,8 @@
     let { apiKey } = response;
     let { userName, displayName, _id: userId } = response.user;
 
-    currentUser.set({ userName, displayName, userId });
-    currentSession.set({ apiKey, serverUrl: $server.value });
+    storedUser.set({ userName, displayName, userId });
+    storedSession.set({ apiKey, serverUrl: $server.value });
 
     suggestedServerUrl.set($server.value);
 

@@ -1,14 +1,14 @@
 import type { Session } from "src/model/common.js";
-import { currentSession } from "../store/session.js";
+import { storedSession } from "../store/session.js";
 import { callPostJsonApi } from "../utility/api-utils.js";
 
-let _currentSession: Session = null;
-currentSession.subscribe((value) => (_currentSession = value));
+let _storedSession: Session = null;
+storedSession.subscribe((value) => (_storedSession = value));
 
 export const callBucketListApi = async (data: {}) => {
   return await callPostJsonApi(
-    _currentSession.serverUrl,
-    _currentSession.apiKey,
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
     "/api/bucket/list",
     data
   );
@@ -21,8 +21,8 @@ export const callBucketCreateApi = async (data: {
   metaData: Record<string, any>;
 }) => {
   return await callPostJsonApi(
-    _currentSession.serverUrl,
-    _currentSession.apiKey,
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
     "/api/bucket/create",
     data
   );
@@ -30,8 +30,8 @@ export const callBucketCreateApi = async (data: {
 
 export const callDirectoryGetApi = async (data: { bucketId; directoryId }) => {
   return await callPostJsonApi(
-    _currentSession.serverUrl,
-    _currentSession.apiKey,
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
     "/api/directory/get",
     data
   );
@@ -45,8 +45,8 @@ export const callDirectoryCreateApi = async (data: {
   encryptedMetaData: string;
 }) => {
   return await callPostJsonApi(
-    _currentSession.serverUrl,
-    _currentSession.apiKey,
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
     "/api/directory/create",
     data
   );

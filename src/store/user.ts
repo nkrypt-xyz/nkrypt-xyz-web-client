@@ -7,10 +7,10 @@ import type { User } from "src/model/common.js";
 
 const USER_LOCALSTORAGE_KEY = "--user";
 
-export const currentUser: Writable<User> = writable(
+export const storedUser: Writable<User> = writable(
   getLocalStorageItem(USER_LOCALSTORAGE_KEY)
 );
 
-currentUser.subscribe((value) => {
+storedUser.subscribe((value) => {
   setLocalStorageItem(USER_LOCALSTORAGE_KEY, value);
 });

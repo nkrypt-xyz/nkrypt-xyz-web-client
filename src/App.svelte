@@ -36,8 +36,8 @@
   import PromptDialog from "./lib/PromptDialog.svelte";
   import Footer from "./lib/Footer.svelte";
   // Stores
-  import { currentUser } from "./store/user.js";
-  import { currentSession } from "./store/session.js";
+  import { storedUser } from "./store/user.js";
+  import { storedSession } from "./store/session.js";
   import { bucketList } from "./store/content.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
@@ -73,7 +73,7 @@
 
   const conditionRequiresAuthentication = async (detail) => {
     if ((detail.userData as any).requiresAuthentication) {
-      if (!$currentUser || !$currentSession) {
+      if (!$storedUser || !$storedSession) {
         detail.userData.isUserLoggedIn = false;
         return false;
       }
@@ -134,12 +134,12 @@
   }
 
   onMount(async () => {
-    if ($currentSession) {
+    if ($storedSession) {
       loadBucketList();
     }
   });
 
-  currentSession.subscribe((session) => {
+  storedSession.subscribe((session) => {
     if (session) {
       loadBucketList();
     }
@@ -163,7 +163,7 @@
   <AlertDialog />
   <BucketPasswordDialog />
   <PromptDialog />
-  {#if $currentSession || $currentUser}
+  {#if $storedSession || $storedUser}
     <Drawer variant="modal" bind:open={isLeftDrawerOpen}>
       <Header>
         <DrawerTitle>Encrypted Buckets</DrawerTitle>
@@ -196,7 +196,7 @@
         </div>
 
         <div class="nk-left-bar-footer">
-          You are: {$currentUser.displayName}
+          You are: {$storedUser.displayName}
           <br />
           <Button on:click={logoutClicked}>
             <Icon class="material-icons">logout</Icon>

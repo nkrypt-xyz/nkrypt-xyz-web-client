@@ -7,10 +7,10 @@ import type { Session } from "../model/common.js";
 
 const SESSION_LOCALSTORAGE_KEY = "--session";
 
-export const currentSession: Writable<Session> = writable(
+export const storedSession: Writable<Session> = writable(
   getLocalStorageItem(SESSION_LOCALSTORAGE_KEY)
 );
 
-currentSession.subscribe((value) => {
+storedSession.subscribe((value) => {
   setLocalStorageItem(SESSION_LOCALSTORAGE_KEY, value);
 });

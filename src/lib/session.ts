@@ -1,10 +1,10 @@
 import { callUserLogoutApi } from "../integration/user-apis.js";
-import { currentSession } from "../store/session.js";
+import { storedSession } from "../store/session.js";
 import {
   decrementActiveGlobalObtrusiveTaskCount,
   incrementActiveGlobalObtrusiveTaskCount,
 } from "../store/ui.js";
-import { currentUser } from "../store/user.js";
+import { storedUser } from "../store/user.js";
 import { replace } from "svelte-spa-router";
 
 export const performUserLogout = async () => {
@@ -12,8 +12,8 @@ export const performUserLogout = async () => {
   let response = await callUserLogoutApi({
     message: "Manually pressed logout button",
   });
-  currentUser.set(null);
-  currentSession.set(null);
+  storedUser.set(null);
+  storedSession.set(null);
   replace("/");
   decrementActiveGlobalObtrusiveTaskCount();
 };
