@@ -38,7 +38,7 @@
   // Stores
   import { storedUser } from "./store/user.js";
   import { storedSession } from "./store/session.js";
-  import { bucketList } from "./store/content.js";
+  import { activeBucket, bucketList } from "./store/content.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
@@ -57,7 +57,10 @@
 
   let isLeftDrawerOpen = false;
 
-  let currentlySelectedBucketId = "";
+  let _activeBucket = null;
+  activeBucket.subscribe((value) => {
+    _activeBucket = value;
+  });
 
   const loadBucketList = createDebouncedMethod(async () => {
     incrementActiveGlobalObtrusiveTaskCount();
@@ -119,7 +122,7 @@
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
   function conditionsFailed(event) {
-    console.error("conditionsFailed event", event.detail);
+    console.error("conditionsFailed:", event.detail);
     let data = event.detail.userData as any;
 
     if (data.requiresAuthentication && !data.isUserLoggedIn) {
@@ -130,7 +133,13 @@
 
   // Handles the "routeLoaded" event dispatched by the router when a component was loaded
   function routeLoaded(event) {
-    console.log("routeLoaded event", event.detail);
+    let { detail } = event;
+    console.log("routeLoaded:", event);
+
+    // housekeeping
+    if (detail.route !== "/explore/*") {
+      activeBucket.set(null);
+    }
   }
 
   onMount(async () => {
@@ -151,7 +160,6 @@
   };
 
   const bucketClicked = async (bucketId: string) => {
-    currentlySelectedBucketId = bucketId;
     push(`/explore/${bucketId}`);
     isLeftDrawerOpen = false;
   };
@@ -180,7 +188,7 @@
               <Item
                 href="javascript:void(0)"
                 on:click={() => bucketClicked(bucket._id)}
-                activated={currentlySelectedBucketId === bucket._id}
+                activated={_activeBucket && _activeBucket._id === bucket._id}
               >
                 <Text>{bucket.name}</Text>
               </Item>
