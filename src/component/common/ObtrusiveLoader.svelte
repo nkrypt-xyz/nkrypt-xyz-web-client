@@ -3,7 +3,7 @@
   import Button, { Label } from "@smui/button";
   import CircularProgress from "@smui/circular-progress";
 
-  import { activeGlobalObtrusiveTaskCount } from "../store/ui.js";
+  import { activeGlobalObtrusiveTaskCount } from "../../store/ui.js";
 
   let isOpen = false;
   activeGlobalObtrusiveTaskCount.subscribe((value) => {

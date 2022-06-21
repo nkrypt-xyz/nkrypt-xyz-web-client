@@ -1,6 +1,5 @@
 <script lang="ts">
   // UI
-  import Footer from "../lib/Footer.svelte";
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
@@ -9,24 +8,24 @@
   import { required, min } from "svelte-forms/validators";
   import { replace } from "svelte-spa-router";
   // Intern
-  import { standardField } from "../lib/validations.js";
-  import { CommonConstant } from "../constant/common-constants.js";
-  import { callUserLoginApi } from "../integration/user-apis.js";
-  import { minlength } from "../lib/validators.js";
-  import { extract } from "../utility/misc-utils.js";
-  import { storedUser } from "../store/user.js";
-  import { storedSession } from "../store/session.js";
+  import { standardField } from "../../lib/validations.js";
+  import { CommonConstant } from "../../constant/common-constants.js";
+  import { callUserLoginApi } from "../../integration/user-apis.js";
+  import { minlength } from "../../lib/validators.js";
+  import { extract } from "../../utility/misc-utils.js";
+  import { storedUser } from "../../store/user.js";
+  import { storedSession } from "../../store/session.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
-  } from "../store/ui.js";
+  } from "../../store/ui.js";
   import {
     callBucketCreateApi,
     callBucketListApi,
-  } from "../integration/content-apis.js";
-  import { encryptText } from "../utility/crypto-utils.js";
-  import { BUCKET_CRYPTO_SPEC } from "../lib/crypto.js";
-  import { bucketList } from "../store/content.js";
+  } from "../../integration/content-apis.js";
+  import { encryptText } from "../../utility/crypto-utils.js";
+  import { BUCKET_CRYPTO_SPEC } from "../../lib/crypto.js";
+  import { bucketList } from "../../store/content.js";
 
   import Dialog, { Title, Content, Actions } from "@smui/dialog";
   import Button, { Label } from "@smui/button";
@@ -35,7 +34,7 @@
   import {
     bucketPasswordDialog,
     bucketPasswordDialogResponse,
-  } from "../store/ui.js";
+  } from "../../store/ui.js";
 
   const encryptionPassword = standardField(
     "encryptionPassword",

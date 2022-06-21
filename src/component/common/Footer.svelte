@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CommonConstant } from "../constant/common-constants.js";
+  import { CommonConstant } from "../../constant/common-constants.js";
 </script>
 
 <div class="copyright">App version: {CommonConstant.APP_VERSION}</div>

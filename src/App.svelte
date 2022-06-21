@@ -24,17 +24,17 @@
   import Router, { replace, location, push } from "svelte-spa-router";
   import { wrap } from "svelte-spa-router/wrap";
   // Pages
-  import LoginPage from "./page/LoginPage.svelte";
-  import DashboardPage from "./page/DashboardPage.svelte";
-  import CreateBucketPage from "./page/CreateBucketPage.svelte";
-  import ExplorePage from "./page/ExplorePage.svelte";
+  import LoginPage from "./component/page/LoginPage.svelte";
+  import DashboardPage from "./component/page/DashboardPage.svelte";
+  import CreateBucketPage from "./component/page/CreateBucketPage.svelte";
+  import ExplorePage from "./component/page/ExplorePage.svelte";
   // Components
-  import ObtrusiveLoader from "./lib/ObtrusiveLoader.svelte";
-  import AlertDialog from "./lib/AlertDialog.svelte";
-  import BucketPasswordDialog from "./lib/BucketPasswordDialog.svelte";
-  import ConfirmationDialog from "./lib/ConfirmationDialog.svelte";
-  import PromptDialog from "./lib/PromptDialog.svelte";
-  import Footer from "./lib/Footer.svelte";
+  import ObtrusiveLoader from "./component/common/ObtrusiveLoader.svelte";
+  import AlertDialog from "./component/dialog/AlertDialog.svelte";
+  import BucketPasswordDialog from "./component/dialog/BucketPasswordDialog.svelte";
+  import ConfirmationDialog from "./component/dialog/ConfirmationDialog.svelte";
+  import PromptDialog from "./component/dialog/PromptDialog.svelte";
+  import Footer from "./component/common/Footer.svelte";
   // Stores
   import { storedUser } from "./store/user.js";
   import { storedSession } from "./store/session.js";

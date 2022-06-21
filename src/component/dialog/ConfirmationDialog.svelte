@@ -6,7 +6,7 @@
   import {
     confirmationDialog,
     confirmationDialogResponse,
-  } from "../store/ui.js";
+  } from "../../store/ui.js";
 
   let _confirmationDialog = null;
   confirmationDialog.subscribe((value) => {

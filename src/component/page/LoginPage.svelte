@@ -2,7 +2,7 @@
   // UI
   import Button, { Label, Icon as ButtonIcon } from "@smui/button";
   import Card, { Content } from "@smui/card";
-  import Footer from "../lib/Footer.svelte";
+  import Footer from "../common/Footer.svelte";
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
@@ -11,19 +11,19 @@
   import { required, min } from "svelte-forms/validators";
   import { replace } from "svelte-spa-router";
   // Intern
-  import { standardField } from "../lib/validations.js";
-  import { CommonConstant } from "../constant/common-constants.js";
-  import { suggestedServerUrl } from "../store/cache.js";
-  import { callUserLoginApi } from "../integration/user-apis.js";
-  import { minlength } from "../lib/validators.js";
-  import { extract } from "../utility/misc-utils.js";
-  import { storedUser } from "../store/user.js";
-  import { storedSession } from "../store/session.js";
+  import { standardField } from "../../lib/validations.js";
+  import { CommonConstant } from "../../constant/common-constants.js";
+  import { suggestedServerUrl } from "../../store/cache.js";
+  import { callUserLoginApi } from "../../integration/user-apis.js";
+  import { minlength } from "../../lib/validators.js";
+  import { extract } from "../../utility/misc-utils.js";
+  import { storedUser } from "../../store/user.js";
+  import { storedSession } from "../../store/session.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
-  } from "../store/ui.js";
-  import { handleErrorIfAny } from "../lib/error-handling.js";
+  } from "../../store/ui.js";
+  import { handleErrorIfAny } from "../../lib/error-handling.js";
 
   const loginClicked = async () => {
     let payload = extract($finalForm.summary, ["userName", "password"]);
