@@ -21,12 +21,13 @@
     setPasswordForBucket,
   } from "../store/password.js";
   import { getOrCollectPasswordForBucket } from "../lib/password-provider.js";
+  import { encryptObject, encryptText } from "../utility/crypto-utils.js";
 
   const ROUTE_PREFIX = "/explore/";
 
   let currentPath: string = null;
   let currentBucketPassword: string = null;
-  let entityList = [];
+  let entityStack = [];
 
   let childDirectoryList = [];
   let childFileList = [];
@@ -96,6 +97,7 @@
     // if last target is a file, put a ref?
   };
 
+  // Watch parameter changes
   const derived1 = derived([location, bucketList], ([$a, $b]) => [$a, $b]);
   derived1.subscribe(([location, bucketList]) => {
     if (
@@ -118,7 +120,7 @@
       name,
       parentDirectoryId: (directory as any)._id,
       metaData: {},
-      encryptedMetaData: "AAA",
+      encryptedMetaData: await encryptObject({}, currentBucketPassword),
     });
     if (await handleErrorIfAny(response)) return;
     decrementActiveGlobalObtrusiveTaskCount();
