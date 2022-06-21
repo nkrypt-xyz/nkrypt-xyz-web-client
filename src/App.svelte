@@ -223,6 +223,7 @@
           <IconButton
             class="material-icons"
             on:click={() => (isLeftDrawerOpen = !isLeftDrawerOpen)}
+            tabindex="-1"
             >menu</IconButton
           >
           <Title>nkrypt.xyz</Title>

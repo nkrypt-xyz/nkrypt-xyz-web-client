@@ -1,7 +1,11 @@
 <script lang="ts">
   import Button, { Label, Icon } from "@smui/button";
   import IconButton from "@smui/icon-button";
-  import { activeBucket, bucketList, currentBucket } from "../../store/content.js";
+  import {
+    activeBucket,
+    bucketList,
+    currentBucket,
+  } from "../../store/content.js";
   import { location, push } from "svelte-spa-router";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
@@ -23,6 +27,7 @@
   } from "../../store/password.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
   import { encryptObject, encryptText } from "../../utility/crypto-utils.js";
+  import Breadcrumbs from "./ExplorePage/Breadcrumbs.svelte";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -52,7 +57,7 @@
       handleInvalidParameter();
       return;
     }
-    console.log("Found bucket:", bucket);
+    // console.log("Found bucket:", bucket);
     currentBucket = bucket;
     activeBucket.set(currentBucket);
   };
@@ -214,29 +219,11 @@
 </script>
 
 {#if currentBucket}
-  <div class="breadcrumb-container">
-    <div
-      class="breadcrumb breadcrumb-bucket"
-      draggable="true"
-      on:click={() => breadcrumbClicked(null)}
-    >
-      {currentBucket.name}
-    </div>
-    {#each entityStack.slice(1) as entity, i}
-      <div class="breadcrumb-divider">&gt;</div>
-      <div
-        class="breadcrumb breadcrumb-directory"
-        draggable="true"
-        on:click={() => breadcrumbClicked(entity)}
-      >
-        {entity.directory.name}
-      </div>
-    {/each}
-  </div>
+  <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />
 
   <div class="control-row">
     <IconButton
-      disabled={entityStack.length <= 2}
+      disabled={entityStack.length <= 1}
       size="mini"
       class="material-icons control-row-icon-button"
       on:click={goUpClicked}
@@ -275,37 +262,6 @@
 <style>
   .directory {
     margin: 16px;
-  }
-
-  .breadcrumb-container {
-    background-color: rgb(206, 206, 206);
-    font-size: 12px;
-    padding-left: 4px;
-  }
-
-  .breadcrumb-divider {
-    display: inline-block;
-    color: rgb(128, 128, 128);
-  }
-
-  .breadcrumb {
-    cursor: pointer;
-    display: inline-block;
-    margin: 8px 2px;
-    color: #0275d8;
-  }
-
-  .breadcrumb:hover {
-    text-decoration: underline;
-  }
-
-  .breadcrumb:last-child {
-    color: rgb(126, 125, 125);
-    text-decoration: none;
-  }
-
-  .breadcrumb-bucket {
-    color: #0275d8;
   }
 
   .control-row {
