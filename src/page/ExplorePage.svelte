@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button, { Label, Icon } from "@smui/button";
-  import { bucketList, currentBucket } from "../store/content.js";
+  import IconButton from "@smui/icon-button";
+  import { activeBucket, bucketList, currentBucket } from "../store/content.js";
   import { location, push } from "svelte-spa-router";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
@@ -26,30 +27,38 @@
   const ROUTE_PREFIX = "/explore/";
 
   let currentPath: string = null;
+
   let currentBucketPassword: string = null;
+
+  let currentBucket = null;
   let entityStack = [];
 
   let childDirectoryList = [];
   let childFileList = [];
-  let directory = {};
+  let currentDirectory = null;
 
-  const loadBucket = async (bucketId) => {
-    let bucket = $bucketList.find((bucket) => bucket._id == bucketId);
-    if (!bucket) {
-      await showAlert(
-        "Invalid parameters",
-        "The link you are using is invalid. Redirecting you to the dashboard."
-      );
-      push("/dashboard");
-      return;
-    }
-    console.log(bucket, bucketId, $bucketList);
-    currentBucket.set(bucket);
-    return bucket;
+  const handleInvalidParameter = async () => {
+    await showAlert(
+      "Invalid parameters",
+      "The link you are using is invalid. Redirecting you to the dashboard."
+    );
+    push("/dashboard");
+    return;
   };
 
-  const getBucketPassword = async (bucket) => {
-    let bucketPassword = await getOrCollectPasswordForBucket(bucket);
+  const loadBucket = async (bucketId): void => {
+    let bucket = $bucketList.find((bucket) => bucket._id == bucketId);
+    if (!bucket) {
+      handleInvalidParameter();
+      return;
+    }
+    console.log("Found bucket:", bucket);
+    currentBucket = bucket;
+    activeBucket.set(currentBucket);
+  };
+
+  const loadCurrentBucketPassword = async (): void => {
+    let bucketPassword = await getOrCollectPasswordForBucket(currentBucket);
     if (!bucketPassword) {
       await showAlert(
         "Password required",
@@ -58,43 +67,82 @@
       push("/dashboard");
       return;
     }
-    setPasswordForBucket(bucket._id, bucketPassword);
-    return bucketPassword;
+    setPasswordForBucket(currentBucket._id, bucketPassword);
+    currentBucketPassword = bucketPassword;
   };
 
-  const loadDirectoryAndChildren = async () => {};
+  const getDirectory = async (directoryId: string) => {
+    incrementActiveGlobalObtrusiveTaskCount();
+    let response = await callDirectoryGetApi({
+      bucketId: currentBucket._id,
+      directoryId: directoryId,
+    });
+    if (await handleErrorIfAny(response)) return;
+    decrementActiveGlobalObtrusiveTaskCount();
+    // console.log("DIRECTORY ", response);
+    return response;
+  };
+
+  const loadRootDirectory = async (): void => {
+    let response = await getDirectory(currentBucket.rootDirectoryId);
+    // TODO: handle edge case
+    if (!response) return;
+    entityStack = [response];
+  };
+
+  const loadCurrentDirectoryAndChildren = async () => {
+    let head = entityStack[entityStack.length - 1];
+    // console.log("permanent head", head);
+    ({ directory: currentDirectory, childDirectoryList, childFileList } = head);
+  };
+
+  const loadEntityStack = async (parts: string[]) => {
+    let fileId = null;
+    for (let i = 0; i < parts.length; i++) {
+      if (fileId) {
+        console.error(new Error(`Files cannot contain children.`));
+        handleInvalidParameter();
+        return;
+      }
+
+      let entityId = parts[i];
+      let head = entityStack[entityStack.length - 1];
+      // console.log("temp head", head);
+
+      if (head.childDirectoryList.find((child) => child._id === entityId)) {
+        // it is a directory
+
+        let response = await getDirectory(entityId);
+        // TODO: handle edge case
+        if (!response) return;
+        entityStack = [...entityStack, response];
+      } else if (head.childFileList.find((child) => child._id === entityId)) {
+        // it is a file
+        alert("File handling is a work in progress.");
+      } else {
+        console.error(
+          new Error(
+            `Directory "${head.name}"" has no directory/file with ID "${entityId}".`
+          )
+        );
+        handleInvalidParameter();
+        return;
+      }
+    }
+  };
 
   const explorePath = async (explorePath: string) => {
     console.log(`explorePath()`, explorePath);
     currentPath = explorePath;
 
-    let parts = explorePath.split("/");
+    let parts = explorePath.split("/").filter((part) => part.length > 0);
     let bucketId = parts.shift();
 
-    let bucket = await loadBucket(bucketId);
-    currentBucketPassword = await getBucketPassword(bucket);
-
-    incrementActiveGlobalObtrusiveTaskCount();
-    let response = await callDirectoryGetApi({
-      bucketId,
-      directoryId: bucket.rootDirectoryId,
-    });
-    if (await handleErrorIfAny(response)) return;
-    decrementActiveGlobalObtrusiveTaskCount();
-
-    for (let i = 0; i < parts.length; i++) {
-      let entityId = parts[i];
-    }
-
-    console.log(response);
-
-    ({ childDirectoryList, childFileList, directory } = response);
-
-    // get bucket
-    // set bucket
-    // get each directory
-    // put each directory in stack
-    // if last target is a file, put a ref?
+    await loadBucket(bucketId);
+    await loadCurrentBucketPassword();
+    await loadRootDirectory();
+    await loadEntityStack(parts);
+    await loadCurrentDirectoryAndChildren();
   };
 
   // Watch parameter changes
@@ -116,37 +164,101 @@
 
     incrementActiveGlobalObtrusiveTaskCount();
     let response = await callDirectoryCreateApi({
-      bucketId: $currentBucket._id,
+      bucketId: currentBucket._id,
       name,
-      parentDirectoryId: (directory as any)._id,
+      parentDirectoryId: (currentDirectory as any)._id,
       metaData: {},
       encryptedMetaData: await encryptObject({}, currentBucketPassword),
     });
     if (await handleErrorIfAny(response)) return;
     decrementActiveGlobalObtrusiveTaskCount();
+
+    explorePath(currentPath);
   };
 
-  const directoryClicked = async (childDirectory) => {
+  const childDirectoryClicked = async (childDirectory) => {
     console.log("childDirectory", childDirectory);
-    let path = `${ROUTE_PREFIX}${$currentBucket._id}/${childDirectory._id}`;
+
+    let path = `${ROUTE_PREFIX}${currentBucket._id}`;
+    if (entityStack.length > 1) {
+      path +=
+        "/" +
+        entityStack
+          .slice(1)
+          .map((e) => e.directory._id)
+          .join("/");
+    }
+    path += `/${childDirectory._id}`;
     push(path);
+  };
+
+  const breadcrumbClicked = async (targetEntity) => {
+    let path = `${ROUTE_PREFIX}${currentBucket._id}`;
+    if (targetEntity) {
+      for (let i = 1; i < entityStack.length; i++) {
+        let entity = entityStack[i];
+        path += "/" + entity.directory._id;
+        if (targetEntity.directory._id === entity.directory._id) break;
+      }
+    }
+    push(path);
+  };
+
+  const goUpClicked = async () => {
+    if (entityStack.length > 2) {
+      breadcrumbClicked(entityStack[entityStack.length - 2]);
+    } else {
+      breadcrumbClicked(null);
+    }
   };
 </script>
 
-{#if $currentBucket}
-  <div>{$currentBucket.name}</div>
+{#if currentBucket}
+  <div class="breadcrumb-container">
+    <div
+      class="breadcrumb breadcrumb-bucket"
+      draggable="true"
+      on:click={() => breadcrumbClicked(null)}
+    >
+      {currentBucket.name}
+    </div>
+    {#each entityStack.slice(1) as entity, i}
+      <div class="breadcrumb-divider">&gt;</div>
+      <div
+        class="breadcrumb breadcrumb-directory"
+        draggable="true"
+        on:click={() => breadcrumbClicked(entity)}
+      >
+        {entity.directory.name}
+      </div>
+    {/each}
+  </div>
 
-  <Button on:click={createDirectoryClicked} variant="unelevated">
-    <Icon class="material-icons">create</Icon>
-    <Label>Create Directory</Label>
-  </Button>
+  <div class="control-row">
+    <IconButton
+      disabled={entityStack.length <= 2}
+      size="mini"
+      class="material-icons control-row-icon-button"
+      on:click={goUpClicked}
+      >arrow_upward
+    </IconButton>
 
+    <IconButton
+      size="mini"
+      class="material-icons control-row-icon-button"
+      on:click={createDirectoryClicked}
+      >create_new_folder
+    </IconButton>
+  </div>
   <h3>Directories</h3>
   {#if childDirectoryList.length === 0}
     No subdirectories found.
   {/if}
   {#each childDirectoryList as childDirectory, i}
-    <div class="directory" on:click={() => directoryClicked(childDirectory)}>
+    <div
+      class="directory"
+      on:click={() => childDirectoryClicked(childDirectory)}
+    >
       {childDirectory.name}
     </div>
   {/each}
@@ -163,5 +275,53 @@
 <style>
   .directory {
     margin: 16px;
+  }
+
+  .breadcrumb-container {
+    background-color: rgb(206, 206, 206);
+    font-size: 12px;
+    padding-left: 4px;
+  }
+
+  .breadcrumb-divider {
+    display: inline-block;
+    color: rgb(128, 128, 128);
+  }
+
+  .breadcrumb {
+    cursor: pointer;
+    display: inline-block;
+    margin: 8px 2px;
+    color: #0275d8;
+  }
+
+  .breadcrumb:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb:last-child {
+    color: rgb(126, 125, 125);
+    text-decoration: none;
+  }
+
+  .breadcrumb-bucket {
+    color: #0275d8;
+  }
+
+  .control-row {
+    margin-left: 4px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .control-row :global(.control-row-icon-button) {
+    background-color: #dfdfdf;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
+  .control-row :global(.control-row-icon-button:not([disabled])) {
+    color: #0275d8;
   }
 </style>
