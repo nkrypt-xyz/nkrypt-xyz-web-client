@@ -3,7 +3,7 @@
   import Button, { Label } from "@smui/button";
   import CircularProgress from "@smui/circular-progress";
 
-  import { alertDialog, alertDialogResponse } from "../store/ui.js";
+  import { alertDialog, alertDialogResponse } from "../../store/ui.js";
 
   let _alertDialog = null;
   alertDialog.subscribe((value) => {
