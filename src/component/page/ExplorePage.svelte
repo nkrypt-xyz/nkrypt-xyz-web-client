@@ -28,6 +28,8 @@
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
   import { encryptObject, encryptText } from "../../utility/crypto-utils.js";
   import Breadcrumbs from "./ExplorePage/Breadcrumbs.svelte";
+  import DirectorySection from "./ExplorePage/DirectorySection.svelte";
+  import FileSection from "./ExplorePage/FileSection.svelte";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -197,6 +199,12 @@
     push(path);
   };
 
+  const childFileClicked = async (childFile) => {
+    console.log("childFile", childFile);
+
+    alert("work in progress");
+  };
+
   const breadcrumbClicked = async (targetEntity) => {
     let path = `${ROUTE_PREFIX}${currentBucket._id}`;
     if (targetEntity) {
@@ -218,46 +226,32 @@
   };
 </script>
 
-{#if currentBucket}
-  <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />
+<div class="nk-page">
+  {#if currentBucket}
+    <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />
 
-  <div class="control-row">
-    <IconButton
-      disabled={entityStack.length <= 1}
-      size="mini"
-      class="material-icons control-row-icon-button"
-      on:click={goUpClicked}
-      >arrow_upward
-    </IconButton>
+    <div class="control-row">
+      <IconButton
+        disabled={entityStack.length <= 1}
+        size="mini"
+        class="material-icons control-row-icon-button"
+        on:click={goUpClicked}
+        >arrow_upward
+      </IconButton>
 
-    <IconButton
-      size="mini"
-      class="material-icons control-row-icon-button"
-      on:click={createDirectoryClicked}
-      >create_new_folder
-    </IconButton>
-  </div>
-  <h3>Directories</h3>
-  {#if childDirectoryList.length === 0}
-    No subdirectories found.
-  {/if}
-  {#each childDirectoryList as childDirectory, i}
-    <div
-      class="directory"
-      on:click={() => childDirectoryClicked(childDirectory)}
-    >
-      {childDirectory.name}
+      <IconButton
+        size="mini"
+        class="material-icons control-row-icon-button"
+        on:click={createDirectoryClicked}
+        >create_new_folder
+      </IconButton>
     </div>
-  {/each}
 
-  <h3>Files</h3>
-  {#if childFileList.length === 0}
-    No files found.
+    <DirectorySection {childDirectoryList} {childDirectoryClicked} />
+
+    <FileSection {childFileList} {childDirectoryClicked} />
   {/if}
-  {#each childFileList as childFile, i}
-    <div>{childFile.name}</div>
-  {/each}
-{/if}
+</div>
 
 <style>
   .directory {

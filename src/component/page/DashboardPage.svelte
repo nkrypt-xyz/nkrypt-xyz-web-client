@@ -7,12 +7,14 @@
   };
 </script>
 
-DASHBOARD <br />
+<div class="nk-page">
+  DASHBOARD <br />
 
-<Button on:click={clicked}>
-  <Icon class="material-icons">favorite</Icon>
-  <Label>Example Button</Label>
-</Button>
+  <Button on:click={clicked}>
+    <Icon class="material-icons">favorite</Icon>
+    <Label>Example Button</Label>
+  </Button>
+</div>
 
 <style>
 </style>

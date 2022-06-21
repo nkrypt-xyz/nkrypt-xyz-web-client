@@ -76,3 +76,13 @@ button:focus {
 .nk-top-bar.mdc-top-app-bar .mdc-top-app-bar__title {
   padding-left: 0;
 }
+
+.nk-page {
+  min-height: calc(100vh - 64px - 0px - 38px);
+}
+
+@media only screen and (max-width: 599px) {
+  .nk-page {
+    min-height: calc(100vh - 56px - 38px);
+  }
+}

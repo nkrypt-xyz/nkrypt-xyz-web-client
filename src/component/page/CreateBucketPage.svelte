@@ -69,7 +69,7 @@
   };
 </script>
 
-<div class="create-bucket-page">
+<div class="create-bucket-page nk-page">
   <h3>Create New Bucket</h3>
 
   <Card>
