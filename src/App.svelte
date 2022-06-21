@@ -27,60 +27,52 @@
   import LoginPage from "./page/LoginPage.svelte";
   import DashboardPage from "./page/DashboardPage.svelte";
   import CreateBucketPage from "./page/CreateBucketPage.svelte";
+  import ExplorePage from "./page/ExplorePage.svelte";
   // Components
   import ObtrusiveLoader from "./lib/ObtrusiveLoader.svelte";
   import AlertDialog from "./lib/AlertDialog.svelte";
+  import BucketPasswordDialog from "./lib/BucketPasswordDialog.svelte";
   import ConfirmationDialog from "./lib/ConfirmationDialog.svelte";
+  import PromptDialog from "./lib/PromptDialog.svelte";
   import Footer from "./lib/Footer.svelte";
   // Stores
   import { currentUser } from "./store/user.js";
   import { currentSession } from "./store/session.js";
   import { bucketList } from "./store/content.js";
+  import {
+    decrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount,
+  } from "./store/ui.js";
   // Integrations
   import { callBucketListApi } from "./integration/content-apis.js";
   import { callUserLogoutApi } from "./integration/user-apis.js";
   // Local Misc
   import { CommonConstant } from "./constant/common-constants.js";
   import { createDebouncedMethod } from "./utility/misc-utils.js";
-  import {
-    decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-  } from "./store/ui.js";
+  import { decryptText, encryptText } from "./utility/crypto-utils.js";
+  import { performUserLogout } from "./lib/session.js";
+  import { handleErrorIfAny } from "./lib/error-handling.js";
 
   let topAppBar: TopAppBarComponentDev;
 
   let isLeftDrawerOpen = false;
 
-  let active = "";
-
-  function setActive(value: string) {
-    active = value;
-  }
+  let currentlySelectedBucketId = "";
 
   const loadBucketList = createDebouncedMethod(async () => {
     incrementActiveGlobalObtrusiveTaskCount();
     let response = await callBucketListApi({});
-    // handle error
+    if (await handleErrorIfAny(response)) return;
     bucketList.set(response.bucketList);
     decrementActiveGlobalObtrusiveTaskCount();
   }, 100);
 
   const logoutClicked = async () => {
-    incrementActiveGlobalObtrusiveTaskCount();
-    let response = await callUserLogoutApi({
-      message: "Manually pressed logout button",
-    });
-    console.log(response);
-    currentUser.set(null);
-    currentSession.set(null);
-    replace("/");
-    decrementActiveGlobalObtrusiveTaskCount();
+    performUserLogout();
   };
 
   const conditionRequiresAuthentication = async (detail) => {
     if ((detail.userData as any).requiresAuthentication) {
-      console.log($currentUser);
-
       if (!$currentUser || !$currentSession) {
         detail.userData.isUserLoggedIn = false;
         return false;
@@ -105,6 +97,14 @@
     conditions: [conditionRequiresAuthentication],
   });
 
+  const exploreRoute = wrap({
+    component: ExplorePage,
+    userData: {
+      requiresAuthentication: true,
+    },
+    conditions: [conditionRequiresAuthentication],
+  });
+
   const loginRoute = wrap({
     component: LoginPage,
   });
@@ -114,6 +114,7 @@
     "/": dashboardRoute,
     "/login": loginRoute,
     "/bucket/create": createBucketRoute,
+    "/explore/*": exploreRoute,
   };
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
@@ -148,12 +149,20 @@
     push("/bucket/create");
     isLeftDrawerOpen = false;
   };
+
+  const bucketClicked = async (bucketId: string) => {
+    currentlySelectedBucketId = bucketId;
+    push(`/explore/${bucketId}`);
+    isLeftDrawerOpen = false;
+  };
 </script>
 
 <main>
   <ObtrusiveLoader />
   <ConfirmationDialog />
   <AlertDialog />
+  <BucketPasswordDialog />
+  <PromptDialog />
   {#if $currentSession || $currentUser}
     <Drawer variant="modal" bind:open={isLeftDrawerOpen}>
       <Header>
@@ -170,8 +179,8 @@
             {#each $bucketList as bucket, i}
               <Item
                 href="javascript:void(0)"
-                on:click={() => setActive(bucket._id)}
-                activated={active === bucket._id}
+                on:click={() => bucketClicked(bucket._id)}
+                activated={currentlySelectedBucketId === bucket._id}
               >
                 <Text>{bucket.name}</Text>
               </Item>

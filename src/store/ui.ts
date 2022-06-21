@@ -70,3 +70,20 @@ export let showBucketPasswordDialog = (bucketName) => {
     bucketPasswordDialog.set({ bucketName });
   });
 };
+
+export let promptDialog: Writable<{ title: string; message: string }> =
+  writable(null);
+
+export let promptDialogResponse: Writable<string> = writable(null);
+
+export let showPrompt = (title, message) => {
+  return new Promise<string>((accept) => {
+    promptDialogResponse.set(null);
+    let unsubscribe = promptDialogResponse.subscribe((value) => {
+      if (value === null) return;
+      accept(value);
+      unsubscribe();
+    });
+    promptDialog.set({ title, message });
+  });
+};
