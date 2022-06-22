@@ -13,7 +13,7 @@
   {/if}
   {#each childFileList as childFile, i}
     <div class="file" on:click={() => childFileClicked(childFile)}>
-      <Icon class="material-icons" size="button">draft</Icon>
+      <Icon class="material-icons">draft</Icon>
       <div class="title">
         {childFile.name}
       </div>

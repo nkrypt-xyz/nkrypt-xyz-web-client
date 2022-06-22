@@ -223,7 +223,7 @@
           <IconButton
             class="material-icons"
             on:click={() => (isLeftDrawerOpen = !isLeftDrawerOpen)}
-            tabindex="-1">menu</IconButton
+            >menu</IconButton
           >
           <Title>nkrypt.xyz</Title>
         </Section>
@@ -256,8 +256,5 @@
   .nk-left-bar-footer {
     position: fixed;
     bottom: 0px;
-  }
-
-  .create-bucket-container {
   }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
   // UI
-    import Textfield from "@smui/textfield";
+  import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
   // Extern
