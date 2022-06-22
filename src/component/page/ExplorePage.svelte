@@ -1,11 +1,7 @@
 <script lang="ts">
   import Button, { Label, Icon } from "@smui/button";
   import IconButton from "@smui/icon-button";
-  import {
-    activeBucket,
-    bucketList,
-    currentBucket,
-  } from "../../store/content.js";
+  import { activeBucket, bucketList } from "../../store/content.js";
   import { location, push } from "svelte-spa-router";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
@@ -53,7 +49,7 @@
     return;
   };
 
-  const loadBucket = async (bucketId): void => {
+  const loadBucket = async (bucketId): Promise<void> => {
     let bucket = $bucketList.find((bucket) => bucket._id == bucketId);
     if (!bucket) {
       handleInvalidParameter();
@@ -64,7 +60,7 @@
     activeBucket.set(currentBucket);
   };
 
-  const loadCurrentBucketPassword = async (): void => {
+  const loadCurrentBucketPassword = async (): Promise<void> => {
     let bucketPassword = await getOrCollectPasswordForBucket(currentBucket);
     if (!bucketPassword) {
       await showAlert(
@@ -90,7 +86,7 @@
     return response;
   };
 
-  const loadRootDirectory = async (): void => {
+  const loadRootDirectory = async (): Promise<void> => {
     let response = await getDirectory(currentBucket.rootDirectoryId);
     // TODO: handle edge case
     if (!response) return;
@@ -184,7 +180,7 @@
   };
 
   const childDirectoryClicked = async (childDirectory) => {
-    console.log("childDirectory", childDirectory);
+    console.debug("childDirectory", childDirectory);
 
     let path = `${ROUTE_PREFIX}${currentBucket._id}`;
     if (entityStack.length > 1) {
@@ -200,7 +196,7 @@
   };
 
   const childFileClicked = async (childFile) => {
-    console.log("childFile", childFile);
+    console.debug("childFile", childFile);
 
     alert("work in progress");
   };
@@ -249,15 +245,11 @@
 
     <DirectorySection {childDirectoryList} {childDirectoryClicked} />
 
-    <FileSection {childFileList} {childDirectoryClicked} />
+    <FileSection {childFileList} {childFileClicked} />
   {/if}
 </div>
 
 <style>
-  .directory {
-    margin: 16px;
-  }
-
   .control-row {
     margin-left: 4px;
     margin-top: 8px;

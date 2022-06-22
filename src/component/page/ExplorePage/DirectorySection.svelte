@@ -16,7 +16,7 @@
       class="directory"
       on:click={() => childDirectoryClicked(childDirectory)}
     >
-      <Icon class="material-icons" size="button">folder</Icon>
+      <Icon class="material-icons">folder</Icon>
       <div class="title">
         {childDirectory.name}
       </div>
