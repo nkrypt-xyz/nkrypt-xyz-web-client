@@ -51,3 +51,18 @@ export const callDirectoryCreateApi = async (data: {
     data
   );
 };
+
+export const callFileCreateApi = async (data: {
+  name: string;
+  bucketId: string;
+  parentDirectoryId: string;
+  metaData: Record<string, any>;
+  encryptedMetaData: string;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/file/create",
+    data
+  );
+};

@@ -57,6 +57,7 @@
   }
 
   .directory .title {
-    margin-top: 4px;
+    margin-top: 2px;
+    cursor: pointer;
   }
 </style>

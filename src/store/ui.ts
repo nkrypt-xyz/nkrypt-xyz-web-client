@@ -1,6 +1,8 @@
 import { Writable, writable } from "svelte/store";
 import type { User } from "src/model/common.js";
 
+// ---------------------------------------------- Global Obtrusive Task
+
 export let activeGlobalObtrusiveTaskCount = writable(0);
 let _activeGlobalObtrusiveTaskCount = 0;
 
@@ -18,6 +20,8 @@ export const decrementActiveGlobalObtrusiveTaskCount = () => {
   }, 100);
 };
 
+// ---------------------------------------------- Confirmation Dialog
+
 export let confirmationDialog: Writable<{ title: string; message: string }> =
   writable(null);
 
@@ -34,6 +38,8 @@ export let showConfirmation = (title, message) => {
     confirmationDialog.set({ title, message });
   });
 };
+
+// ---------------------------------------------- Alert Dialog
 
 export let alertDialog: Writable<{ title: string; message: string }> =
   writable(null);
@@ -53,6 +59,8 @@ export let showAlert = (title, message) => {
   });
 };
 
+// ---------------------------------------------- Bucket Password Dialog
+
 export let bucketPasswordDialog: Writable<{ bucketName: string }> =
   writable(null);
 
@@ -70,6 +78,8 @@ export let showBucketPasswordDialog = (bucketName) => {
     bucketPasswordDialog.set({ bucketName });
   });
 };
+
+// ---------------------------------------------- Prompt Dialog
 
 export let promptDialog: Writable<{ title: string; message: string }> =
   writable(null);
