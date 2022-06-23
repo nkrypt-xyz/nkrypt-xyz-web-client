@@ -13,7 +13,7 @@
   {/if}
   {#each childFileList as childFile, i}
     <div class="file" on:click={() => childFileClicked(childFile)}>
-      <Icon class="material-icons">draft</Icon>
+      <Icon class="material-icons">file_present</Icon>
       <div class="title">
         {childFile.name}
       </div>
@@ -54,6 +54,7 @@
   }
 
   .file .title {
-    margin-top: 4px;
+    margin-top: 2px;
+    cursor: pointer;
   }
 </style>

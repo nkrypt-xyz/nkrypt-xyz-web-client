@@ -1,0 +1,286 @@
+<script lang="ts">
+  // UI
+  import Textfield from "@smui/textfield";
+  import Icon from "@smui/textfield/icon";
+  import HelperText from "@smui/textfield/helper-text";
+  // Extern
+  import { form, field } from "svelte-forms";
+  import { required, min } from "svelte-forms/validators";
+  import { replace } from "svelte-spa-router";
+  // Intern
+  import { standardField } from "../../../lib/validations.js";
+  import { CommonConstant } from "../../../constant/common-constants.js";
+  import { callUserLoginApi } from "../../../integration/user-apis.js";
+  import { minlength } from "../../../lib/validators.js";
+  import { extract } from "../../../utility/misc-utils.js";
+  import { storedUser } from "../../../store/user.js";
+  import { storedSession } from "../../../store/session.js";
+  import {
+    decrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount,
+  } from "../../../store/ui.js";
+  import {
+    callBucketCreateApi,
+    callBucketListApi,
+    callFileCreateApi,
+  } from "../../../integration/content-apis.js";
+  import { encryptObject, encryptText } from "../../../utility/crypto-utils.js";
+  import { BUCKET_CRYPTO_SPEC } from "../../../lib/crypto.js";
+  import { bucketList } from "../../../store/content.js";
+
+  import Dialog, { Title, Content, Actions } from "@smui/dialog";
+  import Button, { Label } from "@smui/button";
+  import CircularProgress from "@smui/circular-progress";
+  import { expressBytesPrettified } from "../../../utility/value-utils.js";
+  import { handleErrorIfAny } from "../../../lib/error-handling.js";
+
+  enum FileUploadModalState {
+    IDLE,
+    FILE_SELECTION,
+    FILE_UPLOAD,
+  }
+
+  let state: FileUploadModalState = FileUploadModalState.IDLE;
+
+  let directory = null;
+  let childDirectoryList = [];
+  let childFileList = [];
+  let bucketPassword = null;
+
+  let acceptFn = null;
+  let rejectFn = null;
+
+  let wrapper;
+  let uploadCandidate = null;
+  let fileName = "";
+
+  let warningMessage = null;
+
+  export function showAndUploadFile(params: {
+    directory;
+    childDirectoryList;
+    childFileList;
+    bucketPassword;
+  }): Promise<string> {
+    return new Promise<string>((accept, reject) => {
+      ({ directory, childDirectoryList, childFileList, bucketPassword } =
+        params);
+      acceptFn = accept;
+      rejectFn = reject;
+
+      uploadCandidate = null;
+      fileName = "";
+
+      // start the show
+      state = FileUploadModalState.FILE_SELECTION;
+      warningMessage = null;
+    });
+  }
+
+  const selectFileToUploadClicked = () => {
+    wrapper.querySelector("#native-file-input").click();
+  };
+
+  const fileSelected = async (e) => {
+    uploadCandidate = e.target.files[0] || null;
+    fileName = "";
+    fileNameChanged();
+    if (uploadCandidate) {
+      console.log(uploadCandidate);
+      fileName = sanitizeFileName(uploadCandidate.name);
+      fileNameChanged();
+    }
+  };
+
+  const setAnswer = (answer) => {
+    state = FileUploadModalState.IDLE;
+    if (!answer) {
+      acceptFn(null);
+      return;
+    }
+  };
+
+  // TODO strip unsupported characters
+  const sanitizeFileName = (_fileName) => {
+    return _fileName;
+  };
+
+  const fileNameChanged = () => {
+    console.log("CHANGE", fileName);
+
+    warningMessage = null;
+    requiresOverwrite = false;
+
+    if (fileName.length === 0) {
+      allowUpload = false;
+      return;
+    }
+
+    // directories can not be overwritten
+    let matchingDirectory = childDirectoryList.find(
+      (directory) => directory.name === fileName
+    );
+    if (matchingDirectory) {
+      warningMessage = `A directory with the expected name "${fileName}" already exists.`;
+      allowUpload = false;
+      return;
+    }
+
+    // files can be overwritten
+    let matchingFile = childFileList.find((file) => file.name === fileName);
+    if (matchingFile) {
+      warningMessage = `A file with the expected name "${fileName}" already exists. 
+      Either rename your file or overwrite.`;
+      requiresOverwrite = true;
+    }
+    // console.log({matchingFile, chil})
+
+    allowUpload = true;
+  };
+
+  const startUploadClicked = async () => {
+    let fileId = null;
+    let { bucketId, _id: parentDirectoryId } = directory;
+
+    if (requiresOverwrite) {
+      let matchingFile = childFileList.find((file) => file.name === fileName);
+      fileId = matchingFile._id;
+    } else {
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callFileCreateApi({
+        bucketId,
+        name: fileName,
+        parentDirectoryId,
+        metaData: {},
+        encryptedMetaData: await encryptObject({}, bucketPassword),
+      });
+      if (response.hasError) {
+        setAnswer(null);
+        await handleErrorIfAny(response);
+        return;
+      }
+      decrementActiveGlobalObtrusiveTaskCount();
+      ({ fileId } = response);
+    }
+
+    console.log({ fileId });
+  };
+
+  let shouldShowDialog = false;
+  let allowCancel = false;
+  let allowUpload = false;
+  let requiresOverwrite = false;
+  $: {
+    shouldShowDialog = state !== FileUploadModalState.IDLE;
+    allowCancel = state !== FileUploadModalState.FILE_UPLOAD;
+  }
+</script>
+
+{#if shouldShowDialog}
+  <div bind:this={wrapper}>
+    <Dialog
+      bind:open={shouldShowDialog}
+      scrimClickAction=""
+      escapeKeyAction=""
+      aria-labelledby="mandatory-title"
+      aria-describedby="mandatory-content"
+    >
+      <Title id="mandatory-title">Upload file</Title>
+
+      <input
+        type="file"
+        id="native-file-input"
+        on:change={fileSelected}
+        style="display:none;"
+      />
+
+      <Content id="mandatory-content">
+        {#if uploadCandidate}
+          <div class="upload-summary">
+            <div>
+              <span class="title">Original Name: </span>
+              <span class="value">{uploadCandidate.name}</span>
+            </div>
+            <div>
+              <span class="title">Size before encryption: </span>
+              <span class="value"
+                >{expressBytesPrettified(uploadCandidate.size)}</span
+              >
+            </div>
+            <div>
+              <span class="title">Type: </span>
+              <span class="value">{uploadCandidate.type}</span>
+            </div>
+          </div>
+          <Textfield
+            style="width: 100%"
+            bind:value={fileName}
+            label="File name"
+            type="text"
+            required
+            on:input={fileNameChanged}
+          >
+            <!-- <Icon class="material-icons" slot="leadingIcon">attachment</Icon> -->
+            <HelperText slot="helper" persistent>
+              {warningMessage || ""}
+            </HelperText>
+          </Textfield>
+        {/if}
+
+        <!-- File selection buttons - start -->
+        {#if uploadCandidate}
+          <div style="margin-top: 8px;">
+            <Button
+              class="start-upload-button"
+              variant="raised"
+              on:click={() => startUploadClicked()}
+              disabled={!allowUpload}
+            >
+              <Label>{requiresOverwrite ? "Overwrite" : "Start Upload"}</Label>
+            </Button>
+            <Button
+              class="select-file-button"
+              variant="outlined"
+              on:click={() => selectFileToUploadClicked()}
+            >
+              <Label>Select again</Label>
+            </Button>
+          </div>
+        {:else}
+          <div>
+            <Button
+              class="select-file-button"
+              variant="raised"
+              on:click={() => selectFileToUploadClicked()}
+            >
+              <Label>Select a file</Label>
+            </Button>
+          </div>
+        {/if}
+        <!-- File selection buttons - end -->
+      </Content>
+      <Actions>
+        {#if allowCancel}
+          <Button
+            on:click={(e) => {
+              e.preventDefault();
+              setAnswer(false);
+            }}
+          >
+            <Label>Cancel</Label>
+          </Button>
+        {/if}
+      </Actions>
+    </Dialog>
+  </div>
+{/if}
+
+<style>
+  .upload-summary {
+    font-size: 12px;
+  }
+
+  .upload-summary .title {
+    font-weight: 600;
+  }
+</style>

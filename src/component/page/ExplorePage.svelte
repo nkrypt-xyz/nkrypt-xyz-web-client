@@ -26,6 +26,7 @@
   import Breadcrumbs from "./ExplorePage/Breadcrumbs.svelte";
   import DirectorySection from "./ExplorePage/DirectorySection.svelte";
   import FileSection from "./ExplorePage/FileSection.svelte";
+  import FileUploadModal from "./ExplorePage/FileUploadModal.svelte";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -220,8 +221,19 @@
       breadcrumbClicked(null);
     }
   };
+
+  let fileUploadModal;
+  const fileUploadClicked = async () => {
+    let directoryEntity = entityStack[entityStack.length - 1];
+    let res = await fileUploadModal.showAndUploadFile({
+      ...directoryEntity,
+      bucketPassword: currentBucketPassword,
+    });
+    console.log(res);
+  };
 </script>
 
+<FileUploadModal bind:this={fileUploadModal} />
 <div class="nk-page">
   {#if currentBucket}
     <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />
@@ -240,6 +252,13 @@
         class="material-icons control-row-icon-button"
         on:click={createDirectoryClicked}
         >create_new_folder
+      </IconButton>
+
+      <IconButton
+        size="mini"
+        class="material-icons control-row-icon-button"
+        on:click={fileUploadClicked}
+        >file_upload
       </IconButton>
     </div>
 
