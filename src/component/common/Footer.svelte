@@ -15,9 +15,11 @@
 
 <style>
   .copyright {
+    border-top: 1px solid rgb(228, 228, 228);
     text-align: center;
     font-size: 12px;
     color: rgb(155, 155, 155);
-    padding-bottom: 4px;
+    padding-bottom: 8px;
+    padding-top: 8px;
   }
 </style>
