@@ -225,11 +225,14 @@
   let fileUploadModal;
   const fileUploadClicked = async () => {
     let directoryEntity = entityStack[entityStack.length - 1];
-    let res = await fileUploadModal.showAndUploadFile({
+    let nullableResponse = await fileUploadModal.showAndUploadFile({
       ...directoryEntity,
       bucketPassword: currentBucketPassword,
     });
-    console.log(res);
+    console.log({ nullableResponse });
+    if (nullableResponse && !nullableResponse.hasError) {
+      explorePath(currentPath);
+    }
   };
 </script>
 

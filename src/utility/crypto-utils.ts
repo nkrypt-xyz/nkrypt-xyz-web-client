@@ -18,7 +18,12 @@ const convertSmallStringToBuffer = (packed: string) => {
   return buffer;
 };
 
-const createEncryptionKeyFromPassword = async (
+export const makeRandomIv = async () => {
+  let iv = window.crypto.getRandomValues(new Uint8Array(12));
+  return { iv };
+};
+
+export const createEncryptionKeyFromPassword = async (
   encryptionPassword: string,
   salt: Uint8Array
 ) => {

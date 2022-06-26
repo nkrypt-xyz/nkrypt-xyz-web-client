@@ -27,20 +27,21 @@
   import { encryptObject, encryptText } from "../../../utility/crypto-utils.js";
   import { BUCKET_CRYPTO_SPEC } from "../../../lib/crypto.js";
   import { bucketList } from "../../../store/content.js";
-
   import Dialog, { Title, Content, Actions } from "@smui/dialog";
   import Button, { Label } from "@smui/button";
   import CircularProgress from "@smui/circular-progress";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
   import { handleErrorIfAny } from "../../../lib/error-handling.js";
+  import { encryptAndUploadFile } from "../../../lib/crypto-stream.js";
+  import LinearProgress from "@smui/linear-progress";
 
-  enum FileUploadModalState {
-    IDLE,
-    FILE_SELECTION,
-    FILE_UPLOAD,
-  }
+  const FileUploadModalState = {
+    IDLE: "IDLE",
+    FILE_SELECTION: "FILE_SELECTION",
+    FILE_UPLOAD: "FILE_UPLOAD",
+  };
 
-  let state: FileUploadModalState = FileUploadModalState.IDLE;
+  let state = FileUploadModalState.IDLE;
 
   let directory = null;
   let childDirectoryList = [];
@@ -55,6 +56,7 @@
   let fileName = "";
 
   let warningMessage = null;
+  let uploadProgress = null;
 
   export function showAndUploadFile(params: {
     directory;
@@ -94,10 +96,8 @@
 
   const setAnswer = (answer) => {
     state = FileUploadModalState.IDLE;
-    if (!answer) {
-      acceptFn(null);
-      return;
-    }
+    acceptFn(answer || null);
+    return;
   };
 
   // TODO strip unsupported characters
@@ -133,9 +133,23 @@
       Either rename your file or overwrite.`;
       requiresOverwrite = true;
     }
-    // console.log({matchingFile, chil})
 
     allowUpload = true;
+  };
+
+  const updateProgressFn = (totalBytes, encryptedBytes, uploadedBytes) => {
+    console.debug(
+      `${encryptedBytes}/${totalBytes} = ${Math.round(
+        (encryptedBytes / totalBytes) * 100
+      )}%`
+    );
+    uploadProgress = {
+      totalBytes,
+      encryptedBytes,
+      uploadedBytes,
+      buffer: encryptedBytes / totalBytes || 0,
+      progress: uploadedBytes / totalBytes || 0,
+    };
   };
 
   const startUploadClicked = async () => {
@@ -163,7 +177,26 @@
       ({ fileId } = response);
     }
 
-    console.log({ fileId });
+    state = FileUploadModalState.FILE_UPLOAD;
+    uploadProgress = {
+      totalBytes: 0,
+      encryptedBytes: 0,
+    };
+    let response = await encryptAndUploadFile(
+      bucketId,
+      fileId,
+      uploadCandidate,
+      bucketPassword,
+      updateProgressFn
+    );
+    if (response.hasError) {
+      setAnswer(null);
+      await handleErrorIfAny(response);
+      return;
+    }
+
+    setAnswer(response);
+    return;
   };
 
   let shouldShowDialog = false;
@@ -185,7 +218,11 @@
       aria-labelledby="mandatory-title"
       aria-describedby="mandatory-content"
     >
-      <Title id="mandatory-title">Upload file</Title>
+      <Title id="mandatory-title"
+        >{state === FileUploadModalState.FILE_UPLOAD
+          ? "Uploading file"
+          : "Upload file"}
+      </Title>
 
       <input
         type="file"
@@ -212,52 +249,71 @@
               <span class="value">{uploadCandidate.type}</span>
             </div>
           </div>
-          <Textfield
-            style="width: 100%"
-            bind:value={fileName}
-            label="File name"
-            type="text"
-            required
-            on:input={fileNameChanged}
-          >
-            <!-- <Icon class="material-icons" slot="leadingIcon">attachment</Icon> -->
-            <HelperText slot="helper" persistent>
-              {warningMessage || ""}
-            </HelperText>
-          </Textfield>
         {/if}
 
-        <!-- File selection buttons - start -->
-        {#if uploadCandidate}
-          <div style="margin-top: 8px;">
-            <Button
-              class="start-upload-button"
-              variant="raised"
-              on:click={() => startUploadClicked()}
-              disabled={!allowUpload}
+        {#if state === FileUploadModalState.FILE_SELECTION}
+          {#if uploadCandidate}
+            <Textfield
+              style="width: 100%"
+              bind:value={fileName}
+              label="File name"
+              type="text"
+              required
+              on:input={fileNameChanged}
             >
-              <Label>{requiresOverwrite ? "Overwrite" : "Start Upload"}</Label>
-            </Button>
-            <Button
-              class="select-file-button"
-              variant="outlined"
-              on:click={() => selectFileToUploadClicked()}
-            >
-              <Label>Select again</Label>
-            </Button>
-          </div>
-        {:else}
-          <div>
-            <Button
-              class="select-file-button"
-              variant="raised"
-              on:click={() => selectFileToUploadClicked()}
-            >
-              <Label>Select a file</Label>
-            </Button>
-          </div>
+              <HelperText slot="helper" persistent>
+                {warningMessage || ""}
+              </HelperText>
+            </Textfield>
+          {/if}
         {/if}
-        <!-- File selection buttons - end -->
+
+        {#if state === FileUploadModalState.FILE_SELECTION}
+          <!-- File selection buttons - start -->
+          {#if uploadCandidate}
+            <div style="margin-top: 8px;">
+              <Button
+                class="start-upload-button"
+                variant="raised"
+                on:click={() => startUploadClicked()}
+                disabled={!allowUpload}
+              >
+                <Label>{requiresOverwrite ? "Overwrite" : "Start Upload"}</Label
+                >
+              </Button>
+              <Button
+                class="select-file-button"
+                variant="outlined"
+                on:click={() => selectFileToUploadClicked()}
+              >
+                <Label>Select again</Label>
+              </Button>
+            </div>
+          {:else}
+            <div>
+              <Button
+                class="select-file-button"
+                variant="raised"
+                on:click={() => selectFileToUploadClicked()}
+              >
+                <Label>Select a file</Label>
+              </Button>
+            </div>
+          {/if}
+          <!-- File selection buttons - end -->
+        {/if}
+
+        {#if state === FileUploadModalState.FILE_UPLOAD}
+          <!-- Upload - start -->
+          <div class="uploading-message">Encrypting and uploading file</div>
+          {#if uploadProgress}
+            <LinearProgress
+              progress={uploadProgress.progress}
+              buffer={uploadProgress.buffer}
+            />
+          {/if}
+          <!-- Upload - end -->
+        {/if}
       </Content>
       <Actions>
         {#if allowCancel}
@@ -282,5 +338,10 @@
 
   .upload-summary .title {
     font-weight: 600;
+  }
+
+  .uploading-message {
+    margin-top: 8px;
+    margin-bottom: 8px;
   }
 </style>
