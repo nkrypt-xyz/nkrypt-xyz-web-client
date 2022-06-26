@@ -78,11 +78,11 @@ button:focus {
 }
 
 .nk-page {
-  min-height: calc(100vh - 64px - 0px - 38px);
+  min-height: calc(100vh - 64px - 0px - 50px);
 }
 
 @media only screen and (max-width: 599px) {
   .nk-page {
-    min-height: calc(100vh - 56px - 38px);
+    min-height: calc(100vh - 56px - 50px);
   }
 }
