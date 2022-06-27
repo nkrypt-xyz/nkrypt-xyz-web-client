@@ -106,8 +106,6 @@
   };
 
   const fileNameChanged = () => {
-    console.log("CHANGE", fileName);
-
     warningMessage = null;
     requiresOverwrite = false;
 

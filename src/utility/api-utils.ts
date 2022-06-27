@@ -1,3 +1,5 @@
+import { convertStreamToBuffer } from "./stream-and-buffer-utils.js";
+
 const genericConnectionFailureMessage =
   "Failed to establish a connection with the server. Please make sure you have a working internet connection. If you believe, everything is in working order on your end, please contact server administrator.";
 
@@ -67,7 +69,7 @@ export const callPostStreamUploadApi = async (
   }
 
   // FIXME: Detect browser support for directly sending ReadableStream to fetch call
-  let buffer = await convertStreamToBufferForCompatibility(readableStream);
+  let buffer = await convertStreamToBuffer(readableStream);
 
   const options: any = {
     method: "POST",
@@ -95,34 +97,46 @@ export const callPostStreamUploadApi = async (
   return responseJson;
 };
 
-const convertStreamToBufferForCompatibility = async (
-  readableStream: ReadableStream
+export const callPostStreamDownloadApi = async (
+  serverBaseUrl: string,
+  authToken: string | null,
+  apiUrl: string
 ) => {
-  let arrayBufferList = [];
+  const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
-  let reader = readableStream.getReader();
-  while (true) {
-    let { done, value: chunk } = await reader.read();
-    await new Promise((accept) => setTimeout(accept, 40));
-    if (done) break;
-    arrayBufferList.push(chunk);
+  let headers = {
+    Accept: "application/octet-stream",
+    "Content-Type": "application/json",
+  };
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  let totalLength = 0;
-  arrayBufferList.forEach((arrayBuffer) => {
-    let view = new Uint8Array(arrayBuffer);
-    totalLength += view.length;
-  });
+  const options: any = {
+    method: "POST",
+    headers,
+    body: {},
+  };
 
-  let resultBuffer = new ArrayBuffer(totalLength);
-  let resultView = new Uint8Array(resultBuffer);
-
-  let startIndex = 0;
-  for (let arrayBuffer of arrayBufferList) {
-    const view = new Uint8Array(arrayBuffer);
-    resultView.set(view, length);
-    startIndex += view.length;
+  let responseJson = null;
+  let responseObject = null;
+  try {
+    responseObject = await fetch(url, options);
+    responseJson = {
+      hasError: false,
+      readableStream: responseObject.body,
+    };
+  } catch (ex) {
+    console.error(ex);
+    responseJson = {
+      hasError: true,
+      error: {
+        code: "SERVER_CONNECTION_FAILURE",
+        message: genericConnectionFailureMessage,
+        details: {},
+      },
+    };
   }
 
-  return resultBuffer;
+  return responseJson;
 };
