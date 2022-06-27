@@ -1,25 +1,11 @@
+import {
+  convertSmallBufferToString,
+  convertSmallStringToBuffer,
+  convertSmallUint8ArrayToString,
+} from "./buffer-utils.js";
+
 export const IV_LENGTH = 12;
 export const SALT_LENGTH = 16;
-
-const convertSmallBufferToString = (buffer: Buffer) => {
-  return window.btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)));
-};
-
-const convertSmallUint8ArrayToString = (array: Uint8Array) => {
-  return window.btoa(String.fromCharCode.apply(null, array));
-};
-
-const convertSmallStringToBuffer = (packed: string) => {
-  const string = window.atob(packed);
-  const buffer = new ArrayBuffer(string.length);
-  const bufferView = new Uint8Array(buffer);
-
-  for (let i = 0; i < string.length; i++) {
-    bufferView[i] = string.charCodeAt(i);
-  }
-
-  return buffer;
-};
 
 export const makeRandomIv = async () => {
   let iv = window.crypto.getRandomValues(new Uint8Array(IV_LENGTH));
