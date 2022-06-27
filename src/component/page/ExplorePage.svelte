@@ -27,6 +27,7 @@
   import DirectorySection from "./ExplorePage/DirectorySection.svelte";
   import FileSection from "./ExplorePage/FileSection.svelte";
   import FileUploadModal from "./ExplorePage/FileUploadModal.svelte";
+  import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -196,10 +197,16 @@
     push(path);
   };
 
+  let fileOperationModal;
   const childFileClicked = async (childFile) => {
     console.debug("childFile", childFile);
 
-    alert("work in progress");
+    let nullableResponse = await fileOperationModal.showModal({
+      file: childFile,
+      bucketPassword: currentBucketPassword,
+    });
+
+    console.log({ nullableResponse });
   };
 
   const breadcrumbClicked = async (targetEntity) => {
@@ -237,6 +244,7 @@
 </script>
 
 <FileUploadModal bind:this={fileUploadModal} />
+<FileOperationModal bind:this={fileOperationModal} />
 <div class="nk-page">
   {#if currentBucket}
     <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />

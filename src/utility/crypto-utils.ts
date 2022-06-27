@@ -1,3 +1,6 @@
+export const IV_LENGTH = 12;
+export const SALT_LENGTH = 16;
+
 const convertSmallBufferToString = (buffer: Buffer) => {
   return window.btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)));
 };
@@ -19,16 +22,25 @@ const convertSmallStringToBuffer = (packed: string) => {
 };
 
 export const makeRandomIv = async () => {
-  let iv = window.crypto.getRandomValues(new Uint8Array(12));
+  let iv = window.crypto.getRandomValues(new Uint8Array(IV_LENGTH));
   return { iv };
+};
+
+export const makeRandomSalt = async () => {
+  let salt = window.crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
+  return { salt };
 };
 
 export const createEncryptionKeyFromPassword = async (
   encryptionPassword: string,
   salt: Uint8Array
 ) => {
+  if (!encryptionPassword) {
+    throw new Error("encryptionPassword is required");
+  }
+
   if (!salt) {
-    salt = window.crypto.getRandomValues(new Uint8Array(16));
+    throw new Error("salt is required");
   }
 
   let encodedPassphrase = new TextEncoder().encode(encryptionPassword);
@@ -64,13 +76,11 @@ export const encryptText = async (text: string, encryptionPassword: string) => {
   let encodedData = encoder.encode(text);
 
   // get salt and key
-  let { salt, key } = await createEncryptionKeyFromPassword(
-    encryptionPassword,
-    null
-  );
+  let { salt } = await makeRandomSalt();
+  let { key } = await createEncryptionKeyFromPassword(encryptionPassword, salt);
 
   // generate random iv
-  let iv = window.crypto.getRandomValues(new Uint8Array(12));
+  let { iv } = await makeRandomIv();
 
   const cipher = await window.crypto.subtle.encrypt(
     {
@@ -135,4 +145,47 @@ export const decryptToObject = async (
   let encrypted = JSON.parse(encryptedText);
   let decrypted = await decryptText(encrypted, encryptionPassword);
   return JSON.parse(decrypted);
+};
+
+// for decrypting chunks of data
+export const encryptBuffer = async (
+  { iv, key },
+  buffer: ArrayBuffer
+): Promise<ArrayBuffer> => {
+  const encryptedBuffer = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+    },
+    key,
+    buffer
+  );
+  return encryptedBuffer;
+};
+
+// for decrypting chunks of data
+export const decryptBuffer = async (
+  { iv, key },
+  buffer: ArrayBuffer
+): Promise<ArrayBuffer> => {
+  console.log("decryptBuffer ATTEMPT");
+  try {
+    const decryptedBuffer = await window.crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      key,
+      buffer
+    );
+    console.log("decryptBuffer OK");
+    return decryptedBuffer;
+  } catch (ex) {
+    // @ts-ignore
+    console.log(ex instanceof DOMException);
+    // @ts-ignore
+    console.log(ex.code, ex.message, ex.name);
+    console.error(ex);
+    throw ex;
+  }
 };
