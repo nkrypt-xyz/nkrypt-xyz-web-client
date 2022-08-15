@@ -1,4 +1,4 @@
-import { callBlobReadApi, callBlobWriteApi } from "../integration/blob-apis.js";
+import { callBlobReadStreamApi, callBlobWriteStreamApi } from "../integration/blob-apis.js";
 import {
   createEncryptionKeyFromPassword,
   decryptBuffer,
@@ -120,7 +120,9 @@ export const encryptAndUploadFile = async (
     bucketPassword
   );
 
-  let response = await callBlobWriteApi(
+  let inputStream: ReadableStream = file.stream() as any;
+
+  let response = await callBlobWriteStreamApi(
     bucketId,
     fileId,
     file.size,
@@ -240,7 +242,7 @@ export const downloadAndDecryptFile = async (
   bucketPassword: string,
   progressNotifierFn: Function
 ) => {
-  let response = await callBlobReadApi(bucketId, fileId);
+  let response = await callBlobReadStreamApi(bucketId, fileId);
 
   if (response.hasError) {
     return response;
