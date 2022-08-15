@@ -1,3 +1,4 @@
+import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../lib/crypto.js";
 import { convertStreamToBuffer } from "./stream-and-buffer-utils.js";
 
 const genericConnectionFailureMessage =
@@ -105,7 +106,9 @@ export const callPostStreamDownloadApi = async (
   const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
   let headers = {
-    Accept: "application/octet-stream",
+    // Accept: "application/octet-stream",
+    Accept: "*",
+
     "Content-Type": "application/json",
   };
   if (authToken) {
@@ -125,6 +128,106 @@ export const callPostStreamDownloadApi = async (
     responseJson = {
       hasError: false,
       readableStream: responseObject.body,
+    };
+  } catch (ex) {
+    console.error(ex);
+    responseJson = {
+      hasError: true,
+      error: {
+        code: "SERVER_CONNECTION_FAILURE",
+        message: genericConnectionFailureMessage,
+        details: {},
+      },
+    };
+  }
+
+  return responseJson;
+};
+
+export const callPostArrayBufferUploadApi = async (
+  serverBaseUrl: string,
+  authToken: string | null,
+  apiUrl: string,
+  contentLength: number,
+  arrayBuffer: ArrayBuffer,
+  cryptoHeaderContent: string
+) => {
+  const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
+
+  console.log(apiUrl, arrayBuffer);
+
+  let headers = {
+    Accept: "application/json",
+    "Content-Type": "application/octet-stream",
+    // "Content-Length": String(contentLength),
+  };
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+    headers[BLOB_API_CRYPTO_META_HEADER_NAME] = cryptoHeaderContent;
+  }
+
+  const options: any = {
+    method: "POST",
+    headers,
+    body: arrayBuffer,
+  };
+
+  let responseJson = null;
+  let responseObject: Response = null;
+  try {
+    responseObject = await fetch(url, options);
+    responseJson = await responseObject.json();
+  } catch (ex) {
+    console.error(ex);
+    responseJson = {
+      hasError: true,
+      error: {
+        code: "SERVER_CONNECTION_FAILURE",
+        message: genericConnectionFailureMessage,
+        details: {},
+      },
+    };
+  }
+
+  return responseJson;
+};
+
+export const callPostArrayBufferDownloadApi = async (
+  serverBaseUrl: string,
+  authToken: string | null,
+  apiUrl: string
+) => {
+  const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
+
+  let headers = {
+    Accept: "*",
+    "Content-Type": "application/json",
+  };
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  const options: any = {
+    method: "POST",
+    headers,
+    body: {},
+  };
+
+  let responseJson = null;
+  let responseObject: Response = null;
+  try {
+    responseObject = await fetch(url, options);
+
+    let cryptoHeaderContent = responseObject.headers.get(
+      BLOB_API_CRYPTO_META_HEADER_NAME
+    );
+
+    let arrayBuffer = await responseObject.arrayBuffer();
+
+    responseJson = {
+      hasError: false,
+      arrayBuffer,
+      cryptoHeaderContent,
     };
   } catch (ex) {
     console.error(ex);
