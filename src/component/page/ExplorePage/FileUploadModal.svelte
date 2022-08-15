@@ -3,6 +3,8 @@
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
+  import Radio from "@smui/radio";
+  import FormField from "@smui/form-field";
   // Extern
   import { form, field } from "svelte-forms";
   import { required, min } from "svelte-forms/validators";
@@ -32,7 +34,7 @@
   import CircularProgress from "@smui/circular-progress";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
   import { handleErrorIfAny } from "../../../lib/error-handling.js";
-  import { encryptAndUploadFile } from "../../../lib/crypto-stream.js";
+  import { encryptAndUploadFile } from "../../../lib/crypto-transit.js";
   import LinearProgress from "@smui/linear-progress";
 
   const FileUploadModalState = {
@@ -57,6 +59,8 @@
 
   let warningMessage = null;
   let uploadProgress = null;
+
+  let selectedUploadMethod = "basic";
 
   export function showAndUploadFile(params: {
     directory;
@@ -185,7 +189,8 @@
       fileId,
       uploadCandidate,
       bucketPassword,
-      updateProgressFn
+      updateProgressFn,
+      selectedUploadMethod
     );
     if (response.hasError) {
       setAnswer(null);
@@ -299,6 +304,34 @@
             </div>
           {/if}
           <!-- File selection buttons - end -->
+        {/if}
+
+        {#if state === FileUploadModalState.FILE_SELECTION}
+          {#if uploadCandidate}
+            <h4>Upload method</h4>
+            <div class="upload-method">
+              <FormField>
+                <Radio
+                  bind:group={selectedUploadMethod}
+                  value={"basic"}
+                  touch
+                />
+                <span slot="label">Basic</span>
+              </FormField>
+              <FormField>
+                <Radio
+                  bind:group={selectedUploadMethod}
+                  value={"stream"}
+                  touch
+                />
+                <span slot="label">Streaming</span>
+              </FormField>
+              <FormField>
+                <Radio bind:group={selectedUploadMethod} value={"vfs"} touch />
+                <span slot="label">Virtual File System</span>
+              </FormField>
+            </div>
+          {/if}
         {/if}
 
         {#if state === FileUploadModalState.FILE_UPLOAD}

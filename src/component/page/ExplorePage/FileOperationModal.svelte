@@ -35,7 +35,7 @@
   import {
     downloadAndDecryptFile,
     encryptAndUploadFile,
-  } from "../../../lib/crypto-stream.js";
+  } from "../../../lib/crypto-transit.js";
   import LinearProgress from "@smui/linear-progress";
 
   const FileOperationModalState = {
@@ -98,7 +98,8 @@
       file._id,
       file.name,
       bucketPassword,
-      downloadProgressFn
+      downloadProgressFn,
+      "basic"
     );
     console.log({ response });
   };
