@@ -24,7 +24,6 @@
     callBucketListApi,
   } from "../../integration/content-apis.js";
   import { encryptText } from "../../utility/crypto-utils.js";
-  import { BUCKET_CRYPTO_SPEC } from "../../lib/crypto.js";
   import { bucketList } from "../../store/content.js";
 
   import Dialog, { Title, Content, Actions } from "@smui/dialog";

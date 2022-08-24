@@ -26,7 +26,7 @@
     callBucketListApi,
   } from "../../integration/content-apis.js";
   import { encryptText } from "../../utility/crypto-utils.js";
-  import { BUCKET_CRYPTO_SPEC } from "../../lib/crypto.js";
+  import { BUCKET_CRYPTO_SPEC } from "../../lib/crypto-specs.js";
   import { bucketList } from "../../store/content.js";
   import { handleErrorIfAny } from "../../lib/error-handling.js";
 

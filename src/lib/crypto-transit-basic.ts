@@ -12,10 +12,8 @@ import {
   encryptBuffer,
   makeRandomIv,
   makeRandomSalt,
-  IV_LENGTH,
-  SALT_LENGTH,
 } from "../utility/crypto-utils.js";
-import { BUCKET_CRYPTO_SPEC } from "./crypto.js";
+
 import {
   buildCryptoHeader,
   unbuildCryptoHeader,
