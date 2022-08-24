@@ -18,6 +18,7 @@
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
+    showAlert,
   } from "../../../store/ui.js";
   import {
     callBucketCreateApi,
@@ -31,12 +32,13 @@
   import Button, { Label } from "@smui/button";
   import CircularProgress from "@smui/circular-progress";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
-  import { handleErrorIfAny } from "../../../lib/error-handling.js";
+  import { CodedError, handleErrorIfAny } from "../../../lib/error-handling.js";
   import {
     downloadAndDecryptFile,
     encryptAndUploadFile,
   } from "../../../lib/crypto-transit.js";
   import LinearProgress from "@smui/linear-progress";
+  import { clientError } from "../../../constant/client-errors.js";
 
   const FileOperationModalState = {
     IDLE: "IDLE",
@@ -93,17 +95,29 @@
   };
 
   const startDownloadClicked = async () => {
-    let response = await downloadAndDecryptFile(
-      file.bucketId,
-      file._id,
-      file.name,
-      bucketPassword,
-      downloadProgressFn,
-      "basic"
-    );
-    console.log({ response });
+    try {
+      let response = await downloadAndDecryptFile(
+        file.bucketId,
+        file._id,
+        file.name,
+        bucketPassword,
+        downloadProgressFn,
+        "basic"
+      );
+      console.log({ response });
+    } catch (ex) {
+      if (
+        ex instanceof CodedError &&
+        ex.code === clientError.DECRYPTION_FAILED.code
+      ) {
+        shouldTemporarilyHideDialog = true;
+        await showAlert("Decryption failed", "Failed to decrypt the file. Most likely the file has been corrupted during transmission to or storage on the server.");
+        shouldTemporarilyHideDialog = false;
+      }
+    }
   };
 
+  let shouldTemporarilyHideDialog = false;
   let shouldShowDialog = false;
   let allowCancel = false;
   $: {
@@ -112,7 +126,7 @@
   }
 </script>
 
-{#if shouldShowDialog}
+{#if shouldShowDialog && !shouldTemporarilyHideDialog}
   <div bind:this={wrapper}>
     <Dialog
       bind:open={shouldShowDialog}
