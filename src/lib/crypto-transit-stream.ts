@@ -12,8 +12,15 @@ import {
   makeRandomSalt,
 } from "../utility/crypto-utils.js";
 
-import { convertStreamToBuffer } from "../utility/stream-and-buffer-utils.js";
-import { IV_LENGTH, SALT_LENGTH } from "./crypto-specs.js";
+import {
+  convertStreamToBuffer,
+  MeteredByteStreamReader,
+} from "../utility/stream-and-buffer-utils.js";
+import {
+  BLOB_CHUNK_SIZE_BYTES,
+  IV_LENGTH,
+  SALT_LENGTH,
+} from "./crypto-specs.js";
 
 const createCipherProperties = async (bucketPassword: string) => {
   let { iv } = await makeRandomIv();
@@ -28,19 +35,20 @@ const createEncryptedPseudoTransformStream = async (
   progressNotifierFn: Function,
   bucketPassword // delme
 ): Promise<ReadableStream<any>> => {
-  let { iv, key, salt } = cipherProps;
-
   const totalBytes = file.size;
   let bytesRead = 0;
   progressNotifierFn(totalBytes, bytesRead, 0);
 
   let inputStream: ReadableStream = file.stream() as any;
-  let inputStreamReader = inputStream.getReader();
+  // let inputStreamReader = inputStream.getReader();
+  let meteredBytedReader = new MeteredByteStreamReader(inputStream);
 
   // Note: We are not using transform streams due to a lack of browser support.
   return new ReadableStream({
     async pull(controller) {
-      const { value: chunk, done } = await inputStreamReader.read();
+      const { value: chunk, done } = await meteredBytedReader.readBytes(
+        BLOB_CHUNK_SIZE_BYTES
+      );
 
       if (done) {
         controller.close();
@@ -48,13 +56,12 @@ const createEncryptedPseudoTransformStream = async (
       }
 
       let chunkBuffer: ArrayBuffer = chunk.buffer;
-
-      let encryptedChunk = await encryptBuffer(cipherProps, chunkBuffer);
+      let encryptedChunkBuffer = await encryptBuffer(cipherProps, chunkBuffer);
 
       bytesRead += chunkBuffer.byteLength;
       progressNotifierFn(totalBytes, bytesRead, 0);
-      
-      controller.enqueue(encryptedChunk);
+
+      controller.enqueue(encryptedChunkBuffer);
     },
   });
 };

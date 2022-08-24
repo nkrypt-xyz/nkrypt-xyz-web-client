@@ -72,7 +72,7 @@ export const callPostStreamUploadApi = async (
 
   // FIXME: Detect browser support for directly sending ReadableStream to fetch call
   let buffer = await convertStreamToBuffer(readableStream);
-  console.log("Converted to <ArrayBuffer> as fallback", buffer)
+  console.warn("Converted to <ArrayBuffer> as fallback", buffer)
 
   const options: any = {
     method: "POST",

@@ -78,7 +78,9 @@
 
   const downloadProgressFn = (totalBytes, downloadedBytes, decryptedBytes) => {
     console.debug(
-      `${decryptedBytes}/${totalBytes} = ${Math.round(
+      `Download progress: Download = ${downloadedBytes}/${totalBytes} = ${Math.round(
+        (downloadedBytes / totalBytes) * 100
+      )}%, Decrypted = ${decryptedBytes}/${totalBytes} = ${Math.round(
         (decryptedBytes / totalBytes) * 100
       )}%`
     );
