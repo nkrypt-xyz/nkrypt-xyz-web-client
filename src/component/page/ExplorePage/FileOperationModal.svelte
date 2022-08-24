@@ -65,8 +65,6 @@
       acceptFn = accept;
       rejectFn = reject;
 
-      console.log({ file });
-
       // start the show
       state = FileOperationModalState.PROVIDE_OPTIONS;
       warningMessage = null;
@@ -104,14 +102,17 @@
         downloadProgressFn,
         "basic"
       );
-      console.log({ response });
+      console.debug("File download results:", response);
     } catch (ex) {
       if (
         ex instanceof CodedError &&
         ex.code === clientError.DECRYPTION_FAILED.code
       ) {
         shouldTemporarilyHideDialog = true;
-        await showAlert("Decryption failed", "Failed to decrypt the file. Most likely the file has been corrupted during transmission to or storage on the server.");
+        await showAlert(
+          "Decryption failed",
+          "Failed to decrypt the file. Most likely the file has been corrupted during transmission to or storage on the server."
+        );
         shouldTemporarilyHideDialog = false;
       }
     }

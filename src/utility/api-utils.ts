@@ -56,21 +56,23 @@ export const callPostStreamUploadApi = async (
   authToken: string | null,
   apiUrl: string,
   contentLength: number,
-  readableStream: ReadableStream
+  readableStream: ReadableStream,
+  cryptoHeaderContent: string
 ) => {
   const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
   let headers = {
     Accept: "application/json",
     "Content-Type": "application/octet-stream",
-    // "Content-Length": String(contentLength),
   };
   if (authToken) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
+  headers[BLOB_API_CRYPTO_META_HEADER_NAME] = cryptoHeaderContent;
 
   // FIXME: Detect browser support for directly sending ReadableStream to fetch call
   let buffer = await convertStreamToBuffer(readableStream);
+  console.log("Converted to <ArrayBuffer> as fallback", buffer)
 
   const options: any = {
     method: "POST",
@@ -154,17 +156,16 @@ export const callPostArrayBufferUploadApi = async (
 ) => {
   const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
-  console.log(apiUrl, arrayBuffer);
+  console.debug("Basic upload. Encrypted <ArrayBuffer>:", arrayBuffer);
 
   let headers = {
     Accept: "application/json",
     "Content-Type": "application/octet-stream",
-    // "Content-Length": String(contentLength),
   };
   if (authToken) {
     headers["Authorization"] = `Bearer ${authToken}`;
-    headers[BLOB_API_CRYPTO_META_HEADER_NAME] = cryptoHeaderContent;
   }
+  headers[BLOB_API_CRYPTO_META_HEADER_NAME] = cryptoHeaderContent;
 
   const options: any = {
     method: "POST",

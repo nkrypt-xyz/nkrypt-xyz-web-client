@@ -136,11 +136,11 @@
     }
   };
 
-  const explorePath = async (explorePath: string) => {
-    console.log(`explorePath()`, explorePath);
-    currentPath = explorePath;
+  const explorePath = async (pathToExplore: string) => {
+    console.debug(`explorePath(${pathToExplore})`);
+    currentPath = pathToExplore;
 
-    let parts = explorePath.split("/").filter((part) => part.length > 0);
+    let parts = pathToExplore.split("/").filter((part) => part.length > 0);
     let bucketId = parts.shift();
 
     await loadBucket(bucketId);
@@ -182,7 +182,7 @@
   };
 
   const childDirectoryClicked = async (childDirectory) => {
-    console.debug("childDirectory", childDirectory);
+    console.debug("Tapped sub-directory:", childDirectory);
 
     let path = `${ROUTE_PREFIX}${currentBucket._id}`;
     if (entityStack.length > 1) {
@@ -199,14 +199,14 @@
 
   let fileOperationModal;
   const childFileClicked = async (childFile) => {
-    console.debug("childFile", childFile);
+    console.debug("Tapped file:", childFile);
 
     let nullableResponse = await fileOperationModal.showModal({
       file: childFile,
       bucketPassword: currentBucketPassword,
     });
 
-    console.log({ nullableResponse });
+    console.debug("File operation modal closed with response:", nullableResponse);
   };
 
   const breadcrumbClicked = async (targetEntity) => {
@@ -236,7 +236,7 @@
       ...directoryEntity,
       bucketPassword: currentBucketPassword,
     });
-    console.log({ nullableResponse });
+    console.debug("File upload results:", nullableResponse);
     if (nullableResponse && !nullableResponse.hasError) {
       explorePath(currentPath);
     }

@@ -1,4 +1,9 @@
-import { callBlobReadStreamApi, callBlobWriteStreamApi } from "../integration/blob-apis.js";
+import { convertSmallUint8ArrayToString } from "../utility/buffer-utils.js";
+import { buildCryptoHeader } from "../utility/crypto-api-utils.js";
+import {
+  callBlobReadStreamApi,
+  callBlobWriteStreamApi,
+} from "../integration/blob-apis.js";
 import {
   createEncryptionKeyFromPassword,
   decryptBuffer,
@@ -33,8 +38,6 @@ const createEncryptedPseudoTransformStream = async (
   let inputStream: ReadableStream = file.stream() as any;
   let inputStreamReader = inputStream.getReader();
 
-  let hasIvAndSaltBeenSent = false;
-
   // Note: We are not using transform streams due to a lack of browser support.
   return new ReadableStream({
     async pull(controller) {
@@ -45,60 +48,13 @@ const createEncryptedPseudoTransformStream = async (
         return;
       }
 
-      let encryptedChunk = await encryptBuffer(cipherProps, chunk);
+      let chunkBuffer: ArrayBuffer = chunk.buffer;
 
-      bytesRead += chunk.length;
+      let encryptedChunk = await encryptBuffer(cipherProps, chunkBuffer);
+
+      bytesRead += chunkBuffer.byteLength;
       progressNotifierFn(totalBytes, bytesRead, 0);
-
-      if (!hasIvAndSaltBeenSent) {
-        console.log("FIRST UP iv", iv);
-        console.log("FIRST UP salt", salt);
-        console.log("FIRST UP encryptedChunk", encryptedChunk);
-
-        hasIvAndSaltBeenSent = true;
-
-        let oldChunkView = new Uint8Array(encryptedChunk);
-
-        let newChunk = new ArrayBuffer(
-          IV_LENGTH + SALT_LENGTH + oldChunkView.length
-        );
-        let newChunkView = new Uint8Array(newChunk);
-        newChunkView.set(iv, 0);
-        newChunkView.set(salt, IV_LENGTH);
-        newChunkView.set(oldChunkView, IV_LENGTH + SALT_LENGTH);
-
-        encryptedChunk = newChunk;
-
-        console.log("FIRST UP COMBINED encryptedChunk", encryptedChunk);
-
-        {
-          let encryptedChunkView = new Uint8Array(encryptedChunk);
-          let originalLength = encryptedChunkView.length;
-
-          let iv = encryptedChunkView.slice(0, IV_LENGTH);
-          let salt = encryptedChunkView.slice(
-            IV_LENGTH,
-            IV_LENGTH + SALT_LENGTH
-          );
-          let chunkView = encryptedChunkView.slice(
-            IV_LENGTH + SALT_LENGTH,
-            originalLength
-          );
-          let chunk = chunkView.buffer;
-          let { key } = await createEncryptionKeyFromPassword(
-            bucketPassword,
-            salt
-          );
-
-          console.log("TEST iv", iv);
-          console.log("TEST salt", salt);
-          console.log("TEST REDUCED encryptedChunk", chunk);
-
-          let decryptedChunk = await decryptBuffer({ iv, key }, chunk);
-
-          console.log("DECRYPTED CHUNK", decryptedChunk);
-        }
-      }
+      
       controller.enqueue(encryptedChunk);
     },
   });
@@ -120,14 +76,21 @@ export const encryptAndUploadFile = async (
     bucketPassword
   );
 
+  let iv = convertSmallUint8ArrayToString(cipherProps.iv);
+  let salt = convertSmallUint8ArrayToString(cipherProps.salt);
+  let cryptoHeader = buildCryptoHeader(iv, salt);
+
   let inputStream: ReadableStream = file.stream() as any;
 
   let response = await callBlobWriteStreamApi(
     bucketId,
     fileId,
     file.size,
-    encryptedDataStream
+    encryptedDataStream,
+    cryptoHeader
   );
+
+  progressNotifierFn(file.size, file.size, file.size);
 
   return response;
 };
