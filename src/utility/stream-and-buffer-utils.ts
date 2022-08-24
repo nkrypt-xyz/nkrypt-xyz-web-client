@@ -21,7 +21,7 @@ export const convertStreamToBuffer = async (readableStream: ReadableStream) => {
   let startIndex = 0;
   for (let arrayBuffer of arrayBufferList) {
     const view = new Uint8Array(arrayBuffer);
-    resultView.set(view, length);
+    resultView.set(view, startIndex);
     startIndex += view.length;
   }
 

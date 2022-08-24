@@ -92,7 +92,7 @@
     fileName = "";
     fileNameChanged();
     if (uploadCandidate) {
-      console.log(uploadCandidate);
+      console.debug("<File> selected for uploading:", uploadCandidate);
       fileName = sanitizeFileName(uploadCandidate.name);
       fileNameChanged();
     }
@@ -141,8 +141,10 @@
 
   const updateProgressFn = (totalBytes, encryptedBytes, uploadedBytes) => {
     console.debug(
-      `${encryptedBytes}/${totalBytes} = ${Math.round(
+      `Upload progress: Encrypted = ${encryptedBytes}/${totalBytes} = ${Math.round(
         (encryptedBytes / totalBytes) * 100
+      )}%, Uploaded = ${uploadedBytes}/${totalBytes} = ${Math.round(
+        (uploadedBytes / totalBytes) * 100
       )}%`
     );
     uploadProgress = {

@@ -1,4 +1,7 @@
-import { convertSmallUint8ArrayToString, convertSmallStringToBuffer } from "../utility/buffer-utils.js";
+import {
+  convertSmallUint8ArrayToString,
+  convertSmallStringToBuffer,
+} from "../utility/buffer-utils.js";
 import {
   callBlobReadBasicApi,
   callBlobWriteBasicApi,
@@ -13,23 +16,22 @@ import {
   SALT_LENGTH,
 } from "../utility/crypto-utils.js";
 import { BUCKET_CRYPTO_SPEC } from "./crypto.js";
+import {
+  buildCryptoHeader,
+  unbuildCryptoHeader,
+} from "../utility/crypto-api-utils.js";
+import { clientError } from "../constant/client-errors.js";
+import {
+  CodedError,
+  raiseCaughtClientError,
+  raiseClientError,
+} from "./error-handling.js";
 
 const createCipherProperties = async (bucketPassword: string) => {
   let { iv } = await makeRandomIv();
   let { salt } = await makeRandomSalt();
   let { key } = await createEncryptionKeyFromPassword(bucketPassword, salt);
   return { iv, key, salt };
-};
-
-const buildCryptoHeader = (iv, salt) => {
-  return `${BUCKET_CRYPTO_SPEC}|${iv}|${salt}`;
-};
-
-const unbuildCryptoHeader = (cryptoHeader) => {
-  let [_, iv, salt] = cryptoHeader.split('|');
-  iv = convertSmallStringToBuffer(iv);
-  salt = convertSmallStringToBuffer(salt);
-  return [iv, salt];
 };
 
 export const encryptAndUploadFile = async (
@@ -85,17 +87,23 @@ export const downloadAndDecryptFile = async (
   progressNotifierFn: Function
 ) => {
   let response = await callBlobReadBasicApi(bucketId, fileId);
-  let {cryptoHeaderContent, arrayBuffer} = response;
+  let { cryptoHeaderContent, arrayBuffer } = response;
 
   let [iv, salt] = unbuildCryptoHeader(cryptoHeaderContent);
-  let { key } = await createEncryptionKeyFromPassword(
-    bucketPassword,
-    salt
-  );
+  let { key } = await createEncryptionKeyFromPassword(bucketPassword, salt);
 
-  let decryptedArrayBuffer = await decryptBuffer({ iv, key }, arrayBuffer);
+  let decryptedArrayBuffer;
+  try {
+    decryptedArrayBuffer = await decryptBuffer({ iv, key }, arrayBuffer);
+  } catch (ex) {
+    throw raiseCaughtClientError(ex, clientError.DECRYPTION_FAILED);
+  }
 
-  initiateFileDownload(decryptedArrayBuffer, fileNameForDownloading);
+  try {
+    initiateFileDownload(decryptedArrayBuffer, fileNameForDownloading);
+  } catch (ex) {
+    throw raiseCaughtClientError(ex, clientError.DOWNLOAD_FAILED);
+  }
 
-  return null;
+  return true;
 };

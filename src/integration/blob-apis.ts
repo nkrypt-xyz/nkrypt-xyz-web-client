@@ -14,14 +14,16 @@ export const callBlobWriteStreamApi = async (
   bucketId,
   fileId,
   contentLength: number,
-  data: ReadableStream
+  data: ReadableStream,
+  cryptoHeaderContent: string
 ) => {
   return await callPostStreamUploadApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,
     `/api/blob/write/${bucketId}/${fileId}`,
     contentLength,
-    data
+    data,
+    cryptoHeaderContent
   );
 };
 
