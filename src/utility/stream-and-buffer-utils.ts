@@ -81,3 +81,92 @@ export const areBuffersEqual2 = (buf1, buf2) => {
 
   return equal(buf1, buf2);
 };
+
+export class MeteredByteStreamReader {
+  private readableStream: ReadableStream;
+  private reader: ReadableStreamDefaultReader;
+
+  private remainingChunkOffset: number = 0;
+  private remainingChunk: Uint8Array = null;
+
+  constructor(readableStream: ReadableStream) {
+    this.readableStream = readableStream;
+    this.reader = this.readableStream.getReader();
+  }
+
+  async readBytes(
+    byteCount: number
+  ): Promise<{ value: Uint8Array; done: Boolean }> {
+    let returnBytes = new Uint8Array(byteCount);
+    let startingOffset = 0;
+    let isDone = false;
+
+    if (
+      this.remainingChunk &&
+      this.remainingChunk.length === this.remainingChunkOffset
+    ) {
+      this.remainingChunk = null;
+      this.remainingChunkOffset = 0;
+    }
+
+    // use up any unused ramining chunk
+    if (
+      this.remainingChunk &&
+      this.remainingChunk.length > this.remainingChunkOffset
+    ) {
+      let byteCountToCopy = Math.min(
+        byteCount,
+        this.remainingChunk.length - this.remainingChunkOffset
+      );
+
+      let sourceArray = this.remainingChunk.slice(
+        this.remainingChunkOffset,
+        this.remainingChunkOffset + byteCountToCopy
+      );
+
+      returnBytes.set(sourceArray, startingOffset);
+      startingOffset += byteCountToCopy;
+      this.remainingChunkOffset += byteCountToCopy;
+    }
+
+    // fetch enough data or end the process
+    while (true) {
+      if (startingOffset === byteCount) break;
+
+      const { value: chunk, done }: { value?: Uint8Array; done: Boolean } =
+        await this.reader.read();
+
+      if (done) {
+        isDone = true;
+        break;
+      }
+
+      if (!chunk || chunk.length === 0) {
+        continue;
+      }
+
+      let byteCountToCopy = Math.min(byteCount - startingOffset, chunk.length);
+
+      let sourceArray = chunk.slice(0, byteCountToCopy);
+      returnBytes.set(sourceArray, startingOffset);
+      startingOffset += byteCountToCopy;
+
+      if (chunk.length > byteCountToCopy) {
+        this.remainingChunk = chunk;
+        this.remainingChunkOffset = byteCountToCopy;
+      }
+    }
+
+    // if there are not enough bytes to send, send a reduced array intead
+    if (startingOffset < byteCount) {
+      returnBytes = returnBytes.slice(0, startingOffset);
+    }
+
+    // Ensure that any remaining chunk is flushed before sending the done signal.
+    if (startingOffset > 0) {
+      isDone = false;
+    }
+
+    return { value: returnBytes, done: isDone };
+  }
+}

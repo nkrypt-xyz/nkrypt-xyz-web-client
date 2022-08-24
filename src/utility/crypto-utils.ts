@@ -1,6 +1,6 @@
 import {
   ENCRYPTION_ALGORITHM,
-  ENCRYPTION_TAGLENGTH,
+  ENCRYPTION_TAGLENGTH_IN_BITS,
   IV_LENGTH,
   PASSPHRASE_DERIVEKEY_ALGORITHM,
   PASSPHRASE_DERIVEKEY_GENERATED_KEYLENGTH,
@@ -83,7 +83,7 @@ export const encryptText = async (text: string, encryptionPassword: string) => {
     {
       name: ENCRYPTION_ALGORITHM,
       iv: iv,
-      tagLength: ENCRYPTION_TAGLENGTH,
+      tagLength: ENCRYPTION_TAGLENGTH_IN_BITS,
     },
     key,
     encodedData
@@ -114,7 +114,7 @@ export const decryptText = async (
     {
       name: ENCRYPTION_ALGORITHM,
       iv: iv,
-      tagLength: ENCRYPTION_TAGLENGTH,
+      tagLength: ENCRYPTION_TAGLENGTH_IN_BITS,
     },
     key,
     cipher
@@ -155,7 +155,7 @@ export const encryptBuffer = async (
     {
       name: ENCRYPTION_ALGORITHM,
       iv: iv,
-      tagLength: ENCRYPTION_TAGLENGTH,
+      tagLength: ENCRYPTION_TAGLENGTH_IN_BITS,
     },
     key,
     buffer
@@ -173,14 +173,14 @@ export const decryptBuffer = async (
       {
         name: ENCRYPTION_ALGORITHM,
         iv: iv,
-        tagLength: ENCRYPTION_TAGLENGTH,
+        tagLength: ENCRYPTION_TAGLENGTH_IN_BITS,
       },
       key,
       buffer
     );
     return decryptedBuffer;
   } catch (ex) {
-    console.log(
+    console.warn(
       "Caught and rethrown decryption error (details):",
       ex instanceof DOMException,
       ex.code,
