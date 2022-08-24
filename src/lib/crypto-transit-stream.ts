@@ -10,11 +10,10 @@ import {
   encryptBuffer,
   makeRandomIv,
   makeRandomSalt,
-  IV_LENGTH,
-  SALT_LENGTH,
 } from "../utility/crypto-utils.js";
 
 import { convertStreamToBuffer } from "../utility/stream-and-buffer-utils.js";
+import { IV_LENGTH, SALT_LENGTH } from "./crypto-specs.js";
 
 const createCipherProperties = async (bucketPassword: string) => {
   let { iv } = await makeRandomIv();

@@ -1,11 +1,19 @@
 import {
+  ENCRYPTION_ALGORITHM,
+  ENCRYPTION_TAGLENGTH,
+  IV_LENGTH,
+  PASSPHRASE_DERIVEKEY_ALGORITHM,
+  PASSPHRASE_DERIVEKEY_GENERATED_KEYLENGTH,
+  PASSPHRASE_DERIVEKEY_HASH_ALGORITHM,
+  PASSPHRASE_DERIVEKEY_ITERATIONS,
+  PASSPHRASE_IMPORTKEY_ALGORITHM,
+  SALT_LENGTH,
+} from "../lib/crypto-specs.js";
+import {
   convertSmallBufferToString,
   convertSmallStringToBuffer,
   convertSmallUint8ArrayToString,
 } from "./buffer-utils.js";
-
-export const IV_LENGTH = 12;
-export const SALT_LENGTH = 16;
 
 export const makeRandomIv = async () => {
   let iv = window.crypto.getRandomValues(new Uint8Array(IV_LENGTH));
@@ -34,20 +42,23 @@ export const createEncryptionKeyFromPassword = async (
   let keyMaterial = await window.crypto.subtle.importKey(
     "raw",
     encodedPassphrase,
-    "PBKDF2",
+    PASSPHRASE_IMPORTKEY_ALGORITHM,
     false,
     ["deriveBits", "deriveKey"]
   );
 
   let key = await window.crypto.subtle.deriveKey(
     {
-      name: "PBKDF2",
+      name: PASSPHRASE_DERIVEKEY_ALGORITHM,
       salt,
-      iterations: 100000,
-      hash: "SHA-256",
+      iterations: PASSPHRASE_DERIVEKEY_ITERATIONS,
+      hash: PASSPHRASE_DERIVEKEY_HASH_ALGORITHM,
     },
     keyMaterial,
-    { name: "AES-GCM", length: 256 },
+    {
+      name: ENCRYPTION_ALGORITHM,
+      length: PASSPHRASE_DERIVEKEY_GENERATED_KEYLENGTH,
+    },
     true,
     ["encrypt", "decrypt"]
   );
@@ -70,8 +81,9 @@ export const encryptText = async (text: string, encryptionPassword: string) => {
 
   const cipher = await window.crypto.subtle.encrypt(
     {
-      name: "AES-GCM",
+      name: ENCRYPTION_ALGORITHM,
       iv: iv,
+      tagLength: ENCRYPTION_TAGLENGTH,
     },
     key,
     encodedData
@@ -100,8 +112,9 @@ export const decryptText = async (
 
   const encodedData = await window.crypto.subtle.decrypt(
     {
-      name: "AES-GCM",
+      name: ENCRYPTION_ALGORITHM,
       iv: iv,
+      tagLength: ENCRYPTION_TAGLENGTH,
     },
     key,
     cipher
@@ -133,15 +146,16 @@ export const decryptToObject = async (
   return JSON.parse(decrypted);
 };
 
-// for decrypting chunks of data
+// for encrypting chunks of data
 export const encryptBuffer = async (
   { iv, key },
   buffer: ArrayBuffer
 ): Promise<ArrayBuffer> => {
   const encryptedBuffer = await window.crypto.subtle.encrypt(
     {
-      name: "AES-GCM",
+      name: ENCRYPTION_ALGORITHM,
       iv: iv,
+      tagLength: ENCRYPTION_TAGLENGTH,
     },
     key,
     buffer
@@ -154,23 +168,27 @@ export const decryptBuffer = async (
   { iv, key },
   buffer: ArrayBuffer
 ): Promise<ArrayBuffer> => {
-  console.log("decryptBuffer ATTEMPT");
   try {
     const decryptedBuffer = await window.crypto.subtle.decrypt(
       {
-        name: "AES-GCM",
+        name: ENCRYPTION_ALGORITHM,
         iv: iv,
+        tagLength: ENCRYPTION_TAGLENGTH,
       },
       key,
       buffer
     );
-    console.log("decryptBuffer OK");
     return decryptedBuffer;
   } catch (ex) {
-    // @ts-ignore
-    console.log(ex instanceof DOMException);
-    // @ts-ignore
-    console.log(ex.code, ex.message, ex.name);
+    console.log(
+      "Caught and rethrown decryption error (details):",
+      ex instanceof DOMException,
+      ex.code,
+      ex.message,
+      ex.name,
+      ex.stack
+    );
+    console.error("Caught and rethrown decryption error:", ex);
     console.error(ex);
     throw ex;
   }

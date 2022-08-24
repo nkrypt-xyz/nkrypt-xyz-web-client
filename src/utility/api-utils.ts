@@ -1,4 +1,4 @@
-import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../lib/crypto.js";
+import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../lib/crypto-specs.js";
 import { convertStreamToBuffer } from "./stream-and-buffer-utils.js";
 
 const genericConnectionFailureMessage =
