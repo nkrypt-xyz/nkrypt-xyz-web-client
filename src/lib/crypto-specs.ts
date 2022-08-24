@@ -25,7 +25,7 @@ export const PASSPHRASE_DERIVEKEY_GENERATED_KEYLENGTH = 256;
 export const ENCRYPTION_ALGORITHM = "AES-GCM";
 export const ENCRYPTION_TAGLENGTH_IN_BITS = 128;
 
-export const BLOB_CHUNK_SIZE_BYTES = 1024 * 1024; // 1mib
+export const BLOB_CHUNK_SIZE_BYTES = 1024 * 1024 - 128 / 8; // 1048560 bytes. Thus after encryption we neatly get exactly 1mb chunks.
 
 // export const BLOB_CHUNK_SIZE_BYTES = 32 * 1024; // 32kb
 
