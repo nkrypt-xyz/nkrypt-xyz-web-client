@@ -94,6 +94,7 @@
   };
 
   const startDownloadClicked = async () => {
+    state = FileOperationModalState.FILE_DOWNLOAD;
     try {
       let response = await downloadAndDecryptFile(
         file.bucketId,
@@ -117,6 +118,7 @@
         shouldTemporarilyHideDialog = false;
       }
     }
+    state = FileOperationModalState.PROVIDE_OPTIONS;
   };
 
   let shouldTemporarilyHideDialog = false;
@@ -160,13 +162,29 @@
             </div>
           </div>
 
-          <Button
-            class="start-download-button"
-            variant="raised"
-            on:click={() => startDownloadClicked()}
-          >
-            <Label>Decrypt and download</Label>
-          </Button>
+          {#if state === FileOperationModalState.PROVIDE_OPTIONS}
+            <Button
+              class="start-download-button"
+              variant="raised"
+              on:click={() => startDownloadClicked()}
+            >
+              <Label>Decrypt and download</Label>
+            </Button>
+          {/if}
+
+          {#if state === FileOperationModalState.FILE_DOWNLOAD}
+            <!-- Download - start -->
+            <div class="downloading-message">
+              Downloading and decrypting file
+            </div>
+            {#if downloadProgress}
+              <LinearProgress
+                progress={downloadProgress.progress}
+                buffer={downloadProgress.buffer}
+              />
+            {/if}
+            <!-- Download - end -->
+          {/if}
         {/if}
       </Content>
       <Actions>
@@ -195,7 +213,7 @@
     font-weight: 600;
   }
 
-  .download-message {
+  .downloading-message {
     margin-top: 8px;
     margin-bottom: 8px;
   }
