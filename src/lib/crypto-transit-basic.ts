@@ -217,7 +217,11 @@ export const downloadAndDecryptFile = async (
   bucketPassword: string,
   progressNotifierFn: Function
 ) => {
-  let response = await callBlobReadBasicApi(bucketId, fileId);
+  let response = await callBlobReadBasicApi(
+    bucketId,
+    fileId,
+    progressNotifierFn
+  );
   let { cryptoHeaderContent, arrayBuffer } = response;
 
   let [iv, salt] = unbuildCryptoHeader(cryptoHeaderContent);
@@ -237,7 +241,7 @@ export const downloadAndDecryptFile = async (
   try {
     initiateFileDownload(decryptedArrayBuffer, fileNameForDownloading);
   } catch (ex) {
-    throw raiseCaughtClientError(ex, clientError.DOWNLOAD_FAILED);
+    throw raiseCaughtClientError(ex, clientError.FAILED_TO_SAVE_FILE);
   }
 
   return true;

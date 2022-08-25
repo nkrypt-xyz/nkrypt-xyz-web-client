@@ -3,5 +3,12 @@ export const clientError = {
     code: "DECRYPTION_FAILED",
     message: "Decryption failed",
   },
-  DOWNLOAD_FAILED: { code: "DOWNLOAD_FAILED", message: "Downlaod failed" },
+  ENCRYPTED_DOWNLOAD_FAILED: {
+    code: "ENCRYPTED_DOWNLOAD_FAILED",
+    message: "Failed to download file from server",
+  },
+  FAILED_TO_SAVE_FILE: {
+    code: "FAILED_TO_SAVE_FILE",
+    message: "Failed to save file after decryption",
+  },
 };

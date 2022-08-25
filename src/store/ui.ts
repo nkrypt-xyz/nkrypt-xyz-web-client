@@ -97,3 +97,12 @@ export let showPrompt = (title, message) => {
     promptDialog.set({ title, message });
   });
 };
+
+// ---------------------------------------------- Prompt Dialog
+
+
+export let showCommonErrorDialog = (error: Error) => {
+  return new Promise<string>((accept) => {
+
+  });
+};
