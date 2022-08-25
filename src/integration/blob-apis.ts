@@ -54,10 +54,15 @@ export const callBlobWriteBasicApi = async (
   );
 };
 
-export const callBlobReadBasicApi = async (bucketId, fileId) => {
+export const callBlobReadBasicApi = async (
+  bucketId,
+  fileId,
+  progressNotifierFn: Function
+) => {
   return await callPostArrayBufferDownloadApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,
-    `/api/blob/read/${bucketId}/${fileId}`
+    `/api/blob/read/${bucketId}/${fileId}`,
+    progressNotifierFn
   );
 };

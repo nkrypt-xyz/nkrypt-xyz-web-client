@@ -1,3 +1,5 @@
+import { clientError } from "../constant/client-errors.js";
+import { CodedError, raiseClientError } from "../lib/error-handling.js";
 import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../lib/crypto-specs.js";
 import { convertStreamToBuffer } from "./stream-and-buffer-utils.js";
 
@@ -218,39 +220,61 @@ export const callPostArrayBufferUploadApi = async (
 export const callPostArrayBufferDownloadApi = async (
   serverBaseUrl: string,
   authToken: string | null,
-  apiUrl: string
+  apiUrl: string,
+  progressNotifierFn: Function
 ) => {
   const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
-  let headers = {
-    Accept: "*",
-    "Content-Type": "application/json",
-  };
-  if (authToken) {
-    headers["Authorization"] = `Bearer ${authToken}`;
-  }
-
-  const options: any = {
-    method: "POST",
-    headers,
-    body: {},
-  };
-
   let responseJson = null;
-  let responseObject: Response = null;
   try {
-    responseObject = await fetch(url, options);
+    // xhr - start
+    let responseObject = await new Promise<XMLHttpRequest>((accept, reject) => {
+      var xhr = new XMLHttpRequest();
 
-    let cryptoHeaderContent = responseObject.headers.get(
-      BLOB_API_CRYPTO_META_HEADER_NAME
-    );
+      xhr.responseType = "arraybuffer";
 
-    let arrayBuffer = await responseObject.arrayBuffer();
+      xhr.open("POST", url);
+
+      xhr.setRequestHeader("Accept", "*");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
+
+      xhr.onprogress = function (e) {
+        progressNotifierFn(e.total, e.loaded, 0);
+      };
+
+      xhr.onload = function (event) {
+        accept(xhr);
+      };
+
+      xhr.onerror = (event) => {
+        let error = raiseClientError(clientError.ENCRYPTED_DOWNLOAD_FAILED);
+        (<any>error).details = {
+          xhr,
+          event,
+        };
+        reject(error);
+      };
+
+      xhr.onabort = (event) => {
+        let error = raiseClientError(clientError.ENCRYPTED_DOWNLOAD_FAILED);
+        (<any>error).details = {
+          xhr,
+          event,
+        };
+        reject(error);
+      };
+
+      xhr.send("{}");
+    });
+    // xhr - end
 
     responseJson = {
       hasError: false,
-      arrayBuffer,
-      cryptoHeaderContent,
+      arrayBuffer: responseObject.response,
+      cryptoHeaderContent: responseObject.getResponseHeader(
+        BLOB_API_CRYPTO_META_HEADER_NAME
+      ),
     };
   } catch (ex) {
     console.error(ex);
