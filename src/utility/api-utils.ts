@@ -72,7 +72,7 @@ export const callPostStreamUploadApi = async (
 
   // FIXME: Detect browser support for directly sending ReadableStream to fetch call
   let buffer = await convertStreamToBuffer(readableStream);
-  console.warn("Converted to <ArrayBuffer> as fallback", buffer)
+  console.warn("Converted to <ArrayBuffer> as fallback", buffer);
 
   const options: any = {
     method: "POST",
@@ -150,34 +150,56 @@ export const callPostArrayBufferUploadApi = async (
   serverBaseUrl: string,
   authToken: string | null,
   apiUrl: string,
-  contentLength: number,
+  sourceContentLength: number,
   arrayBuffer: ArrayBuffer,
-  cryptoHeaderContent: string
+  cryptoHeaderContent: string,
+  progressNotifierFn: Function
 ) => {
   const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
   console.debug("Basic upload. Encrypted <ArrayBuffer>:", arrayBuffer);
 
-  let headers = {
-    Accept: "application/json",
-    "Content-Type": "application/octet-stream",
-  };
-  if (authToken) {
-    headers["Authorization"] = `Bearer ${authToken}`;
-  }
-  headers[BLOB_API_CRYPTO_META_HEADER_NAME] = cryptoHeaderContent;
-
-  const options: any = {
-    method: "POST",
-    headers,
-    body: arrayBuffer,
-  };
-
   let responseJson = null;
-  let responseObject: Response = null;
   try {
-    responseObject = await fetch(url, options);
-    responseJson = await responseObject.json();
+    // xhr - start
+    let responseObject = await new Promise<XMLHttpRequest>((accept, reject) => {
+      var xhr = new XMLHttpRequest();
+
+      xhr.open("POST", url);
+
+      xhr.setRequestHeader("Accept", "application/json");
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
+      xhr.setRequestHeader(
+        BLOB_API_CRYPTO_META_HEADER_NAME,
+        cryptoHeaderContent
+      );
+
+      xhr.upload.onprogress = function (e) {
+        progressNotifierFn(
+          sourceContentLength,
+          sourceContentLength,
+          sourceContentLength * (e.loaded / e.total)
+        );
+      };
+
+      xhr.onload = function (event) {
+        accept(xhr);
+      };
+
+      xhr.onerror = (event) => {
+        reject(xhr);
+      };
+
+      xhr.onabort = (event) => {
+        reject(xhr);
+      };
+
+      xhr.send(arrayBuffer);
+    });
+    // xhr - end
+
+    responseJson = JSON.parse(responseObject.responseText);
   } catch (ex) {
     console.error(ex);
     responseJson = {

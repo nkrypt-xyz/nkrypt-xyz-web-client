@@ -38,17 +38,19 @@ export const callBlobReadStreamApi = async (bucketId, fileId) => {
 export const callBlobWriteBasicApi = async (
   bucketId,
   fileId,
-  contentLength: number,
+  sourceContentLength: number,
   data: ArrayBuffer,
-  cryptoHeaderContent: string
+  cryptoHeaderContent: string,
+  progressNotifierFn: Function
 ) => {
   return await callPostArrayBufferUploadApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,
     `/api/blob/write/${bucketId}/${fileId}`,
-    contentLength,
+    sourceContentLength,
     data,
-    cryptoHeaderContent
+    cryptoHeaderContent,
+    progressNotifierFn
   );
 };
 
@@ -59,4 +61,3 @@ export const callBlobReadBasicApi = async (bucketId, fileId) => {
     `/api/blob/read/${bucketId}/${fileId}`
   );
 };
-

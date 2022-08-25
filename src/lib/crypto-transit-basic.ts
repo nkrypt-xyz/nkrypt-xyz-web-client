@@ -39,7 +39,7 @@ const createCipherProperties = async (bucketPassword: string) => {
 const encryptBufferInTaggedChunks = async (
   cipherProps,
   buffer: Uint8Array | ArrayBuffer,
-  progressNotifierFn
+  progressNotifierFn: Function
 ): Promise<Uint8Array> => {
   let sourceBuffer =
     buffer instanceof ArrayBuffer ? new Uint8Array(buffer) : buffer;
@@ -121,7 +121,8 @@ export const encryptAndUploadFile = async (
     fileId,
     file.size,
     encryptedBuffer,
-    cryptoHeader
+    cryptoHeader,
+    progressNotifierFn
   );
 
   return response;
@@ -148,7 +149,7 @@ const initiateFileDownload = (buffer: ArrayBuffer, fileNameForDownloading) => {
 const decryptBufferInTaggedChunks = async (
   { iv, key },
   buffer: Uint8Array | ArrayBuffer,
-  progressNotifierFn
+  progressNotifierFn: Function
 ): Promise<Uint8Array> => {
   let sourceBuffer =
     buffer instanceof ArrayBuffer ? new Uint8Array(buffer) : buffer;
