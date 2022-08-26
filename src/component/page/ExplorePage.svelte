@@ -228,6 +228,10 @@
     }
   };
 
+  const refreshClicked = async () => {
+    explorePath(currentPath);
+  };
+
   let fileUploadModal;
   const fileUploadClicked = async () => {
     let directoryEntity = entityStack[entityStack.length - 1];
@@ -255,6 +259,13 @@
         class="material-icons control-row-icon-button"
         on:click={goUpClicked}
         >arrow_upward
+      </IconButton>
+
+      <IconButton
+        size="mini"
+        class="material-icons control-row-icon-button"
+        on:click={refreshClicked}
+        >refresh
       </IconButton>
 
       <IconButton
