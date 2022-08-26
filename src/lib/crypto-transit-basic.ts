@@ -225,8 +225,6 @@ export const downloadAndDecryptFile = async (
   );
   if (await handleErrorIfAny(response)) return null;
 
-  console.log({response})
-
   let { cryptoHeaderContent, arrayBuffer } = response;
 
   let [iv, salt] = unbuildCryptoHeader(cryptoHeaderContent);

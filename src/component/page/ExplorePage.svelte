@@ -83,7 +83,6 @@
     });
     if (await handleErrorIfAny(response)) return;
     decrementActiveGlobalObtrusiveTaskCount();
-    // console.log("DIRECTORY ", response);
     return response;
   };
 
@@ -96,7 +95,6 @@
 
   const loadCurrentDirectoryAndChildren = async () => {
     let head = entityStack[entityStack.length - 1];
-    // console.log("permanent head", head);
     ({ directory: currentDirectory, childDirectoryList, childFileList } = head);
   };
 
@@ -111,7 +109,6 @@
 
       let entityId = parts[i];
       let head = entityStack[entityStack.length - 1];
-      // console.log("temp head", head);
 
       if (head.childDirectoryList.find((child) => child._id === entityId)) {
         // it is a directory
