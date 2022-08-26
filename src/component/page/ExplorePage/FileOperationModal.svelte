@@ -3,6 +3,8 @@
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
+  import Radio from "@smui/radio";
+  import FormField from "@smui/form-field";
   // Extern
   import { form, field } from "svelte-forms";
   import { required, min } from "svelte-forms/validators";
@@ -59,6 +61,8 @@
   let warningMessage = null;
   let downloadProgress = null;
 
+  let selectedDownloadMethod = "basic";
+
   export function showModal(params: { file; bucketPassword }): Promise<string> {
     return new Promise<string>((accept, reject) => {
       ({ file, bucketPassword } = params);
@@ -103,7 +107,7 @@
         file.name,
         bucketPassword,
         downloadProgressFn,
-        "basic"
+        selectedDownloadMethod
       );
       console.debug("File download results:", response);
     } catch (ex) {
@@ -160,6 +164,34 @@
             >
               <Label>Decrypt and download</Label>
             </Button>
+
+            <h4>Download method</h4>
+            <div class="upload-method">
+              <FormField>
+                <Radio
+                  bind:group={selectedDownloadMethod}
+                  value={"basic"}
+                  touch
+                />
+                <span slot="label">Basic</span>
+              </FormField>
+              <FormField>
+                <Radio
+                  bind:group={selectedDownloadMethod}
+                  value={"stream"}
+                  touch
+                />
+                <span slot="label">Streaming</span>
+              </FormField>
+              <FormField>
+                <Radio
+                  bind:group={selectedDownloadMethod}
+                  value={"vfs"}
+                  touch
+                />
+                <span slot="label">Virtual File System</span>
+              </FormField>
+            </div>
           {/if}
 
           {#if state === FileOperationModalState.FILE_DOWNLOAD}

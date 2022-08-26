@@ -110,9 +110,7 @@ export const callPostStreamDownloadApi = async (
   const url = joinUrlPathFragments(serverBaseUrl, apiUrl);
 
   let headers = {
-    // Accept: "application/octet-stream",
     Accept: "*",
-
     "Content-Type": "application/json",
   };
   if (authToken) {
@@ -132,6 +130,12 @@ export const callPostStreamDownloadApi = async (
     responseJson = {
       hasError: false,
       readableStream: responseObject.body,
+      cryptoHeaderContent: responseObject.headers.get(
+        BLOB_API_CRYPTO_META_HEADER_NAME
+      ),
+      contentLengthOnServer: parseInt(
+        responseObject.headers.get("Content-Length")
+      ),
     };
   } catch (ex) {
     console.error(ex);
