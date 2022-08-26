@@ -18,6 +18,7 @@
 
 {#if _alertDialog}
   <Dialog
+    class="nk-alert-dialog"
     bind:open={_alertDialog}
     scrimClickAction=""
     escapeKeyAction=""

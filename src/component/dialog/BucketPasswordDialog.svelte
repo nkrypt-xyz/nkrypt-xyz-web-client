@@ -55,6 +55,7 @@
 
 {#if _bucketPasswordDialog}
   <Dialog
+  class="nk-bucket-password-dialog"
     bind:open={_bucketPasswordDialog}
     scrimClickAction=""
     escapeKeyAction=""

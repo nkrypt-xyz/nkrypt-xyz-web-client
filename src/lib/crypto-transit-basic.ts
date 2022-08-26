@@ -21,6 +21,7 @@ import {
 import { clientError } from "../constant/client-errors.js";
 import {
   CodedError,
+  handleErrorIfAny,
   raiseCaughtClientError,
   raiseClientError,
 } from "./error-handling.js";
@@ -222,6 +223,10 @@ export const downloadAndDecryptFile = async (
     fileId,
     progressNotifierFn
   );
+  if (await handleErrorIfAny(response)) return null;
+
+  console.log({response})
+
   let { cryptoHeaderContent, arrayBuffer } = response;
 
   let [iv, salt] = unbuildCryptoHeader(cryptoHeaderContent);
