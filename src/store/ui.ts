@@ -1,5 +1,26 @@
 import { Writable, writable } from "svelte/store";
 import type { User } from "src/model/common.js";
+import { CodedError } from "../lib/error-handling.js";
+import { clientError } from "../constant/client-errors.js";
+
+let inflatedZIndex = 8;
+const STARTING_Z_INDEX = 8;
+// ---------------------------------------------- Related utils
+
+const applyInflatingZIndexHack = (className) => {
+  setTimeout(() => {
+    let maxZIndex = Array.from(document.querySelectorAll(".mdc-dialog")).reduce(
+      (currentMax, el) => {
+        return Math.max(currentMax, (<any>el).style.zIndex || 0);
+      },
+      STARTING_Z_INDEX
+    );
+
+    inflatedZIndex = maxZIndex + 1;
+    (<any>document.querySelector(className)).style.zIndex =
+      String(inflatedZIndex);
+  }, 100);
+};
 
 // ---------------------------------------------- Global Obtrusive Task
 
@@ -35,6 +56,7 @@ export let showConfirmation = (title, message) => {
       accept(value);
       unsubscribe();
     });
+    applyInflatingZIndexHack(".nk-confirmation-dialog");
     confirmationDialog.set({ title, message });
   });
 };
@@ -55,6 +77,7 @@ export let showAlert = (title, message) => {
       accept(value);
       unsubscribe();
     });
+    applyInflatingZIndexHack(".nk-alert-dialog");
     alertDialog.set({ title, message });
   });
 };
@@ -75,6 +98,7 @@ export let showBucketPasswordDialog = (bucketName) => {
       accept(value);
       unsubscribe();
     });
+    applyInflatingZIndexHack(".nk-bucket-password-dialog");
     bucketPasswordDialog.set({ bucketName });
   });
 };
@@ -94,15 +118,28 @@ export let showPrompt = (title, message) => {
       accept(value);
       unsubscribe();
     });
+    applyInflatingZIndexHack(".nk-prompt-dialog");
     promptDialog.set({ title, message });
   });
 };
 
-// ---------------------------------------------- Prompt Dialog
+// ---------------------------------------------- Common Error Alert Dialog
 
+export let showCommonErrorDialog = async (ex: Error) => {
+  console.error(ex);
 
-export let showCommonErrorDialog = (error: Error) => {
-  return new Promise<string>((accept) => {
+  let title = "Error occurred";
+  let message = "An unknown error occurred.";
 
-  });
+  if (ex && "object" === typeof ex) {
+    if (ex instanceof CodedError && ex.code in clientError) {
+      title = clientError[ex.code].shorthand;
+    }
+
+    if (ex.message) {
+      message = ex.message;
+    }
+  }
+
+  return await showAlert(title, message);
 };

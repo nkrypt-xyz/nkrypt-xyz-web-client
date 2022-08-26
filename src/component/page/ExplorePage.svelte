@@ -57,7 +57,6 @@
       handleInvalidParameter();
       return;
     }
-    // console.log("Found bucket:", bucket);
     currentBucket = bucket;
     activeBucket.set(currentBucket);
   };
@@ -206,7 +205,10 @@
       bucketPassword: currentBucketPassword,
     });
 
-    console.debug("File operation modal closed with response:", nullableResponse);
+    console.debug(
+      "File operation modal closed with response:",
+      nullableResponse
+    );
   };
 
   const breadcrumbClicked = async (targetEntity) => {

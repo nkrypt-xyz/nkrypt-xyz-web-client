@@ -19,6 +19,7 @@
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
     showAlert,
+    showCommonErrorDialog,
   } from "../../../store/ui.js";
   import {
     callBucketCreateApi,
@@ -106,22 +107,11 @@
       );
       console.debug("File download results:", response);
     } catch (ex) {
-      if (
-        ex instanceof CodedError &&
-        ex.code === clientError.DECRYPTION_FAILED.code
-      ) {
-        shouldTemporarilyHideDialog = true;
-        await showAlert(
-          "Decryption failed",
-          "Failed to decrypt the file. Most likely the file has been corrupted during transmission to or storage on the server."
-        );
-        shouldTemporarilyHideDialog = false;
-      }
+      await showCommonErrorDialog(ex);
     }
     state = FileOperationModalState.PROVIDE_OPTIONS;
   };
 
-  let shouldTemporarilyHideDialog = false;
   let shouldShowDialog = false;
   let allowCancel = false;
   $: {
@@ -130,7 +120,7 @@
   }
 </script>
 
-{#if shouldShowDialog && !shouldTemporarilyHideDialog}
+{#if shouldShowDialog}
   <div bind:this={wrapper}>
     <Dialog
       bind:open={shouldShowDialog}

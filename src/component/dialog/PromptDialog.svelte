@@ -48,6 +48,7 @@
 
 {#if _promptDialog}
   <Dialog
+    class="nk-prompt-dialog"
     bind:open={_promptDialog}
     scrimClickAction=""
     escapeKeyAction=""

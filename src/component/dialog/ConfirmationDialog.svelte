@@ -21,6 +21,7 @@
 
 {#if _confirmationDialog}
   <Dialog
+  class="nk-confirmation-dialog"
     bind:open={_confirmationDialog}
     scrimClickAction=""
     escapeKeyAction=""
