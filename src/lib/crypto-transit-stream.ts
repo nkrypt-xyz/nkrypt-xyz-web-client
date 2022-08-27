@@ -27,6 +27,11 @@ import {
 } from "./crypto-specs.js";
 import { handleErrorIfAny } from "./error-handling.js";
 
+import streamSaver from "streamsaver";
+import { CommonConstant } from "../constant/common-constants.js";
+import { storedSession, _storedSession } from "../store/session.js";
+import { joinUrlPathFragments } from "../utility/api-utils.js";
+
 const createCipherProperties = async (bucketPassword: string) => {
   let { iv } = await makeRandomIv();
   let { salt } = await makeRandomSalt();
@@ -136,27 +141,27 @@ const createDeryptedPseudoTransformStream = async (
       bytesRead += chunkBuffer.byteLength;
       progressNotifierFn(totalBytes, bytesRead, bytesRead);
 
-      controller.enqueue(decryptedChunkBuffer);
+      controller.enqueue(new Uint8Array(decryptedChunkBuffer));
     },
   });
 };
 
-const initiateFileDownload = (buffer: ArrayBuffer, fileNameForDownloading) => {
-  let blob = new Blob([new Uint8Array(buffer)]);
+const getStreamSaverMitmUrl = () => {
+  return joinUrlPathFragments(
+    _storedSession.serverUrl,
+    "/static/stream-saver/mitm_2_0_0.html"
+  );
+};
 
-  let url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.style.display = "none";
-  a.href = url;
-  a.download = fileNameForDownloading;
-  document.body.appendChild(a);
-  a.click();
-
-  setTimeout(() => {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 100);
+const calculateDecryptedFileSize = (encryptedFileSize) => {
+  let count =
+    encryptedFileSize /
+    (BLOB_CHUNK_SIZE_BYTES + ENCRYPTION_TAGLENGTH_IN_BITS / 8);
+  if (count > Math.floor(count)) {
+    count = Math.floor(count) + 1;
+  }
+  let totalExtraSpaceForTags = count * (ENCRYPTION_TAGLENGTH_IN_BITS / 8);
+  return encryptedFileSize - totalExtraSpaceForTags;
 };
 
 export const downloadAndDecryptFile = async (
@@ -179,16 +184,21 @@ export const downloadAndDecryptFile = async (
   }
 
   let decryptedReadableStream = await createDeryptedPseudoTransformStream(
-    response.readableStream,
+    readableStream,
     { iv, key },
     contentLengthOnServer,
     progressNotifierFn
   );
 
-  // TODO: Investigate ways to save file directly from stream
-  let buffer = await convertStreamToBuffer(decryptedReadableStream);
+  streamSaver.mitm = getStreamSaverMitmUrl();
 
-  initiateFileDownload(buffer, fileNameForDownloading);
+  const fileStream = streamSaver.createWriteStream(fileNameForDownloading, {
+    size: calculateDecryptedFileSize(contentLengthOnServer),
+    writableStrategy: undefined, // (optional)
+    readableStrategy: undefined, // (optional)
+  });
 
-  return response;
+  let results = await decryptedReadableStream.pipeTo(fileStream);
+
+  return results;
 };
