@@ -11,6 +11,9 @@ export const storedSession: Writable<Session> = writable(
   getLocalStorageItem(SESSION_LOCALSTORAGE_KEY)
 );
 
+export let _storedSession: Session = null;
+
 storedSession.subscribe((value) => {
+  _storedSession = value;
   setLocalStorageItem(SESSION_LOCALSTORAGE_KEY, value);
 });
