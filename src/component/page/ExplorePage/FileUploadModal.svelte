@@ -328,8 +328,12 @@
                 <span slot="label">Streaming</span>
               </FormField>
               <FormField>
-                <Radio bind:group={selectedUploadMethod} value={"vfs"} touch />
-                <span slot="label">Virtual File System</span>
+                <Radio
+                  bind:group={selectedUploadMethod}
+                  value={"chunkedStream"}
+                  touch
+                />
+                <span slot="label">Quantized Streams (Multi-request)</span>
               </FormField>
             </div>
           {/if}

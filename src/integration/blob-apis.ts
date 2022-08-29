@@ -66,3 +66,25 @@ export const callBlobReadBasicApi = async (
     progressNotifierFn
   );
 };
+
+export const callBlobWriteQuantizedApi = async (
+  bucketId,
+  fileId,
+  sourceContentLength: number,
+  data: ArrayBuffer,
+  cryptoHeaderContent: string,
+  progressNotifierFn: Function,
+  blobId,
+  offset,
+  shouldEnd
+) => {
+  return await callPostArrayBufferUploadApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    `/api/blob/write-quantized/${bucketId}/${fileId}/${blobId}/${offset}/${shouldEnd}`,
+    sourceContentLength,
+    data,
+    cryptoHeaderContent,
+    progressNotifierFn
+  );
+};

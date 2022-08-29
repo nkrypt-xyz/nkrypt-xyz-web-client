@@ -41,9 +41,9 @@ export class MeteredByteStreamReader {
 
   private remainingChunkOffset: number = 0;
   private remainingChunk: Uint8Array = null;
-  id: number;
+  id: string;
 
-  constructor(readableStream: ReadableStream, id) {
+  constructor(readableStream: ReadableStream, id: string) {
     this.readableStream = readableStream;
     this.reader = this.readableStream.getReader();
     this.id = id;

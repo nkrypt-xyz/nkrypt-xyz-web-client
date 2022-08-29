@@ -121,7 +121,7 @@ export const encryptAndUploadFile = async (
     bucketId,
     fileId,
     file.size,
-    encryptedBuffer,
+    encryptedBuffer.buffer,
     cryptoHeader,
     progressNotifierFn
   );

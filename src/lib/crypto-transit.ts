@@ -25,6 +25,14 @@ export const encryptAndUploadFile = async (
       bucketPassword,
       progressNotifierFn
     );
+  } else if (uploadMethod === "chunkedStream") {
+    return await cryptoTransitStream.encryptAndUploadFileAsChunkedStream(
+      bucketId,
+      fileId,
+      file,
+      bucketPassword,
+      progressNotifierFn
+    );
   }
 
   return null;

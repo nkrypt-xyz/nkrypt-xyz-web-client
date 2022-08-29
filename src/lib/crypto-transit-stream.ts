@@ -5,6 +5,7 @@ import {
 } from "../utility/crypto-api-utils.js";
 import {
   callBlobReadStreamApi,
+  callBlobWriteQuantizedApi,
   callBlobWriteStreamApi,
 } from "../integration/blob-apis.js";
 import {
@@ -21,11 +22,12 @@ import {
 } from "../utility/stream-and-buffer-utils.js";
 import {
   BLOB_CHUNK_SIZE_BYTES,
+  BLOB_CHUNK_SIZE_INCLUDING_TAG_BYTES,
   ENCRYPTION_TAGLENGTH_IN_BITS,
   IV_LENGTH,
   SALT_LENGTH,
-} from "./crypto-specs.js";
-import { handleErrorIfAny } from "./error-handling.js";
+} from "../constant/crypto-specs.js";
+import { CodedError, handleErrorIfAny } from "./error-handling.js";
 
 import streamSaver from "streamsaver";
 import { CommonConstant } from "../constant/common-constants.js";
@@ -51,12 +53,12 @@ const createEncryptedPseudoTransformStream = async (
 
   let inputStream: ReadableStream = file.stream() as any;
   // let inputStreamReader = inputStream.getReader();
-  let meteredBytedReader = new MeteredByteStreamReader(inputStream);
+  let meteredByteReader = new MeteredByteStreamReader(inputStream, "PlaintextStreamForEncryption");
 
   // Note: We are not using transform streams due to a lack of browser support.
   return new ReadableStream({
     async pull(controller) {
-      const { value: chunk, done } = await meteredBytedReader.readBytes(
+      const { value: chunk, done } = await meteredByteReader.readBytes(
         BLOB_CHUNK_SIZE_BYTES
       );
 
@@ -111,6 +113,97 @@ export const encryptAndUploadFile = async (
   return response;
 };
 
+const collectChunksAndUploadFromStream = async (
+  bucketId,
+  fileId,
+  fileSize,
+  encryptedDataStream: ReadableStream<any>,
+  cryptoHeader: string
+) => {
+  const packetSize = CommonConstant.PACKET_SIZE_FOR_QUANTIZED_STREAMS;
+
+  let meteredByteReader = new MeteredByteStreamReader(
+    encryptedDataStream,
+    "EncryptedStreamForPacketing"
+  );
+
+  let blobId = null;
+  let startingOffset = 0;
+  while (true) {
+    const { value: packet, done } = await meteredByteReader.readBytes(
+      packetSize
+    );
+
+    if (done) return true;
+
+    let shouldEnd = packet.length < packetSize;
+    const progressNotifierFnOverride = (total, encrypted, uploaded) => {
+      console.log("PACKET PROGRESS", total, encrypted, uploaded);
+    };
+
+    let response = await callBlobWriteQuantizedApi(
+      bucketId,
+      fileId,
+      Math.min(packetSize, packet.length),
+      packet.buffer,
+      cryptoHeader,
+      progressNotifierFnOverride,
+      blobId,
+      startingOffset,
+      shouldEnd
+    );
+
+    if (await handleErrorIfAny(response)) return null;
+
+    if (!response.blobId) {
+      throw new CodedError(
+        "BLOBID_NOT_GIVEN",
+        "BlobId was not propagated by server"
+      );
+    }
+    blobId = response.blobId;
+
+    startingOffset += Math.min(packetSize, packet.length);
+  }
+
+  return true;
+};
+
+export const encryptAndUploadFileAsChunkedStream = async (
+  bucketId: string,
+  fileId: string,
+  file: File,
+  bucketPassword: string,
+  progressNotifierFn: Function
+) => {
+  let cipherProps = await createCipherProperties(bucketPassword);
+
+  let encryptedDataStream = await createEncryptedPseudoTransformStream(
+    file,
+    cipherProps,
+    progressNotifierFn,
+    bucketPassword
+  );
+
+  let iv = convertSmallUint8ArrayToString(cipherProps.iv);
+  let salt = convertSmallUint8ArrayToString(cipherProps.salt);
+  let cryptoHeader = buildCryptoHeader(iv, salt);
+
+  let inputStream: ReadableStream = file.stream() as any;
+
+  let response = await collectChunksAndUploadFromStream(
+    bucketId,
+    fileId,
+    file.size,
+    encryptedDataStream,
+    cryptoHeader
+  );
+
+  progressNotifierFn(file.size, file.size, file.size);
+
+  return response;
+};
+
 const createDeryptedPseudoTransformStream = async (
   inputStream: ReadableStream,
   { iv, key },
@@ -121,13 +214,13 @@ const createDeryptedPseudoTransformStream = async (
   let bytesRead = 0;
   progressNotifierFn(totalBytes, 0, 0);
 
-  let meteredBytedReader = new MeteredByteStreamReader(inputStream);
+  let meteredByteReader = new MeteredByteStreamReader(inputStream, "EncryptedStreamForDecryption");
 
   // Note: We are not using transform streams due to a lack of browser support.
   return new ReadableStream({
     async pull(controller) {
-      const { value: chunk, done } = await meteredBytedReader.readBytes(
-        BLOB_CHUNK_SIZE_BYTES + ENCRYPTION_TAGLENGTH_IN_BITS / 8
+      const { value: chunk, done } = await meteredByteReader.readBytes(
+        BLOB_CHUNK_SIZE_INCLUDING_TAG_BYTES
       );
 
       if (done) {
