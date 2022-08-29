@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Dialog, { Title, Content, Actions } from "@smui/dialog";
-  import Button, { Label } from "@smui/button";
+  // UI / Framework
   import CircularProgress from "@smui/circular-progress";
-
+  import Dialog, { Content } from "@smui/dialog";
+  // Other imports
   import { activeGlobalObtrusiveTaskCount } from "../../store/ui.js";
 
   let isOpen = false;

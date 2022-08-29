@@ -6,7 +6,7 @@ export const buildCryptoHeader = (iv, salt) => {
 };
 
 export const unbuildCryptoHeader = (cryptoHeader) => {
-  let [_, iv, salt] = cryptoHeader.split('|');
+  let [_, iv, salt] = cryptoHeader.split("|");
   iv = convertSmallStringToBuffer(iv);
   salt = convertSmallStringToBuffer(salt);
   return [iv, salt];

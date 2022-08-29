@@ -1,6 +1,9 @@
 <script lang="ts">
-  import Button, { Label, Icon } from "@smui/button";
+  // UI / Framework
+  import Button, { Icon, Label } from "@smui/button";
+  // Other imports
   import { showAlert, showConfirmation } from "../../store/ui.js";
+
   const clicked = async () => {
     let ans = await showConfirmation("Example Title", "Example Text");
     await showAlert("Another Title", "Another Text");

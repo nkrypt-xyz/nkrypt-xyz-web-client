@@ -1,33 +1,29 @@
 <script lang="ts">
-  import Button, { Label, Icon } from "@smui/button";
+  // UI / Framework
   import IconButton from "@smui/icon-button";
-  import { activeBucket, bucketList } from "../../store/content.js";
   import { location, push } from "svelte-spa-router";
-  import {
-    decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-    showAlert,
-    showBucketPasswordDialog,
-    showConfirmation,
-    showPrompt,
-  } from "../../store/ui.js";
   import { derived } from "svelte/store";
+  // Other imports
   import {
     callDirectoryCreateApi,
     callDirectoryGetApi,
   } from "../../integration/content-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
-  import {
-    getPasswordForBucket,
-    setPasswordForBucket,
-  } from "../../store/password.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
-  import { encryptObject, encryptText } from "../../utility/crypto-utils.js";
+  import { activeBucket, bucketList } from "../../store/content.js";
+  import { setPasswordForBucket } from "../../store/password.js";
+  import {
+    decrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount,
+    showAlert,
+    showPrompt,
+  } from "../../store/ui.js";
+  import { encryptObject } from "../../utility/crypto-utils.js";
   import Breadcrumbs from "./ExplorePage/Breadcrumbs.svelte";
   import DirectorySection from "./ExplorePage/DirectorySection.svelte";
+  import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
   import FileSection from "./ExplorePage/FileSection.svelte";
   import FileUploadModal from "./ExplorePage/FileUploadModal.svelte";
-  import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
 
   const ROUTE_PREFIX = "/explore/";
 

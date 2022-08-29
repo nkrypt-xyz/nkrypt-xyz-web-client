@@ -1,3 +1,4 @@
+import { replace } from "svelte-spa-router";
 import { callUserLogoutApi } from "../integration/user-apis.js";
 import { storedSession } from "../store/session.js";
 import {
@@ -5,7 +6,6 @@ import {
   incrementActiveGlobalObtrusiveTaskCount,
 } from "../store/ui.js";
 import { storedUser } from "../store/user.js";
-import { replace } from "svelte-spa-router";
 
 export const performUserLogout = async () => {
   incrementActiveGlobalObtrusiveTaskCount();

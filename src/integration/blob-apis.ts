@@ -1,10 +1,10 @@
 import type { Session } from "src/model/common.js";
 import { storedSession } from "../store/session.js";
 import {
-  callPostStreamUploadApi,
-  callPostStreamDownloadApi,
-  callPostArrayBufferUploadApi,
   callPostArrayBufferDownloadApi,
+  callPostArrayBufferUploadApi,
+  callPostStreamDownloadApi,
+  callPostStreamUploadApi,
 } from "../utility/api-utils.js";
 
 let _storedSession: Session = null;

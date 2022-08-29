@@ -1,35 +1,14 @@
 <script lang="ts">
-  // UI
-  import Textfield from "@smui/textfield";
-  import Icon from "@smui/textfield/icon";
-  import HelperText from "@smui/textfield/helper-text";
-  // Extern
-  import { form, field } from "svelte-forms";
-  import { required, min } from "svelte-forms/validators";
-  import { replace } from "svelte-spa-router";
-  // Intern
-  import { standardField } from "../../lib/validations.js";
-  import { CommonConstant } from "../../constant/common-constants.js";
-  import { callUserLoginApi } from "../../integration/user-apis.js";
-  import { minlength } from "../../lib/validators.js";
-  import { extract } from "../../utility/misc-utils.js";
-  import { storedUser } from "../../store/user.js";
-  import { storedSession } from "../../store/session.js";
-  import {
-    decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-  } from "../../store/ui.js";
-  import {
-    callBucketCreateApi,
-    callBucketListApi,
-  } from "../../integration/content-apis.js";
-  import { encryptText } from "../../utility/crypto-utils.js";
-  import { bucketList } from "../../store/content.js";
-
-  import Dialog, { Title, Content, Actions } from "@smui/dialog";
+  // UI / Framework
   import Button, { Label } from "@smui/button";
-  import CircularProgress from "@smui/circular-progress";
-
+  import Dialog, { Actions, Content, Title } from "@smui/dialog";
+  import Textfield from "@smui/textfield";
+  import HelperText from "@smui/textfield/helper-text";
+  import Icon from "@smui/textfield/icon";
+  import { form } from "svelte-forms";
+  import { standardField } from "../../lib/validations.js";
+  import { minlength } from "../../lib/validators.js";
+  // Other imports
   import {
     bucketPasswordDialog,
     bucketPasswordDialogResponse,
@@ -55,7 +34,7 @@
 
 {#if _bucketPasswordDialog}
   <Dialog
-  class="nk-bucket-password-dialog"
+    class="nk-bucket-password-dialog"
     bind:open={_bucketPasswordDialog}
     scrimClickAction=""
     escapeKeyAction=""

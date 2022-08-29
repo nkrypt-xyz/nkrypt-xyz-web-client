@@ -1,4 +1,3 @@
-import { testConstants } from "../constant/test-constants.js";
 import {
   ENCRYPTION_ALGORITHM,
   ENCRYPTION_TAGLENGTH_IN_BITS,
@@ -10,6 +9,7 @@ import {
   PASSPHRASE_IMPORTKEY_ALGORITHM,
   SALT_LENGTH,
 } from "../constant/crypto-specs.js";
+import { testConstants } from "../constant/test-constants.js";
 import {
   convertSmallBufferToString,
   convertSmallStringToBuffer,

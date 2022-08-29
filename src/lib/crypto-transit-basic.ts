@@ -1,11 +1,17 @@
+import { clientErrorDef } from "../constant/client-errors.js";
 import {
-  convertSmallUint8ArrayToString,
-  convertSmallStringToBuffer,
-} from "../utility/buffer-utils.js";
+  BLOB_CHUNK_SIZE_BYTES,
+  ENCRYPTION_TAGLENGTH_IN_BITS,
+} from "../constant/crypto-specs.js";
 import {
   callBlobReadBasicApi,
   callBlobWriteBasicApi,
 } from "../integration/blob-apis.js";
+import { convertSmallUint8ArrayToString } from "../utility/buffer-utils.js";
+import {
+  buildCryptoHeader,
+  unbuildCryptoHeader,
+} from "../utility/crypto-api-utils.js";
 import {
   createEncryptionKeyFromPassword,
   decryptBuffer,
@@ -13,17 +19,7 @@ import {
   makeRandomIv,
   makeRandomSalt,
 } from "../utility/crypto-utils.js";
-
-import {
-  buildCryptoHeader,
-  unbuildCryptoHeader,
-} from "../utility/crypto-api-utils.js";
-import { clientErrorDef } from "../constant/client-errors.js";
 import { raiseCaughtClientError } from "./error-handling.js";
-import {
-  BLOB_CHUNK_SIZE_BYTES,
-  ENCRYPTION_TAGLENGTH_IN_BITS,
-} from "../constant/crypto-specs.js";
 
 const createCipherProperties = async (bucketPassword: string) => {
   let { iv } = await makeRandomIv();

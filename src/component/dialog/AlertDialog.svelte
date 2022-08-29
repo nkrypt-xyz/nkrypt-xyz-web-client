@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Dialog, { Title, Content, Actions } from "@smui/dialog";
+  // UI / Framework
   import Button, { Label } from "@smui/button";
-  import CircularProgress from "@smui/circular-progress";
-
+  import Dialog, { Actions, Content, Title } from "@smui/dialog";
+  // Other imports
   import { alertDialog, alertDialogResponse } from "../../store/ui.js";
 
   let _alertDialog = null;

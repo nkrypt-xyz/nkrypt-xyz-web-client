@@ -1,40 +1,22 @@
 <script lang="ts">
-  // UI
-  import Textfield from "@smui/textfield";
-  import Icon from "@smui/textfield/icon";
-  import HelperText from "@smui/textfield/helper-text";
-  import Radio from "@smui/radio";
+  // UI / Framework
+  import Button, { Label } from "@smui/button";
+  import Dialog, { Actions, Content, Title } from "@smui/dialog";
   import FormField from "@smui/form-field";
-  // Extern
-  import { form, field } from "svelte-forms";
-  import { required, min } from "svelte-forms/validators";
-  import { replace } from "svelte-spa-router";
-  // Intern
-  import { standardField } from "../../../lib/validations.js";
-  import { CommonConstant } from "../../../constant/common-constants.js";
-  import { callUserLoginApi } from "../../../integration/user-apis.js";
-  import { minlength } from "../../../lib/validators.js";
-  import { extract } from "../../../utility/misc-utils.js";
-  import { storedUser } from "../../../store/user.js";
-  import { storedSession } from "../../../store/session.js";
+  import LinearProgress from "@smui/linear-progress";
+  import Radio from "@smui/radio";
+  import Textfield from "@smui/textfield";
+  import HelperText from "@smui/textfield/helper-text";
+  // Other imports
+  import { callFileCreateApi } from "../../../integration/content-apis.js";
+  import { encryptAndUploadFile } from "../../../lib/crypto-transit.js";
+  import { handleAnyError } from "../../../lib/error-handling.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
   } from "../../../store/ui.js";
-  import {
-    callBucketCreateApi,
-    callBucketListApi,
-    callFileCreateApi,
-  } from "../../../integration/content-apis.js";
-  import { encryptObject, encryptText } from "../../../utility/crypto-utils.js";
-  import { bucketList } from "../../../store/content.js";
-  import Dialog, { Title, Content, Actions } from "@smui/dialog";
-  import Button, { Label } from "@smui/button";
-  import CircularProgress from "@smui/circular-progress";
+  import { encryptObject } from "../../../utility/crypto-utils.js";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
-  import { handleAnyError } from "../../../lib/error-handling.js";
-  import { encryptAndUploadFile } from "../../../lib/crypto-transit.js";
-  import LinearProgress from "@smui/linear-progress";
 
   const FileUploadModalState = {
     IDLE: "IDLE",
