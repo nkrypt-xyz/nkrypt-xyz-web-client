@@ -1,7 +1,7 @@
 import { Writable, writable } from "svelte/store";
 import type { User } from "src/model/common.js";
-import { CodedError } from "../lib/error-handling.js";
-import { clientError } from "../constant/client-errors.js";
+import { ClientError } from "../lib/error-handling.js";
+import { clientErrorDef } from "../constant/client-errors.js";
 
 let inflatedZIndex = 8;
 const STARTING_Z_INDEX = 8;
@@ -132,8 +132,8 @@ export let showCommonErrorDialog = async (ex: Error) => {
   let message = "An unknown error occurred.";
 
   if (ex && "object" === typeof ex) {
-    if (ex instanceof CodedError && ex.code in clientError) {
-      title = clientError[ex.code].shorthand;
+    if (ex instanceof ClientError && ex.code in clientErrorDef) {
+      title = clientErrorDef[ex.code].shorthand;
     }
 
     if (ex.message) {

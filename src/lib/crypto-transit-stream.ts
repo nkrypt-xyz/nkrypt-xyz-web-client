@@ -27,12 +27,13 @@ import {
   IV_LENGTH,
   SALT_LENGTH,
 } from "../constant/crypto-specs.js";
-import { CodedError, handleErrorIfAny } from "./error-handling.js";
+import { raiseClientError } from "./error-handling.js";
 
 import streamSaver from "streamsaver";
 import { CommonConstant } from "../constant/common-constants.js";
 import { storedSession, _storedSession } from "../store/session.js";
 import { joinUrlPathFragments } from "../utility/api-utils.js";
+import { clientErrorDef } from "../constant/client-errors.js";
 
 const createCipherProperties = async (bucketPassword: string) => {
   let { iv } = await makeRandomIv();
@@ -53,7 +54,10 @@ const createEncryptedPseudoTransformStream = async (
 
   let inputStream: ReadableStream = file.stream() as any;
   // let inputStreamReader = inputStream.getReader();
-  let meteredByteReader = new MeteredByteStreamReader(inputStream, "PlaintextStreamForEncryption");
+  let meteredByteReader = new MeteredByteStreamReader(
+    inputStream,
+    "PlaintextStreamForEncryption"
+  );
 
   // Note: We are not using transform streams due to a lack of browser support.
   return new ReadableStream({
@@ -153,13 +157,8 @@ const collectChunksAndUploadFromStream = async (
       shouldEnd
     );
 
-    if (await handleErrorIfAny(response)) return null;
-
     if (!response.blobId) {
-      throw new CodedError(
-        "BLOBID_NOT_GIVEN",
-        "BlobId was not propagated by server"
-      );
+      raiseClientError(clientErrorDef.NKCE_BLOB_ID_MISSING);
     }
     blobId = response.blobId;
 
@@ -214,7 +213,10 @@ const createDeryptedPseudoTransformStream = async (
   let bytesRead = 0;
   progressNotifierFn(totalBytes, 0, 0);
 
-  let meteredByteReader = new MeteredByteStreamReader(inputStream, "EncryptedStreamForDecryption");
+  let meteredByteReader = new MeteredByteStreamReader(
+    inputStream,
+    "EncryptedStreamForDecryption"
+  );
 
   // Note: We are not using transform streams due to a lack of browser support.
   return new ReadableStream({
@@ -265,7 +267,6 @@ export const downloadAndDecryptFile = async (
   progressNotifierFn: Function
 ) => {
   let response = await callBlobReadStreamApi(bucketId, fileId);
-  if (await handleErrorIfAny(response)) return null;
 
   let { readableStream, cryptoHeaderContent, contentLengthOnServer } = response;
 

@@ -1,10 +1,7 @@
-import { clientError } from "../constant/client-errors.js";
-import { CodedError, raiseClientError } from "../lib/error-handling.js";
+import { clientErrorDef } from "../constant/client-errors.js";
+import { raiseClientError, ResponseError } from "../lib/error-handling.js";
 import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../constant/crypto-specs.js";
 import { convertStreamToBuffer } from "./stream-and-buffer-utils.js";
-
-const genericConnectionFailureMessage =
-  "Failed to establish a connection with the server. Please make sure you have a working internet connection. If you believe, everything is in working order on your end, please contact server administrator.";
 
 export const joinUrlPathFragments = (...pathFragments: string[]) => {
   return pathFragments.map((str) => str.replace(/^\/+|\/+$/g, "")).join("/");
@@ -33,21 +30,25 @@ export const callPostJsonApi = async (
   };
 
   let responseJson = null;
-  let responseObject = null;
-
   try {
-    responseObject = await fetch(url, options);
-    responseJson = await responseObject.json();
+    let fetchResponse = await fetch(url, options);
+    responseJson = await fetchResponse.json();
   } catch (ex) {
     console.error(ex);
-    responseJson = {
-      hasError: true,
-      error: {
-        code: "SERVER_CONNECTION_FAILURE",
-        message: genericConnectionFailureMessage,
-        details: {},
-      },
-    };
+    throw new ResponseError(
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.code,
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.message
+    );
+  }
+
+  if (responseJson.hasError) {
+    let code =
+      responseJson.error?.code ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.code;
+    let message =
+      responseJson.error?.message ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.message;
+    throw new ResponseError(code, message);
   }
 
   return responseJson;
@@ -83,20 +84,25 @@ export const callPostStreamUploadApi = async (
   };
 
   let responseJson = null;
-  let responseObject = null;
   try {
-    responseObject = await fetch(url, options);
-    responseJson = await responseObject.json();
+    let fetchResponse = await fetch(url, options);
+    responseJson = await fetchResponse.json();
   } catch (ex) {
     console.error(ex);
-    responseJson = {
-      hasError: true,
-      error: {
-        code: "SERVER_CONNECTION_FAILURE",
-        message: genericConnectionFailureMessage,
-        details: {},
-      },
-    };
+    throw new ResponseError(
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.code,
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.message
+    );
+  }
+
+  if (responseJson.hasError) {
+    let code =
+      responseJson.error?.code ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.code;
+    let message =
+      responseJson.error?.message ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.message;
+    throw new ResponseError(code, message);
   }
 
   return responseJson;
@@ -124,29 +130,34 @@ export const callPostStreamDownloadApi = async (
   };
 
   let responseJson = null;
-  let responseObject = null;
   try {
-    responseObject = await fetch(url, options);
+    let fetchResponse = await fetch(url, options);
     responseJson = {
       hasError: false,
-      readableStream: responseObject.body,
-      cryptoHeaderContent: responseObject.headers.get(
+      readableStream: fetchResponse.body,
+      cryptoHeaderContent: fetchResponse.headers.get(
         BLOB_API_CRYPTO_META_HEADER_NAME
       ),
       contentLengthOnServer: parseInt(
-        responseObject.headers.get("Content-Length")
+        fetchResponse.headers.get("Content-Length")
       ),
     };
   } catch (ex) {
     console.error(ex);
-    responseJson = {
-      hasError: true,
-      error: {
-        code: "SERVER_CONNECTION_FAILURE",
-        message: genericConnectionFailureMessage,
-        details: {},
-      },
-    };
+    throw new ResponseError(
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.code,
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.message
+    );
+  }
+
+  if (responseJson.hasError) {
+    let code =
+      responseJson.error?.code ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.code;
+    let message =
+      responseJson.error?.message ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.message;
+    throw new ResponseError(code, message);
   }
 
   return responseJson;
@@ -208,14 +219,20 @@ export const callPostArrayBufferUploadApi = async (
     responseJson = JSON.parse(responseObject.responseText);
   } catch (ex) {
     console.error(ex);
-    responseJson = {
-      hasError: true,
-      error: {
-        code: "SERVER_CONNECTION_FAILURE",
-        message: genericConnectionFailureMessage,
-        details: {},
-      },
-    };
+    throw new ResponseError(
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.code,
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.message
+    );
+  }
+
+  if (responseJson.hasError) {
+    let code =
+      responseJson.error?.code ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.code;
+    let message =
+      responseJson.error?.message ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.message;
+    throw new ResponseError(code, message);
   }
 
   return responseJson;
@@ -252,21 +269,11 @@ export const callPostArrayBufferDownloadApi = async (
       };
 
       xhr.onerror = (event) => {
-        let error = raiseClientError(clientError.ENCRYPTED_DOWNLOAD_FAILED);
-        (<any>error).details = {
-          xhr,
-          event,
-        };
-        reject(error);
+        reject(xhr);
       };
 
       xhr.onabort = (event) => {
-        let error = raiseClientError(clientError.ENCRYPTED_DOWNLOAD_FAILED);
-        (<any>error).details = {
-          xhr,
-          event,
-        };
-        reject(error);
+        reject(xhr);
       };
 
       xhr.send("{}");
@@ -282,14 +289,20 @@ export const callPostArrayBufferDownloadApi = async (
     };
   } catch (ex) {
     console.error(ex);
-    responseJson = {
-      hasError: true,
-      error: {
-        code: "SERVER_CONNECTION_FAILURE",
-        message: genericConnectionFailureMessage,
-        details: {},
-      },
-    };
+    throw new ResponseError(
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.code,
+      clientErrorDef.NKRE_CONNECTIVITY_ISSUE.message
+    );
+  }
+
+  if (responseJson.hasError) {
+    let code =
+      responseJson.error?.code ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.code;
+    let message =
+      responseJson.error?.message ||
+      clientErrorDef.NKRE_MALFORMATTED_RESPONSE.message;
+    throw new ResponseError(code, message);
   }
 
   return responseJson;

@@ -18,13 +18,8 @@ import {
   buildCryptoHeader,
   unbuildCryptoHeader,
 } from "../utility/crypto-api-utils.js";
-import { clientError } from "../constant/client-errors.js";
-import {
-  CodedError,
-  handleErrorIfAny,
-  raiseCaughtClientError,
-  raiseClientError,
-} from "./error-handling.js";
+import { clientErrorDef } from "../constant/client-errors.js";
+import { raiseCaughtClientError } from "./error-handling.js";
 import {
   BLOB_CHUNK_SIZE_BYTES,
   ENCRYPTION_TAGLENGTH_IN_BITS,
@@ -223,7 +218,6 @@ export const downloadAndDecryptFile = async (
     fileId,
     progressNotifierFn
   );
-  if (await handleErrorIfAny(response)) return null;
 
   let { cryptoHeaderContent, arrayBuffer } = response;
 
@@ -238,13 +232,13 @@ export const downloadAndDecryptFile = async (
       progressNotifierFn
     );
   } catch (ex) {
-    throw raiseCaughtClientError(ex, clientError.DECRYPTION_FAILED);
+    throw raiseCaughtClientError(ex, clientErrorDef.NKCE_DECRYPTION_FAILED);
   }
 
   try {
     initiateFileDownload(decryptedArrayBuffer, fileNameForDownloading);
   } catch (ex) {
-    throw raiseCaughtClientError(ex, clientError.FAILED_TO_SAVE_FILE);
+    throw raiseCaughtClientError(ex, clientErrorDef.NKCE_FAILED_TO_SAVE_FILE);
   }
 
   return true;

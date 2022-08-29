@@ -28,7 +28,7 @@
   import { encryptText } from "../../utility/crypto-utils.js";
   import { BUCKET_CRYPTO_SPEC } from "../../constant/crypto-specs.js";
   import { bucketList } from "../../store/content.js";
-  import { handleErrorIfAny } from "../../lib/error-handling.js";
+  import { handleAnyError } from "../../lib/error-handling.js";
 
   const NEW_BUCKET_ID = "new";
 
@@ -41,31 +41,36 @@
   const finalForm = form(name, encryptionPassword);
 
   const saveClicked = async () => {
-    let bucketPassword = $encryptionPassword.value;
+    try {
+      let bucketPassword = $encryptionPassword.value;
 
-    incrementActiveGlobalObtrusiveTaskCount();
+      incrementActiveGlobalObtrusiveTaskCount();
 
-    let cryptDataObject = await encryptText(BUCKET_CRYPTO_SPEC, bucketPassword);
+      let cryptDataObject = await encryptText(
+        BUCKET_CRYPTO_SPEC,
+        bucketPassword
+      );
 
-    let cryptData = JSON.stringify(cryptDataObject);
+      let cryptData = JSON.stringify(cryptDataObject);
 
-    let response = await callBucketCreateApi({
-      name: $name.value,
-      cryptSpec: BUCKET_CRYPTO_SPEC,
-      cryptData,
-      metaData: {
-        createFrom: "nkrypt.xyz app",
-      },
-    });
-    if (await handleErrorIfAny(response)) return;
+      let response = await callBucketCreateApi({
+        name: $name.value,
+        cryptSpec: BUCKET_CRYPTO_SPEC,
+        cryptData,
+        metaData: {
+          createFrom: "nkrypt.xyz app",
+        },
+      });
 
-    let response2 = await callBucketListApi({});
-    if (await handleErrorIfAny(response)) return;
+      let response2 = await callBucketListApi({});
 
-    bucketList.set(response2.bucketList);
+      bucketList.set(response2.bucketList);
 
-    replace("/dashboard");
-    decrementActiveGlobalObtrusiveTaskCount();
+      replace("/dashboard");
+      decrementActiveGlobalObtrusiveTaskCount();
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
   };
 </script>
 

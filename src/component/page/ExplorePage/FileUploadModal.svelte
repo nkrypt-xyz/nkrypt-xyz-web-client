@@ -32,7 +32,7 @@
   import Button, { Label } from "@smui/button";
   import CircularProgress from "@smui/circular-progress";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
-  import { handleErrorIfAny } from "../../../lib/error-handling.js";
+  import { handleAnyError } from "../../../lib/error-handling.js";
   import { encryptAndUploadFile } from "../../../lib/crypto-transit.js";
   import LinearProgress from "@smui/linear-progress";
 
@@ -156,51 +156,53 @@
   };
 
   const startUploadClicked = async () => {
-    let fileId = null;
-    let { bucketId, _id: parentDirectoryId } = directory;
+    try {
+      let fileId = null;
+      let { bucketId, _id: parentDirectoryId } = directory;
 
-    if (requiresOverwrite) {
-      let matchingFile = childFileList.find((file) => file.name === fileName);
-      fileId = matchingFile._id;
-    } else {
-      incrementActiveGlobalObtrusiveTaskCount();
-      let response = await callFileCreateApi({
+      if (requiresOverwrite) {
+        let matchingFile = childFileList.find((file) => file.name === fileName);
+        fileId = matchingFile._id;
+      } else {
+        incrementActiveGlobalObtrusiveTaskCount();
+        let response = await callFileCreateApi({
+          bucketId,
+          name: fileName,
+          parentDirectoryId,
+          metaData: {},
+          encryptedMetaData: await encryptObject({}, bucketPassword),
+        });
+        if (response.hasError) {
+          setAnswer(null);
+          return;
+        }
+        decrementActiveGlobalObtrusiveTaskCount();
+        ({ fileId } = response);
+      }
+
+      state = FileUploadModalState.FILE_UPLOAD;
+      uploadProgress = {
+        totalBytes: 0,
+        encryptedBytes: 0,
+      };
+      let response = await encryptAndUploadFile(
         bucketId,
-        name: fileName,
-        parentDirectoryId,
-        metaData: {},
-        encryptedMetaData: await encryptObject({}, bucketPassword),
-      });
+        fileId,
+        uploadCandidate,
+        bucketPassword,
+        updateProgressFn,
+        selectedUploadMethod
+      );
       if (response.hasError) {
         setAnswer(null);
-        await handleErrorIfAny(response);
         return;
       }
-      decrementActiveGlobalObtrusiveTaskCount();
-      ({ fileId } = response);
-    }
 
-    state = FileUploadModalState.FILE_UPLOAD;
-    uploadProgress = {
-      totalBytes: 0,
-      encryptedBytes: 0,
-    };
-    let response = await encryptAndUploadFile(
-      bucketId,
-      fileId,
-      uploadCandidate,
-      bucketPassword,
-      updateProgressFn,
-      selectedUploadMethod
-    );
-    if (response.hasError) {
-      setAnswer(null);
-      await handleErrorIfAny(response);
+      setAnswer(response);
       return;
+    } catch (ex) {
+      return await handleAnyError(ex);
     }
-
-    setAnswer(response);
-    return;
   };
 
   let shouldShowDialog = false;

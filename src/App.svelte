@@ -51,7 +51,7 @@
   import { createDebouncedMethod } from "./utility/misc-utils.js";
   import { decryptText, encryptText } from "./utility/crypto-utils.js";
   import { performUserLogout } from "./lib/session.js";
-  import { handleErrorIfAny } from "./lib/error-handling.js";
+  import { handleAnyError } from "./lib/error-handling.js";
 
   let topAppBar: TopAppBarComponentDev;
 
@@ -64,10 +64,13 @@
 
   const loadBucketList = createDebouncedMethod(async () => {
     incrementActiveGlobalObtrusiveTaskCount();
-    let response = await callBucketListApi({});
-    if (await handleErrorIfAny(response)) return;
-    bucketList.set(response.bucketList);
-    decrementActiveGlobalObtrusiveTaskCount();
+    try {
+      let response = await callBucketListApi({});
+      bucketList.set(response.bucketList);
+      decrementActiveGlobalObtrusiveTaskCount();
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
   }, 100);
 
   const logoutClicked = async () => {

@@ -34,13 +34,12 @@
   import Button, { Label } from "@smui/button";
   import CircularProgress from "@smui/circular-progress";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
-  import { CodedError, handleErrorIfAny } from "../../../lib/error-handling.js";
   import {
     downloadAndDecryptFile,
     encryptAndUploadFile,
   } from "../../../lib/crypto-transit.js";
   import LinearProgress from "@smui/linear-progress";
-  import { clientError } from "../../../constant/client-errors.js";
+  import { clientErrorDef } from "../../../constant/client-errors.js";
 
   const FileOperationModalState = {
     IDLE: "IDLE",

@@ -1,16 +1,37 @@
+import { clientErrorDef } from "../constant/client-errors.js";
 import {
   decrementActiveGlobalObtrusiveTaskCount,
   showAlert,
 } from "../store/ui.js";
 import { performUserLogout } from "./session.js";
 
-export const handleErrorIfAny = async (
-  response,
+export const handleAnyError = async (
+  error: Error,
   reduceObtrusiveLoader: boolean = true
 ): Promise<boolean> => {
-  if (!response.hasError) return false;
-  let { message, code } = response.error;
-  await showAlert("Error occurred", message);
+  if (!error || "object" !== typeof error || !(error instanceof Error)) {
+    console.log("Unknown type of error found.");
+    console.error(error);
+    await showAlert("Error occurred", "An unknown type of error occurred.");
+    return;
+  }
+
+  let code = null;
+  let title = "Error occurred";
+  if (error instanceof CodedError) {
+    let logMessage = `(Handled) ${error.name}: ${error.code} - ${error.message}`;
+    console.error(logMessage);
+
+    if (error.code in clientErrorDef) {
+      title = clientErrorDef[error.code].shorthand;
+    }
+  } else {
+    let logMessage = `(Handled) ${error.name}: ${error.message}`;
+    console.error(logMessage);
+  }
+
+  let message = error.message || "An unidentified error occurred";
+  await showAlert(title, message);
 
   if (reduceObtrusiveLoader) {
     decrementActiveGlobalObtrusiveTaskCount();
@@ -22,6 +43,21 @@ export const handleErrorIfAny = async (
   }
 
   return true;
+};
+
+export const executeAndHandle = async (
+  fn: Function,
+  reduceObtrusiveLoader: boolean = true
+): Promise<[any, boolean]> => {
+  let hadError = false;
+  let response;
+  try {
+    response = await fn();
+  } catch (ex) {
+    await handleAnyError(ex, reduceObtrusiveLoader);
+    hadError = true;
+  }
+  return [response, hadError];
 };
 
 class ExtendableError extends Error {
@@ -45,17 +81,24 @@ export class CodedError extends ExtendableError {
   }
 }
 
+export class ClientError extends CodedError {}
+
+export class ResponseError extends CodedError {}
+
 export function raiseCaughtClientError(
-  exception: Error,
-  clientError,
+  caughtError: Error,
+  clientErrorDef,
   message: string = null
 ) {
-  console.error("Caught and proxied:", exception);
-  let error = raiseClientError(clientError, message);
-  error.cause = exception;
+  console.error("Caught and proxied:", caughtError);
+  let error = raiseClientError(clientErrorDef, message);
+  error.cause = caughtError;
   return error;
 }
 
-export function raiseClientError(clientError, message: string = null) {
-  return new CodedError(clientError.code, message || clientError.message);
+export function raiseClientError(clientErrorDef, message: string = null) {
+  return new ClientError(
+    clientErrorDef.code,
+    message || clientErrorDef.message
+  );
 }

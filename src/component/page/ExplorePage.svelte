@@ -16,7 +16,7 @@
     callDirectoryCreateApi,
     callDirectoryGetApi,
   } from "../../integration/content-apis.js";
-  import { handleErrorIfAny } from "../../lib/error-handling.js";
+  import { handleAnyError } from "../../lib/error-handling.js";
   import {
     getPasswordForBucket,
     setPasswordForBucket,
@@ -76,14 +76,17 @@
   };
 
   const getDirectory = async (directoryId: string) => {
-    incrementActiveGlobalObtrusiveTaskCount();
-    let response = await callDirectoryGetApi({
-      bucketId: currentBucket._id,
-      directoryId: directoryId,
-    });
-    if (await handleErrorIfAny(response)) return;
-    decrementActiveGlobalObtrusiveTaskCount();
-    return response;
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callDirectoryGetApi({
+        bucketId: currentBucket._id,
+        directoryId: directoryId,
+      });
+      decrementActiveGlobalObtrusiveTaskCount();
+      return response;
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
   };
 
   const loadRootDirectory = async (): Promise<void> => {
@@ -160,21 +163,24 @@
   });
 
   const createDirectoryClicked = async () => {
-    let name = await showPrompt("Create directory", "Enter directory name");
-    if (!name) return;
+    try {
+      let name = await showPrompt("Create directory", "Enter directory name");
+      if (!name) return;
 
-    incrementActiveGlobalObtrusiveTaskCount();
-    let response = await callDirectoryCreateApi({
-      bucketId: currentBucket._id,
-      name,
-      parentDirectoryId: (currentDirectory as any)._id,
-      metaData: {},
-      encryptedMetaData: await encryptObject({}, currentBucketPassword),
-    });
-    if (await handleErrorIfAny(response)) return;
-    decrementActiveGlobalObtrusiveTaskCount();
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callDirectoryCreateApi({
+        bucketId: currentBucket._id,
+        name,
+        parentDirectoryId: (currentDirectory as any)._id,
+        metaData: {},
+        encryptedMetaData: await encryptObject({}, currentBucketPassword),
+      });
+      decrementActiveGlobalObtrusiveTaskCount();
 
-    explorePath(currentPath);
+      explorePath(currentPath);
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
   };
 
   const childDirectoryClicked = async (childDirectory) => {

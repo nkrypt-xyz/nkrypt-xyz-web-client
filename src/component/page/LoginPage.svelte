@@ -23,24 +23,27 @@
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
   } from "../../store/ui.js";
-  import { handleErrorIfAny } from "../../lib/error-handling.js";
+  import { handleAnyError } from "../../lib/error-handling.js";
 
   const loginClicked = async () => {
-    let payload = extract($finalForm.summary, ["userName", "password"]);
-    incrementActiveGlobalObtrusiveTaskCount();
-    let response = await callUserLoginApi($server.value, payload);
-    if (await handleErrorIfAny(response)) return;
-    decrementActiveGlobalObtrusiveTaskCount();
+    try {
+      let payload = extract($finalForm.summary, ["userName", "password"]);
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callUserLoginApi($server.value, payload);
+      decrementActiveGlobalObtrusiveTaskCount();
 
-    let { apiKey } = response;
-    let { userName, displayName, _id: userId } = response.user;
+      let { apiKey } = response;
+      let { userName, displayName, _id: userId } = response.user;
 
-    storedUser.set({ userName, displayName, userId });
-    storedSession.set({ apiKey, serverUrl: $server.value });
+      storedUser.set({ userName, displayName, userId });
+      storedSession.set({ apiKey, serverUrl: $server.value });
 
-    suggestedServerUrl.set($server.value);
+      suggestedServerUrl.set($server.value);
 
-    replace("/dashboard");
+      replace("/dashboard");
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
   };
 
   const server = standardField("server", $suggestedServerUrl, [minlength(4)]);
