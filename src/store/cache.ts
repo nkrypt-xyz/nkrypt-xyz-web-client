@@ -1,9 +1,9 @@
+import { Writable, writable } from "svelte/store";
+import { CommonConstant } from "../constant/common-constants.js";
 import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from "../utility/store-utils.js";
-import { Writable, writable } from "svelte/store";
-import { CommonConstant } from "../constant/common-constants.js";
 
 const LAST_USED_SERVER_URL_LOCALSTORAGE_KEY = "--cache--lastUsedServerUrl";
 

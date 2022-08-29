@@ -1,5 +1,7 @@
 <script lang="ts">
-  import Button, { Label, Icon } from "@smui/button";
+  // UI / Framework
+  import { Icon } from "@smui/button";
+  // Other imports
 
   export let childFileList = [];
   export let childFileClicked = null;

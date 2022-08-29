@@ -1,9 +1,8 @@
+import { Writable, writable } from "svelte/store";
 import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from "../utility/store-utils.js";
-import { Writable, writable } from "svelte/store";
-import type { Session } from "../model/common.js";
 
 const BUCKET_PREFIX = "bucket_";
 const SAVED_PASSWORDS_LOCALSTORAGE_KEY = "--saved-passwords";

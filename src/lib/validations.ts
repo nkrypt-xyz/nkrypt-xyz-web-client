@@ -1,7 +1,7 @@
 import { field } from "svelte-forms";
 import type { FieldOptions } from "svelte-forms/types";
+import { required } from "svelte-forms/validators";
 import type { Validator } from "svelte-forms/validators/validator";
-import { required, min } from "svelte-forms/validators";
 
 export function standardField(
   name: string,

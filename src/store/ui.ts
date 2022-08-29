@@ -1,7 +1,6 @@
 import { Writable, writable } from "svelte/store";
-import type { User } from "src/model/common.js";
-import { ClientError } from "../lib/error-handling.js";
 import { clientErrorDef } from "../constant/client-errors.js";
+import { ClientError } from "../lib/error-handling.js";
 
 let inflatedZIndex = 8;
 const STARTING_Z_INDEX = 8;

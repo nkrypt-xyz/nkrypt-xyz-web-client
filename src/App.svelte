@@ -1,57 +1,53 @@
 <script lang="ts">
   // Core
   import { onMount } from "svelte";
-  // UI Library Item
-  import Button, { Label, Icon } from "@smui/button";
+  // UI / Framework Library Item
+  import Button, { Icon, Label } from "@smui/button";
+  import Drawer, {
+    Content,
+    Header,
+    Scrim,
+    Subtitle,
+    Title as DrawerTitle,
+  } from "@smui/drawer";
+  import IconButton from "@smui/icon-button";
+  import List, { Item, Text } from "@smui/list";
   import type { TopAppBarComponentDev } from "@smui/top-app-bar";
   import TopAppBar, {
+    AutoAdjust,
     Row,
     Section,
     Title,
-    AutoAdjust,
   } from "@smui/top-app-bar";
-  import IconButton from "@smui/icon-button";
-  import Drawer, {
-    AppContent,
-    Content,
-    Header,
-    Title as DrawerTitle,
-    Subtitle,
-    Scrim,
-  } from "@smui/drawer";
-  import List, { Item, Text } from "@smui/list";
   // Routing
-  import Router, { replace, location, push } from "svelte-spa-router";
+  import Router, { push, replace } from "svelte-spa-router";
   import { wrap } from "svelte-spa-router/wrap";
   // Pages
-  import LoginPage from "./component/page/LoginPage.svelte";
-  import DashboardPage from "./component/page/DashboardPage.svelte";
   import CreateBucketPage from "./component/page/CreateBucketPage.svelte";
+  import DashboardPage from "./component/page/DashboardPage.svelte";
   import ExplorePage from "./component/page/ExplorePage.svelte";
+  import LoginPage from "./component/page/LoginPage.svelte";
   // Components
+  import Footer from "./component/common/Footer.svelte";
   import ObtrusiveLoader from "./component/common/ObtrusiveLoader.svelte";
   import AlertDialog from "./component/dialog/AlertDialog.svelte";
   import BucketPasswordDialog from "./component/dialog/BucketPasswordDialog.svelte";
   import ConfirmationDialog from "./component/dialog/ConfirmationDialog.svelte";
   import PromptDialog from "./component/dialog/PromptDialog.svelte";
-  import Footer from "./component/common/Footer.svelte";
   // Stores
-  import { storedUser } from "./store/user.js";
-  import { storedSession } from "./store/session.js";
   import { activeBucket, bucketList } from "./store/content.js";
+  import { storedSession } from "./store/session.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
   } from "./store/ui.js";
+  import { storedUser } from "./store/user.js";
   // Integrations
   import { callBucketListApi } from "./integration/content-apis.js";
-  import { callUserLogoutApi } from "./integration/user-apis.js";
   // Local Misc
-  import { CommonConstant } from "./constant/common-constants.js";
-  import { createDebouncedMethod } from "./utility/misc-utils.js";
-  import { decryptText, encryptText } from "./utility/crypto-utils.js";
-  import { performUserLogout } from "./lib/session.js";
   import { handleAnyError } from "./lib/error-handling.js";
+  import { performUserLogout } from "./lib/session.js";
+  import { createDebouncedMethod } from "./utility/misc-utils.js";
 
   let topAppBar: TopAppBarComponentDev;
 

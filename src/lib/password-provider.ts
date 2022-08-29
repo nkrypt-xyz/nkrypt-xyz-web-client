@@ -1,11 +1,7 @@
-import { decryptText } from "../utility/crypto-utils.js";
-import { getPasswordForBucket } from "../store/password.js";
-import {
-  bucketPasswordDialog,
-  showAlert,
-  showBucketPasswordDialog,
-} from "../store/ui.js";
 import { BUCKET_CRYPTO_SPEC } from "../constant/crypto-specs.js";
+import { getPasswordForBucket } from "../store/password.js";
+import { showAlert, showBucketPasswordDialog } from "../store/ui.js";
+import { decryptText } from "../utility/crypto-utils.js";
 
 const ensureBucketPasswordWorks = async (
   bucket,

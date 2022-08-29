@@ -1,6 +1,6 @@
 import { clientErrorDef } from "../constant/client-errors.js";
-import { raiseClientError, ResponseError } from "../lib/error-handling.js";
 import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../constant/crypto-specs.js";
+import { ResponseError } from "../lib/error-handling.js";
 import { convertStreamToBuffer } from "./stream-and-buffer-utils.js";
 
 export const joinUrlPathFragments = (...pathFragments: string[]) => {

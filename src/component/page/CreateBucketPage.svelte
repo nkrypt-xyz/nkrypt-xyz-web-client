@@ -1,34 +1,27 @@
 <script lang="ts">
-  // UI
-  import Button, { Label, Icon as ButtonIcon } from "@smui/button";
+  // UI / Framework
+  import Button, { Label } from "@smui/button";
   import Card, { Content } from "@smui/card";
   import Textfield from "@smui/textfield";
-  import Icon from "@smui/textfield/icon";
   import HelperText from "@smui/textfield/helper-text";
-  // Extern
-  import { form, field } from "svelte-forms";
-  import { required, min } from "svelte-forms/validators";
+  import Icon from "@smui/textfield/icon";
+  import { form } from "svelte-forms";
   import { replace } from "svelte-spa-router";
-  // Intern
+  import { handleAnyError } from "../../lib/error-handling.js";
   import { standardField } from "../../lib/validations.js";
-  import { CommonConstant } from "../../constant/common-constants.js";
-  import { callUserLoginApi } from "../../integration/user-apis.js";
-  import { minlength } from "../../lib/validators.js";
-  import { extract } from "../../utility/misc-utils.js";
-  import { storedUser } from "../../store/user.js";
-  import { storedSession } from "../../store/session.js";
-  import {
-    decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-  } from "../../store/ui.js";
+  // Other imports
+  import { BUCKET_CRYPTO_SPEC } from "../../constant/crypto-specs.js";
   import {
     callBucketCreateApi,
     callBucketListApi,
   } from "../../integration/content-apis.js";
-  import { encryptText } from "../../utility/crypto-utils.js";
-  import { BUCKET_CRYPTO_SPEC } from "../../constant/crypto-specs.js";
+  import { minlength } from "../../lib/validators.js";
   import { bucketList } from "../../store/content.js";
-  import { handleAnyError } from "../../lib/error-handling.js";
+  import {
+    decrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount,
+  } from "../../store/ui.js";
+  import { encryptText } from "../../utility/crypto-utils.js";
 
   const NEW_BUCKET_ID = "new";
 
