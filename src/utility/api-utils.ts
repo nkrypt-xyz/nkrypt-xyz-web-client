@@ -1,6 +1,6 @@
 import { clientError } from "../constant/client-errors.js";
 import { CodedError, raiseClientError } from "../lib/error-handling.js";
-import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../lib/crypto-specs.js";
+import { BLOB_API_CRYPTO_META_HEADER_NAME } from "../constant/crypto-specs.js";
 import { convertStreamToBuffer } from "./stream-and-buffer-utils.js";
 
 const genericConnectionFailureMessage =
