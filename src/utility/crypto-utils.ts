@@ -1,3 +1,4 @@
+import { testConstants } from "../constant/test-constants.js";
 import {
   ENCRYPTION_ALGORITHM,
   ENCRYPTION_TAGLENGTH_IN_BITS,
@@ -8,7 +9,7 @@ import {
   PASSPHRASE_DERIVEKEY_ITERATIONS,
   PASSPHRASE_IMPORTKEY_ALGORITHM,
   SALT_LENGTH,
-} from "../lib/crypto-specs.js";
+} from "../constant/crypto-specs.js";
 import {
   convertSmallBufferToString,
   convertSmallStringToBuffer,
@@ -16,11 +17,23 @@ import {
 } from "./buffer-utils.js";
 
 export const makeRandomIv = async () => {
+  if (testConstants.WEAKEN_CRYPTO_FOR_TESTING) {
+    console.warn(
+      "WARNING! using predefined IV for testing ONLY. This significantly reduces the strength of the cryptography and must NEVER be used in production."
+    );
+    return { iv: testConstants.TEST_IV };
+  }
   let iv = window.crypto.getRandomValues(new Uint8Array(IV_LENGTH));
   return { iv };
 };
 
 export const makeRandomSalt = async () => {
+  if (testConstants.WEAKEN_CRYPTO_FOR_TESTING) {
+    console.warn(
+      "WARNING! using predefined SALT for testing ONLY. This significantly reduces the strength of the cryptography and must NEVER be used in production."
+    );
+    return { salt: testConstants.TEST_SALT };
+  }
   let salt = window.crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
   return { salt };
 };
