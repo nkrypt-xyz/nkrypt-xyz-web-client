@@ -5,7 +5,7 @@ import {
   showAlert,
   showBucketPasswordDialog,
 } from "../store/ui.js";
-import { BUCKET_CRYPTO_SPEC } from "./crypto-specs.js";
+import { BUCKET_CRYPTO_SPEC } from "../constant/crypto-specs.js";
 
 const ensureBucketPasswordWorks = async (
   bucket,

@@ -28,7 +28,7 @@ import {
 import {
   BLOB_CHUNK_SIZE_BYTES,
   ENCRYPTION_TAGLENGTH_IN_BITS,
-} from "./crypto-specs.js";
+} from "../constant/crypto-specs.js";
 
 const createCipherProperties = async (bucketPassword: string) => {
   let { iv } = await makeRandomIv();
