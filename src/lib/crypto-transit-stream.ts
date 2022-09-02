@@ -285,7 +285,11 @@ export const downloadAndDecryptFile = async (
     readableStrategy: undefined, // (optional)
   });
 
-  let results = await decryptedReadableStream.pipeTo(fileStream);
+  await decryptedReadableStream.pipeTo(fileStream);
+  
+  try {
+    await decryptedReadableStream.cancel();
+  } catch (ex) {}
 
-  return results;
+  return true;
 };

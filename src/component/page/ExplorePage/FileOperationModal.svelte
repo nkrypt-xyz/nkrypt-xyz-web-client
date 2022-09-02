@@ -154,10 +154,10 @@
               <FormField>
                 <Radio
                   bind:group={selectedDownloadMethod}
-                  value={"vfs"}
+                  value={"fs"}
                   touch
                 />
-                <span slot="label">Virtual File System</span>
+                <span slot="label">Direct File System</span>
               </FormField>
             </div>
           {/if}

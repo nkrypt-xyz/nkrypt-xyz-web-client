@@ -1,5 +1,6 @@
 import * as cryptoTransitBasic from "./crypto-transit-basic.js";
 import * as cryptoTransitStream from "./crypto-transit-stream.js";
+import * as cryptoTransitViaVfs from "./crypto-transit-fs.js";
 
 export const encryptAndUploadFile = async (
   bucketId: string,
@@ -62,7 +63,15 @@ export const downloadAndDecryptFile = async (
       bucketPassword,
       progressNotifierFn
     );
+  } else if (downloadMethod === "fs") {
+    return await cryptoTransitViaVfs.downloadAndDecryptFile(
+      bucketId,
+      fileId,
+      fileNameForDownloading,
+      bucketPassword,
+      progressNotifierFn
+    );
   }
-
   return null;
 };
+
