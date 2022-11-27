@@ -13,6 +13,7 @@
     "@smui/button": "^6.0.0-beta.16",
     "@smui/card": "^6.0.0-beta.16",
     "@smui/circular-progress": "^6.0.0-beta.16",
+    "@smui/data-table": "^7.0.0-beta.0",
     "@smui/dialog": "^6.0.0-beta.16",
     "@smui/drawer": "^6.0.0-beta.16",
     "@smui/icon-button": "^6.0.0-beta.16",
