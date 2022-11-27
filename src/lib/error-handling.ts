@@ -22,6 +22,8 @@ export const handleAnyError = async (
     let logMessage = `(Handled) ${error.name}: ${error.code} - ${error.message}`;
     console.error(logMessage);
 
+    ({ code } = error);
+
     if (error.code in clientErrorDef) {
       title = clientErrorDef[error.code].shorthand;
     }
