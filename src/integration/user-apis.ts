@@ -20,3 +20,12 @@ export const callUserLogoutApi = async (data: { message }) => {
     data
   );
 };
+
+export const callUserListApi = async (data: {}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/user/list",
+    data
+  );
+};

@@ -1,10 +1,87 @@
 <script lang="ts">
   // UI / Framework
   import { Icon } from "@smui/button";
+  import Menu from "@smui/menu";
+  import List, { Item, Separator, Text } from "@smui/list";
+  import Button, { Label } from "@smui/button";
+  import {
+    decrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount,
+    showConfirmation,
+    showPrompt,
+  } from "../../../store/ui.js";
+  import {
+    callDirectoryDeleteApi,
+    callDirectoryGetApi,
+    callDirectoryRenameApi,
+    callFileDeleteApi,
+    callFileRenameApi,
+  } from "../../../integration/content-apis.js";
+  import { handleAnyError } from "../../../lib/error-handling.js";
   // Other imports
 
   export let childFileList = [];
   export let childFileClicked = null;
+  export let refreshClicked = null;
+  export let viewPropertiesOfChildFileClicked = null;
+
+  let menu: Menu;
+  let possibleChildFile = null;
+
+  const renameClicked = async (childFile) => {
+    console.log("To rename", childFile);
+
+    let answer = await showPrompt(
+      "Renaming Directory",
+      `Enter the new name for the directory "${childFile.name}"`
+    );
+
+    if (!answer || answer.trim().length < 1) return;
+
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callFileRenameApi({
+        bucketId: childFile.bucketId,
+        fileId: childFile._id,
+        name: answer,
+      });
+      decrementActiveGlobalObtrusiveTaskCount();
+    } catch (ex) {
+      await handleAnyError(ex);
+    }
+
+    await refreshClicked();
+  };
+
+  const deleteClicked = async (childFile) => {
+    console.log("To delete", childFile);
+
+    let answer = await showConfirmation(
+      "Confirm Deletion",
+      `Are you sure you want to delete the file "${childFile.name}"? The file will be deleted permanently.`
+    );
+
+    if (!answer) return;
+
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callFileDeleteApi({
+        bucketId: childFile.bucketId,
+        fileId: childFile._id,
+      });
+      decrementActiveGlobalObtrusiveTaskCount();
+    } catch (ex) {
+      await handleAnyError(ex);
+    }
+
+    await refreshClicked();
+  };
+
+  const viewPropertiesClicked = async (childFile) => {
+    console.log("To view properties", childFile);
+
+    await viewPropertiesOfChildFileClicked(childFile);
+  };
 </script>
 
 <div class="file-section-header">Files</div>
@@ -14,10 +91,44 @@
     <div class="no-file">No files found.</div>
   {/if}
   {#each childFileList as childFile, i}
-    <div class="file" on:click={() => childFileClicked(childFile)}>
-      <Icon class="material-icons">file_present</Icon>
-      <div class="title">
+    <div class="file">
+      <Icon class="material-icons" on:click={() => childFileClicked(childFile)}>
+        file_present
+      </Icon>
+      <div class="title" on:click={() => childFileClicked(childFile)}>
         {childFile.name}
+      </div>
+
+      <div class="action-menu-trigger">
+        <Icon
+          class="material-icons"
+          on:click={() => {
+            menu.setOpen(true);
+            // TODO improve upon this unfortunate hack
+            possibleChildFile = childFile;
+          }}
+        >
+          more_vert
+        </Icon>
+        <Menu bind:this={menu} anchorCorner="TOP_RIGHT">
+          <List>
+            <Item on:SMUI:action={() => childFileClicked(possibleChildFile)}>
+              <Text>Open</Text>
+            </Item>
+            <Item on:SMUI:action={() => renameClicked(possibleChildFile)}>
+              <Text>Rename</Text>
+            </Item>
+            <Item on:SMUI:action={() => deleteClicked(possibleChildFile)}>
+              <Text>Delete</Text>
+            </Item>
+            <Separator />
+            <Item
+              on:SMUI:action={() => viewPropertiesClicked(possibleChildFile)}
+            >
+              <Text>Properties</Text>
+            </Item>
+          </List>
+        </Menu>
       </div>
     </div>
   {/each}
@@ -56,6 +167,12 @@
   }
 
   .file .title {
+    margin-top: 2px;
+    cursor: pointer;
+    flex: 1;
+  }
+
+  .file .action-menu-trigger {
     margin-top: 2px;
     cursor: pointer;
   }

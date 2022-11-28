@@ -6,6 +6,7 @@
   import LinearProgress from "@smui/linear-progress";
   import Radio from "@smui/radio";
   // Other imports
+  import { storedSettings } from "../../../store/settings.js";
   import { downloadAndDecryptFile } from "../../../lib/crypto-transit.js";
   import { showCommonErrorDialog } from "../../../store/ui.js";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
@@ -30,6 +31,8 @@
   let downloadProgress = null;
 
   let selectedDownloadMethod = "basic";
+
+  $: selectedDownloadMethod = $storedSettings.downloadMechanism;
 
   export function showModal(params: { file; bucketPassword }): Promise<string> {
     return new Promise<string>((accept, reject) => {
@@ -111,16 +114,16 @@
         {#if file}
           <div class="download-summary">
             <div>
-              <span class="title">Original Name: </span>
+              <span class="title">Name: </span>
               <span class="value">{file.name}</span>
             </div>
             <div>
               <span class="title">Size before encryption: </span>
-              <span class="value">{expressBytesPrettified(file.size)}</span>
+              <span class="value">{expressBytesPrettified(file.metaData?.size)}</span>
             </div>
             <div>
               <span class="title">Type: </span>
-              <span class="value">{file.type}</span>
+              <span class="value">{file.metaData?.mimeType}</span>
             </div>
           </div>
 
@@ -132,34 +135,6 @@
             >
               <Label>Decrypt and download</Label>
             </Button>
-
-            <h4>Download method</h4>
-            <div class="upload-method">
-              <FormField>
-                <Radio
-                  bind:group={selectedDownloadMethod}
-                  value={"basic"}
-                  touch
-                />
-                <span slot="label">Basic</span>
-              </FormField>
-              <FormField>
-                <Radio
-                  bind:group={selectedDownloadMethod}
-                  value={"stream"}
-                  touch
-                />
-                <span slot="label">Streaming</span>
-              </FormField>
-              <FormField>
-                <Radio
-                  bind:group={selectedDownloadMethod}
-                  value={"fs"}
-                  touch
-                />
-                <span slot="label">Direct File System</span>
-              </FormField>
-            </div>
           {/if}
 
           {#if state === FileOperationModalState.FILE_DOWNLOAD}

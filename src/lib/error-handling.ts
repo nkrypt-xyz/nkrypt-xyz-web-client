@@ -41,7 +41,7 @@ export const handleAnyError = async (
 
   const apiKeyErrorCodeList = ["API_KEY_NOT_FOUND", "API_KEY_EXPIRED"];
   if (apiKeyErrorCodeList.indexOf(code) > -1) {
-    await performUserLogout();
+    await performUserLogout({ navigateToDashboard: true });
   }
 
   return true;

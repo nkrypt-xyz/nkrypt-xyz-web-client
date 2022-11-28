@@ -24,6 +24,7 @@
   import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
   import FileSection from "./ExplorePage/FileSection.svelte";
   import FileUploadModal from "./ExplorePage/FileUploadModal.svelte";
+  import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -231,7 +232,7 @@
   };
 
   const refreshClicked = async () => {
-    explorePath(currentPath);
+    await explorePath(currentPath);
   };
 
   let fileUploadModal;
@@ -246,10 +247,30 @@
       explorePath(currentPath);
     }
   };
+
+  let propertiesModal;
+
+  const viewPropertiesOfChildDirectoryClicked = async (childDirectory) => {
+    let nullableResponse = await propertiesModal.showModal({
+      entity: childDirectory,
+      isDirectory: true,
+      bucketPassword: currentBucketPassword,
+    });
+  };
+
+  const viewPropertiesOfChildFileClicked = async (childFile) => {
+    let nullableResponse = await propertiesModal.showModal({
+      entity: childFile,
+      isDirectory: false,
+      bucketPassword: currentBucketPassword,
+    });
+  };
 </script>
 
 <FileUploadModal bind:this={fileUploadModal} />
 <FileOperationModal bind:this={fileOperationModal} />
+<PropertiesModal bind:this={propertiesModal} />
+
 <div class="nk-page">
   {#if currentBucket}
     <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />
@@ -285,9 +306,19 @@
       </IconButton>
     </div>
 
-    <DirectorySection {childDirectoryList} {childDirectoryClicked} />
+    <DirectorySection
+      {childDirectoryList}
+      {childDirectoryClicked}
+      {refreshClicked}
+      {viewPropertiesOfChildDirectoryClicked}
+    />
 
-    <FileSection {childFileList} {childFileClicked} />
+    <FileSection
+      {childFileList}
+      {childFileClicked}
+      {refreshClicked}
+      {viewPropertiesOfChildFileClicked}
+    />
   {/if}
 </div>
 

@@ -7,8 +7,13 @@
   import Radio from "@smui/radio";
   import Textfield from "@smui/textfield";
   import HelperText from "@smui/textfield/helper-text";
+  import { storedSettings } from "../../../store/settings.js";
   // Other imports
-  import { callFileCreateApi } from "../../../integration/content-apis.js";
+  import {
+    callFileCreateApi,
+    callFileSetEncryptedMetaDataApi,
+    callFileSetMetaDataApi,
+  } from "../../../integration/content-apis.js";
   import { encryptAndUploadFile } from "../../../lib/crypto-transit.js";
   import { handleAnyError } from "../../../lib/error-handling.js";
   import {
@@ -42,6 +47,8 @@
   let uploadProgress = null;
 
   let selectedUploadMethod = "basic";
+
+  $: selectedUploadMethod = $storedSettings.uploadMechanism;
 
   export function showAndUploadFile(params: {
     directory;
@@ -180,6 +187,36 @@
         return;
       }
 
+      {
+        incrementActiveGlobalObtrusiveTaskCount();
+        let metaData = {
+          size: uploadCandidate.size,
+          mimeType: uploadCandidate.type,
+        };
+        let response = await callFileSetMetaDataApi({
+          bucketId,
+          fileId,
+          metaData,
+        });
+        decrementActiveGlobalObtrusiveTaskCount();
+      }
+
+      {
+        incrementActiveGlobalObtrusiveTaskCount();
+        let encryptedMetaData = {
+          originalName: uploadCandidate.name,
+        };
+        let response = await callFileSetEncryptedMetaDataApi({
+          bucketId,
+          fileId,
+          encryptedMetaData: await encryptObject(
+            encryptedMetaData,
+            bucketPassword
+          ),
+        });
+        decrementActiveGlobalObtrusiveTaskCount();
+      }
+
       setAnswer(response);
       return;
     } catch (ex) {
@@ -289,38 +326,6 @@
             </div>
           {/if}
           <!-- File selection buttons - end -->
-        {/if}
-
-        {#if state === FileUploadModalState.FILE_SELECTION}
-          {#if uploadCandidate}
-            <h4>Upload method</h4>
-            <div class="upload-method">
-              <FormField>
-                <Radio
-                  bind:group={selectedUploadMethod}
-                  value={"basic"}
-                  touch
-                />
-                <span slot="label">Basic</span>
-              </FormField>
-              <FormField>
-                <Radio
-                  bind:group={selectedUploadMethod}
-                  value={"stream"}
-                  touch
-                />
-                <span slot="label">Streaming</span>
-              </FormField>
-              <FormField>
-                <Radio
-                  bind:group={selectedUploadMethod}
-                  value={"chunkedStream"}
-                  touch
-                />
-                <span slot="label">Quantized Streams (Multi-request)</span>
-              </FormField>
-            </div>
-          {/if}
         {/if}
 
         {#if state === FileUploadModalState.FILE_UPLOAD}
