@@ -8,3 +8,8 @@ export type User = {
   displayName: string;
   userId: string;
 };
+
+export type Settings = {
+  uploadMechanism: string;
+  downloadMechanism: string;
+};

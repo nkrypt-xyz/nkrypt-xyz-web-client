@@ -31,6 +31,11 @@
     return `${value} GB`;
   };
 
+  const formatPercentage = (value, total) => {
+    let percentage = Math.round((value / total) * 100 * 100) / 100;
+    return `${percentage}%`;
+  };
+
   loadMetrics();
 </script>
 
@@ -45,6 +50,10 @@
         <div class="label">Used</div>
         <div class="value">
           {formatSize(metrics.disk.usedBytes)}
+          &nbsp;({formatPercentage(
+            metrics.disk.usedBytes,
+            metrics.disk.totalBytes
+          )})
         </div>
       </div>
 

@@ -7,7 +7,7 @@ import {
 } from "../store/ui.js";
 import { storedUser } from "../store/user.js";
 
-export const performUserLogout = async () => {
+export const performUserLogout = async ({ navigateToDashboard = true }) => {
   incrementActiveGlobalObtrusiveTaskCount();
   try {
     let response = await callUserLogoutApi({
@@ -18,6 +18,8 @@ export const performUserLogout = async () => {
   }
   storedUser.set(null);
   storedSession.set(null);
-  replace("/");
+  if (navigateToDashboard) {
+    replace("/");
+  }
   decrementActiveGlobalObtrusiveTaskCount();
 };

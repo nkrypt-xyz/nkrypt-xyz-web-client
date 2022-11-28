@@ -37,6 +37,24 @@ export const callDirectoryGetApi = async (data: { bucketId; directoryId }) => {
   );
 };
 
+export const callDirectoryRenameApi = async (data: { bucketId; directoryId; name }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/directory/rename",
+    data
+  );
+};
+
+export const callDirectoryDeleteApi = async (data: { bucketId; directoryId }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/directory/delete",
+    data
+  );
+};
+
 export const callDirectoryCreateApi = async (data: {
   name: string;
   bucketId: string;
@@ -63,6 +81,43 @@ export const callFileCreateApi = async (data: {
     _storedSession.serverUrl,
     _storedSession.apiKey,
     "/api/file/create",
+    data
+  );
+};
+
+export const callFileDeleteApi = async (data: { bucketId; fileId }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/file/delete",
+    data
+  );
+};
+
+export const callFileRenameApi = async (data: { bucketId; fileId; name }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/file/rename",
+    data
+  );
+};
+
+
+export const callFileSetMetaDataApi = async (data: { bucketId; fileId; metaData }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/file/set-metadata",
+    data
+  );
+};
+
+export const callFileSetEncryptedMetaDataApi = async (data: { bucketId; fileId; encryptedMetaData }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/file/set-encrypted-metadata",
     data
   );
 };

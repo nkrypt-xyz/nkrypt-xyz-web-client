@@ -48,6 +48,9 @@
   import { handleAnyError } from "./lib/error-handling.js";
   import { performUserLogout } from "./lib/session.js";
   import { createDebouncedMethod } from "./utility/misc-utils.js";
+  import ProfilePage from "./component/page/ProfilePage.svelte";
+  import UsersPage from "./component/page/UsersPage.svelte";
+  import SettingsPage from "./component/page/SettingsPage.svelte";
 
   let topAppBar: TopAppBarComponentDev;
 
@@ -107,6 +110,30 @@
     conditions: [conditionRequiresAuthentication],
   });
 
+  const profileRoute = wrap({
+    component: ProfilePage,
+    userData: {
+      requiresAuthentication: true,
+    },
+    conditions: [conditionRequiresAuthentication],
+  });
+
+  const usersRoute = wrap({
+    component: UsersPage,
+    userData: {
+      requiresAuthentication: true,
+    },
+    conditions: [conditionRequiresAuthentication],
+  });
+
+  const settingsRoute = wrap({
+    component: SettingsPage,
+    userData: {
+      requiresAuthentication: true,
+    },
+    conditions: [conditionRequiresAuthentication],
+  });
+
   const loginRoute = wrap({
     component: LoginPage,
   });
@@ -115,6 +142,9 @@
     "/dashboard": dashboardRoute,
     "/": dashboardRoute,
     "/login": loginRoute,
+    "/profile": profileRoute,
+    "/users": usersRoute,
+    "/settings": settingsRoute,
     "/bucket/create": createBucketRoute,
     "/explore/*": exploreRoute,
   };
@@ -153,6 +183,26 @@
     }
   });
 
+  const dashboardClicked = async () => {
+    push("/");
+    isLeftDrawerOpen = false;
+  };
+
+  const profileClicked = async () => {
+    push("/profile");
+    isLeftDrawerOpen = false;
+  };
+
+  const usersClicked = async () => {
+    push("/users");
+    isLeftDrawerOpen = false;
+  };
+
+  const settingsClicked = async () => {
+    push("/settings");
+    isLeftDrawerOpen = false;
+  };
+
   const createBucketClicked = async () => {
     push("/bucket/create");
     isLeftDrawerOpen = false;
@@ -180,9 +230,9 @@
           <Subtitle>Select one to explore</Subtitle>
         {/if}
       </Header>
-      <Content>
+      <Content class="nk-bucket-list-master-container">
         {#if $bucketList.length > 0}
-          <List>
+          <List class="nk-bucket-list">
             {#each $bucketList as bucket, i}
               <Item
                 href="javascript:void(0)"
@@ -195,21 +245,45 @@
           </List>
         {/if}
 
-        <div class="create-bucket-container">
-          <Button on:click={createBucketClicked}>
+        <div class="nk-left-bar-footer">
+          <Button
+            class="nk-left-bar-footer-button"
+            on:click={createBucketClicked}
+          >
             <Icon class="material-icons">add</Icon>
             <Label>Create a bucket</Label>
           </Button>
-        </div>
 
-        <div class="nk-left-bar-footer">
-          You are: {$storedUser.displayName}
-          <br />
-          <Button on:click={logoutClicked}>
+          <Button class="nk-left-bar-footer-button" on:click={dashboardClicked}>
+            <Icon class="material-icons">home</Icon>
+            <Label>Dashboad</Label>
+          </Button>
+
+          <Button class="nk-left-bar-footer-button" on:click={usersClicked}>
+            <Icon class="material-icons">group</Icon>
+            <Label>Users</Label>
+          </Button>
+
+          <div class="logged-in-as">
+            Logged-in as: {$storedUser.displayName}
+          </div>
+
+          <div class="spacer" />
+
+          <Button class="nk-left-bar-footer-button" on:click={profileClicked}>
+            <Icon class="material-icons">person</Icon>
+            <Label>Profile</Label>
+          </Button>
+
+          <Button class="nk-left-bar-footer-button" on:click={settingsClicked}>
+            <Icon class="material-icons">settings</Icon>
+            <Label>Settings</Label>
+          </Button>
+
+          <Button class="nk-left-bar-footer-button" on:click={logoutClicked}>
             <Icon class="material-icons">logout</Icon>
             <Label>Logout</Label>
           </Button>
-          <br />
         </div>
       </Content>
     </Drawer>
@@ -252,8 +326,40 @@
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   }
 
+  .nk-main :global(.nk-bucket-list) {
+    height: calc(100% - 288px - 32px);
+    overflow: scroll;
+  }
+
   .nk-left-bar-footer {
-    position: fixed;
-    bottom: 0px;
+    padding-top: 8px;
+    background-color: rgb(233, 245, 237);
+    padding-bottom: 8px;
+    height: 288px;
+  }
+
+  .nk-main :global(.bucket-list-master-container) {
+    max-height: 50vh;
+  }
+
+  .nk-main :global(.nk-left-bar-footer-button) {
+    margin-left: 12px;
+    display: block;
+  }
+
+  .logged-in-as {
+    font-size: 12px;
+    margin-right: 12px;
+    text-align: right;
+  }
+
+  .spacer {
+    background-color: rgb(30, 100, 102);
+    width: calc(100% - 8px - 8px);
+    height: 1px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
   }
 </style>
