@@ -9,10 +9,16 @@
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
     showAlert,
+    showUpdateUserPasswordDialog,
     showConfirmation,
+    showUpdateUserProfileDialog,
   } from "../../store/ui.js";
+  import UpdateUserPasswordDialog from "./ProfilePage/UpdateUserPasswordDialog.svelte";
+  import UpdateUserProfileDialog from "./ProfilePage/UpdateUserProfileDialog.svelte";
 </script>
 
+<UpdateUserPasswordDialog />
+<UpdateUserProfileDialog />
 <div class="nk-page profile">
   <div class="nk-page--inner-wrapper--standard">
     <div class="section">
@@ -38,6 +44,24 @@
           {$storedUser.displayName}
         </div>
       </div>
+    </div>
+    <div class="nk--button-row">
+      <Button
+        variant="raised"
+        class="hero-button"
+        on:click={showUpdateUserProfileDialog}
+      >
+        <Icon class="material-icons">person</Icon>
+        <Label>Update Profile</Label>
+      </Button>
+      <Button
+        variant="raised"
+        class="hero-button"
+        on:click={showUpdateUserPasswordDialog}
+      >
+        <Icon class="material-icons">password</Icon>
+        <Label>Change Login Password</Label>
+      </Button>
     </div>
   </div>
 </div>

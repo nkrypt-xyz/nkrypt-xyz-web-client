@@ -16,8 +16,12 @@ const applyInflatingZIndexHack = (className) => {
     );
 
     inflatedZIndex = maxZIndex + 1;
-    (<any>document.querySelector(className)).style.zIndex =
-      String(inflatedZIndex);
+    try {
+      (<any>document.querySelector(className)).style.zIndex =
+        String(inflatedZIndex);
+    } catch (ex) {
+      ("pass");
+    }
   }, 100);
 };
 
@@ -99,6 +103,44 @@ export let showBucketPasswordDialog = (bucketName) => {
     });
     applyInflatingZIndexHack(".nk-bucket-password-dialog");
     bucketPasswordDialog.set({ bucketName });
+  });
+};
+
+// ---------------------------------------------- Update User Password Dialog
+
+export let updateUserPasswordDialog: Writable<{}> = writable(null);
+
+export let updateUserPasswordDialogResponse: Writable<{}> = writable(null);
+
+export let showUpdateUserPasswordDialog = () => {
+  return new Promise((accept) => {
+    updateUserPasswordDialogResponse.set(null);
+    let unsubscribe = updateUserPasswordDialogResponse.subscribe((value) => {
+      if (value === null) return;
+      accept(value);
+      unsubscribe();
+    });
+    applyInflatingZIndexHack(".nk-update-user-password-dialog");
+    updateUserPasswordDialog.set({});
+  });
+};
+
+// ---------------------------------------------- Update User Profile Dialog
+
+export let updateUserProfileDialog: Writable<{}> = writable(null);
+
+export let updateUserProfileDialogResponse: Writable<{}> = writable(null);
+
+export let showUpdateUserProfileDialog = () => {
+  return new Promise((accept) => {
+    updateUserProfileDialogResponse.set(null);
+    let unsubscribe = updateUserProfileDialogResponse.subscribe((value) => {
+      if (value === null) return;
+      accept(value);
+      unsubscribe();
+    });
+    applyInflatingZIndexHack(".nk-update-user-profile-dialog");
+    updateUserProfileDialog.set({});
   });
 };
 
