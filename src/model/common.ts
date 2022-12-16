@@ -13,3 +13,12 @@ export type Settings = {
   uploadMechanism: string;
   downloadMechanism: string;
 };
+
+export type Bucket = {
+  _id: string;
+  name: string;
+  cryptSpec: string;
+  cryptData: string;
+  metaData: any;
+  bucketAuthorizations: [];
+};

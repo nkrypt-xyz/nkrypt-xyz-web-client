@@ -50,6 +50,7 @@
   import { createDebouncedMethod } from "./utility/misc-utils.js";
   import ProfilePage from "./component/page/ProfilePage.svelte";
   import UsersPage from "./component/page/UsersPage.svelte";
+  import BucketsPage from "./component/page/BucketsPage.svelte";
   import SettingsPage from "./component/page/SettingsPage.svelte";
 
   let topAppBar: TopAppBarComponentDev;
@@ -126,6 +127,14 @@
     conditions: [conditionRequiresAuthentication],
   });
 
+  const bucketsRoute = wrap({
+    component: BucketsPage,
+    userData: {
+      requiresAuthentication: true,
+    },
+    conditions: [conditionRequiresAuthentication],
+  });
+
   const settingsRoute = wrap({
     component: SettingsPage,
     userData: {
@@ -144,6 +153,7 @@
     "/login": loginRoute,
     "/profile": profileRoute,
     "/users": usersRoute,
+    "/buckets": bucketsRoute,
     "/settings": settingsRoute,
     "/bucket/create": createBucketRoute,
     "/explore/*": exploreRoute,
@@ -195,6 +205,11 @@
 
   const usersClicked = async () => {
     push("/users");
+    isLeftDrawerOpen = false;
+  };
+
+  const bucketsClicked = async () => {
+    push("/buckets");
     isLeftDrawerOpen = false;
   };
 
@@ -264,6 +279,11 @@
             <Label>Users</Label>
           </Button>
 
+          <Button class="nk-left-bar-footer-button" on:click={bucketsClicked}>
+            <Icon class="material-icons">folder_zip</Icon>
+            <Label>Buckets</Label>
+          </Button>
+
           <div class="logged-in-as">
             Logged-in as: {$storedUser.displayName}
           </div>
@@ -327,7 +347,7 @@
   }
 
   .nk-main :global(.nk-bucket-list) {
-    height: calc(100% - 288px - 32px);
+    height: calc(100% - 331px - 32px);
     overflow: scroll;
   }
 
@@ -335,7 +355,7 @@
     padding-top: 8px;
     background-color: rgb(233, 245, 237);
     padding-bottom: 8px;
-    height: 288px;
+    height: 331px;
   }
 
   .nk-main :global(.bucket-list-master-container) {
