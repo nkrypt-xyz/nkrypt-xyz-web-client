@@ -15,6 +15,10 @@
   let _promptDialog = null;
   promptDialog.subscribe((value) => {
     _promptDialog = value;
+
+    if (_promptDialog && _promptDialog.defaultValue !== null) {
+      inputText.set(_promptDialog.defaultValue);
+    }
   });
 
   const setAnswer = (answer) => {

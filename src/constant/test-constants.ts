@@ -6,4 +6,5 @@ export const testConstants = {
   TEST_SALT: new Uint8Array([
     211, 249, 108, 207, 85, 200, 216, 152, 218, 125, 181, 230, 230, 65, 174, 95,
   ]),
+  STOCK_PASSWORD_FOR_TESTING: "PleaseChangeMe@YourEarliest2Day",
 };

@@ -22,13 +22,14 @@
     incrementActiveGlobalObtrusiveTaskCount,
   } from "../../store/ui.js";
   import { encryptText } from "../../utility/crypto-utils.js";
+  import { testConstants } from "../../constant/test-constants.js";
 
   const NEW_BUCKET_ID = "new";
 
   const name = standardField("name", "", [minlength(4)]);
   const encryptionPassword = standardField(
     "encryptionPassword",
-    "PleaseChangeMe@YourEarliest2Day",
+    testConstants.STOCK_PASSWORD_FOR_TESTING,
     [minlength(8)]
   );
   const finalForm = form(name, encryptionPassword);
