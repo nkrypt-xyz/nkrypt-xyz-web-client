@@ -88,6 +88,19 @@ button:focus {
   margin-right: auto;
 }
 
+.nk--button-row {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.nk--button-row button {
+  margin-right: 4px;
+}
+
+.nk--button-row button:last-child {
+  margin-right: 0px;
+}
+
 @media only screen and (max-width: 599px) {
   .nk-page {
     min-height: calc(100vh - 56px - 50px);

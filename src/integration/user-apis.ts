@@ -21,6 +21,27 @@ export const callUserLogoutApi = async (data: { message }) => {
   );
 };
 
+export const callUserUpdatePasswordApi = async (data: {
+  currentPassword;
+  newPassword;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/user/update-password",
+    data
+  );
+};
+
+export const callUserUpdateProfileApi = async (data: { displayName }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/user/update-profile",
+    data
+  );
+};
+
 export const callUserListApi = async (data: {}) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
