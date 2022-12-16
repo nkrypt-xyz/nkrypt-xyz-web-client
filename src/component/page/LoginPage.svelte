@@ -20,6 +20,7 @@
   } from "../../store/ui.js";
   import { storedUser } from "../../store/user.js";
   import { extract } from "../../utility/misc-utils.js";
+  import { testConstants } from "../../constant/test-constants.js";
 
   const loginClicked = async () => {
     try {
@@ -46,7 +47,7 @@
   const userName = standardField("userName", "admin", [minlength(4)]);
   const password = standardField(
     "password",
-    "PleaseChangeMe@YourEarliest2Day",
+    testConstants.STOCK_PASSWORD_FOR_TESTING,
     [minlength(8)]
   );
   const finalForm = form(server, userName, password);

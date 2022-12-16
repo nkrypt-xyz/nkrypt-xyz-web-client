@@ -31,7 +31,8 @@
   const renameClicked = async (childFile) => {
     let answer = await showPrompt(
       "Renaming Directory",
-      `Enter the new name for the directory "${childFile.name}"`
+      `Enter the new name for the directory "${childFile.name}"`,
+      childFile.name
     );
 
     if (!answer || answer.trim().length < 1) return;

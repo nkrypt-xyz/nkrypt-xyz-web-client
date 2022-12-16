@@ -161,7 +161,7 @@
 
   const createDirectoryClicked = async () => {
     try {
-      let name = await showPrompt("Create directory", "Enter directory name");
+      let name = await showPrompt("Create directory", "Enter directory name", "");
       if (!name) return;
 
       incrementActiveGlobalObtrusiveTaskCount();

@@ -8,6 +8,7 @@
   import { form } from "svelte-forms";
   import { standardField } from "../../lib/validations.js";
   import { minlength } from "../../lib/validators.js";
+  import { testConstants } from "../../constant/test-constants.js";
   // Other imports
   import {
     bucketPasswordDialog,
@@ -16,7 +17,7 @@
 
   const encryptionPassword = standardField(
     "encryptionPassword",
-    "PleaseChangeMe@YourEarliest2Day",
+    testConstants.STOCK_PASSWORD_FOR_TESTING,
     [minlength(8)]
   );
   const finalForm = form(encryptionPassword);

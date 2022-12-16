@@ -146,12 +146,15 @@ export let showUpdateUserProfileDialog = () => {
 
 // ---------------------------------------------- Prompt Dialog
 
-export let promptDialog: Writable<{ title: string; message: string }> =
-  writable(null);
+export let promptDialog: Writable<{
+  title: string;
+  message: string;
+  defaultValue: string;
+}> = writable(null);
 
 export let promptDialogResponse: Writable<string> = writable(null);
 
-export let showPrompt = (title, message) => {
+export let showPrompt = (title, message, defaultValue) => {
   return new Promise<string>((accept) => {
     promptDialogResponse.set(null);
     let unsubscribe = promptDialogResponse.subscribe((value) => {
@@ -160,7 +163,7 @@ export let showPrompt = (title, message) => {
       unsubscribe();
     });
     applyInflatingZIndexHack(".nk-prompt-dialog");
-    promptDialog.set({ title, message });
+    promptDialog.set({ title, message, defaultValue });
   });
 };
 
