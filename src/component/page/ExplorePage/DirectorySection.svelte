@@ -20,7 +20,7 @@
 
   export let childDirectoryList = [];
   export let childDirectoryClicked = null;
-  export let refreshClicked = null;
+  export let refreshExplorePage = null;
   export let viewPropertiesOfChildDirectoryClicked = null;
 
   let menu: Menu;
@@ -48,7 +48,7 @@
       await handleAnyError(ex);
     }
 
-    await refreshClicked();
+    await refreshExplorePage();
   };
 
   const deleteClicked = async (childDirectory) => {
@@ -72,7 +72,7 @@
       await handleAnyError(ex);
     }
 
-    await refreshClicked();
+    await refreshExplorePage();
   };
 
   const viewPropertiesClicked = async (childDirectory) => {

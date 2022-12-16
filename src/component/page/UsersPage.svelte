@@ -31,31 +31,32 @@
   loadUserList();
 </script>
 
-<div class="nk-page profile">
-  {#each userList as user}
-    <div class="section">
-      <div class="title">{user.userName}</div>
+<div class="nk-page users">
+  <div class="nk-page--inner-wrapper--standard">
+    {#each userList as user}
+      <div class="section">
+        <div class="title">{user.userName}</div>
 
-      <div class="item">
-        <div class="label">Username</div>
-        <div class="value">
-          {user.userName}
+        <div class="item">
+          <div class="label">Username</div>
+          <div class="value">
+            {user.userName}
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="label">Display Name</div>
+          <div class="value">
+            {user.displayName}
+          </div>
         </div>
       </div>
-
-      <div class="item">
-        <div class="label">Display Name</div>
-        <div class="value">
-          {user.displayName}
-        </div>
-      </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </div>
 
 <style>
-  .profile {
-    padding: 8px;
+  .users {
   }
 
   .section {

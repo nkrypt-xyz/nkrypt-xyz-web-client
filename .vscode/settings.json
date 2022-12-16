@@ -1,5 +1,6 @@
 {
   "javascript.preferences.importModuleSpecifierEnding": "js",
   "typescript.preferences.importModuleSpecifierEnding": "js",
-  "prettier.printWidth": 80
+  "prettier.printWidth": 80,
+  "css.lint.emptyRules": "ignore"
 }

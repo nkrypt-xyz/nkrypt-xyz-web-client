@@ -37,87 +37,88 @@
 </script>
 
 <div class="nk-page settings">
-  <div class="section">
-    <div class="title">Upload Mechanism</div>
+  <div class="nk-page--inner-wrapper--standard">
+    <div class="section">
+      <div class="title">Upload Mechanism</div>
 
-    <div class="upload-method">
-      <FormField>
-        <Radio
-          bind:group={$storedSettings.uploadMechanism}
-          value={"basic"}
-          touch
-        />
-        <span slot="label">Basic</span>
-      </FormField>
-      <FormField>
-        <Radio
-          bind:group={$storedSettings.uploadMechanism}
-          value={"stream"}
-          touch
-        />
-        <span slot="label">Streaming</span>
-      </FormField>
-      <FormField>
-        <Radio
-          bind:group={$storedSettings.uploadMechanism}
-          value={"chunkedStream"}
-          touch
-        />
-        <span slot="label">Quantized Streams (Multi-request)</span>
-      </FormField>
+      <div class="upload-method">
+        <FormField>
+          <Radio
+            bind:group={$storedSettings.uploadMechanism}
+            value={"basic"}
+            touch
+          />
+          <span slot="label">Basic</span>
+        </FormField>
+        <FormField>
+          <Radio
+            bind:group={$storedSettings.uploadMechanism}
+            value={"stream"}
+            touch
+          />
+          <span slot="label">Streaming</span>
+        </FormField>
+        <FormField>
+          <Radio
+            bind:group={$storedSettings.uploadMechanism}
+            value={"chunkedStream"}
+            touch
+          />
+          <span slot="label">Quantized Streams (Multi-request)</span>
+        </FormField>
+      </div>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="title">Download Mechanism</div>
+    <div class="section">
+      <div class="title">Download Mechanism</div>
 
-    <div class="download-method">
-      <FormField>
-        <Radio
-          bind:group={$storedSettings.downloadMechanism}
-          value={"basic"}
-          touch
-        />
-        <span slot="label">Basic</span>
-      </FormField>
-      <FormField>
-        <Radio
-          bind:group={$storedSettings.downloadMechanism}
-          value={"stream"}
-          touch
-        />
-        <span slot="label">Streaming</span>
-      </FormField>
-      <FormField>
-        <Radio
-          bind:group={$storedSettings.downloadMechanism}
-          value={"fs"}
-          touch
-        />
-        <span slot="label">Direct File System</span>
-      </FormField>
+      <div class="download-method">
+        <FormField>
+          <Radio
+            bind:group={$storedSettings.downloadMechanism}
+            value={"basic"}
+            touch
+          />
+          <span slot="label">Basic</span>
+        </FormField>
+        <FormField>
+          <Radio
+            bind:group={$storedSettings.downloadMechanism}
+            value={"stream"}
+            touch
+          />
+          <span slot="label">Streaming</span>
+        </FormField>
+        <FormField>
+          <Radio
+            bind:group={$storedSettings.downloadMechanism}
+            value={"fs"}
+            touch
+          />
+          <span slot="label">Direct File System</span>
+        </FormField>
+      </div>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="title">Wipe AppData on Device</div>
-    <div style="margin-top: 4px; margin-bottom: 4px; padding: 4px">
-      You can delete all AppData on this Device by clicking the button below. No
-      data on the server will be altered.
+    <div class="section">
+      <div class="title">Wipe AppData on Device</div>
+      <div style="margin-top: 4px; margin-bottom: 4px; padding: 4px">
+        You can delete all AppData on this Device by clicking the button below.
+        No data on the server will be altered.
+      </div>
+      <Button
+        class="hard-wipe-button"
+        variant="outlined"
+        on:click={() => hardWipeClicked()}
+      >
+        <Label>Hard wipe app data</Label>
+      </Button>
     </div>
-    <Button
-      class="hard-wipe-button"
-      variant="outlined"
-      on:click={() => hardWipeClicked()}
-    >
-      <Label>Hard wipe app data</Label>
-    </Button>
   </div>
 </div>
 
 <style>
   .settings {
-    padding: 8px;
   }
 
   .section {

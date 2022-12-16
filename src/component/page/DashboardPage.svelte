@@ -40,36 +40,37 @@
 </script>
 
 <div class="nk-page dashboard">
-  Welcome, {$storedUser.displayName}
+  <div class="nk-page--inner-wrapper--standard">
+    Welcome, {$storedUser.displayName}
 
-  {#if metrics && metrics.disk}
-    <div class="section">
-      <div class="title">Disk Usage</div>
+    {#if metrics && metrics.disk}
+      <div class="section">
+        <div class="title">Disk Usage</div>
 
-      <div class="item">
-        <div class="label">Used</div>
-        <div class="value">
-          {formatSize(metrics.disk.usedBytes)}
-          &nbsp;({formatPercentage(
-            metrics.disk.usedBytes,
-            metrics.disk.totalBytes
-          )})
+        <div class="item">
+          <div class="label">Used</div>
+          <div class="value">
+            {formatSize(metrics.disk.usedBytes)}
+            &nbsp;({formatPercentage(
+              metrics.disk.usedBytes,
+              metrics.disk.totalBytes
+            )})
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="label">Total</div>
+          <div class="value">
+            {formatSize(metrics.disk.totalBytes)}
+          </div>
         </div>
       </div>
-
-      <div class="item">
-        <div class="label">Total</div>
-        <div class="value">
-          {formatSize(metrics.disk.totalBytes)}
-        </div>
-      </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>
 
 <style>
   .dashboard {
-    padding: 8px;
   }
 
   .section {
