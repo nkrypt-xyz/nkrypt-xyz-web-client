@@ -81,8 +81,19 @@ button:focus {
   min-height: calc(100vh - 64px - 0px - 50px);
 }
 
+.nk-page--inner-wrapper--standard {
+  padding: 8px;
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media only screen and (max-width: 599px) {
   .nk-page {
     min-height: calc(100vh - 56px - 50px);
+  }
+
+  .gb--no-padding-on-mobile {
+    padding: 0px;
   }
 }

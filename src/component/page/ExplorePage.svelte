@@ -231,8 +231,16 @@
     }
   };
 
-  const refreshClicked = async () => {
+  const refreshExplorePage = async (hardRefresh = false) => {
+    if (hardRefresh) {
+      childDirectoryList = [];
+      childFileList = [];
+    }
     await explorePath(currentPath);
+  };
+
+  const refreshClicked = async () => {
+    refreshExplorePage(true);
   };
 
   let fileUploadModal;
@@ -272,54 +280,56 @@
 <PropertiesModal bind:this={propertiesModal} />
 
 <div class="nk-page">
-  {#if currentBucket}
-    <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />
+  <div class="nk-page--inner-wrapper--standard gb--no-padding-on-mobile">
+    {#if currentBucket}
+      <Breadcrumbs {breadcrumbClicked} {entityStack} {currentBucket} />
 
-    <div class="control-row">
-      <IconButton
-        disabled={entityStack.length <= 1}
-        size="mini"
-        class="material-icons control-row-icon-button"
-        on:click={goUpClicked}
-        >arrow_upward
-      </IconButton>
+      <div class="control-row">
+        <IconButton
+          disabled={entityStack.length <= 1}
+          size="mini"
+          class="material-icons control-row-icon-button"
+          on:click={goUpClicked}
+          >arrow_upward
+        </IconButton>
 
-      <IconButton
-        size="mini"
-        class="material-icons control-row-icon-button"
-        on:click={refreshClicked}
-        >refresh
-      </IconButton>
+        <IconButton
+          size="mini"
+          class="material-icons control-row-icon-button"
+          on:click={refreshClicked}
+          >refresh
+        </IconButton>
 
-      <IconButton
-        size="mini"
-        class="material-icons control-row-icon-button"
-        on:click={createDirectoryClicked}
-        >create_new_folder
-      </IconButton>
+        <IconButton
+          size="mini"
+          class="material-icons control-row-icon-button"
+          on:click={createDirectoryClicked}
+          >create_new_folder
+        </IconButton>
 
-      <IconButton
-        size="mini"
-        class="material-icons control-row-icon-button"
-        on:click={fileUploadClicked}
-        >file_upload
-      </IconButton>
-    </div>
+        <IconButton
+          size="mini"
+          class="material-icons control-row-icon-button"
+          on:click={fileUploadClicked}
+          >file_upload
+        </IconButton>
+      </div>
 
-    <DirectorySection
-      {childDirectoryList}
-      {childDirectoryClicked}
-      {refreshClicked}
-      {viewPropertiesOfChildDirectoryClicked}
-    />
+      <DirectorySection
+        {childDirectoryList}
+        {childDirectoryClicked}
+        {refreshExplorePage}
+        {viewPropertiesOfChildDirectoryClicked}
+      />
 
-    <FileSection
-      {childFileList}
-      {childFileClicked}
-      {refreshClicked}
-      {viewPropertiesOfChildFileClicked}
-    />
-  {/if}
+      <FileSection
+        {childFileList}
+        {childFileClicked}
+        {refreshExplorePage}
+        {viewPropertiesOfChildFileClicked}
+      />
+    {/if}
+  </div>
 </div>
 
 <style>

@@ -22,7 +22,7 @@
 
   export let childFileList = [];
   export let childFileClicked = null;
-  export let refreshClicked = null;
+  export let refreshExplorePage = null;
   export let viewPropertiesOfChildFileClicked = null;
 
   let menu: Menu;
@@ -50,7 +50,7 @@
       await handleAnyError(ex);
     }
 
-    await refreshClicked();
+    await refreshExplorePage();
   };
 
   const deleteClicked = async (childFile) => {
@@ -74,7 +74,7 @@
       await handleAnyError(ex);
     }
 
-    await refreshClicked();
+    await refreshExplorePage();
   };
 
   const viewPropertiesClicked = async (childFile) => {

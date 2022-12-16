@@ -14,27 +14,29 @@
 </script>
 
 <div class="nk-page profile">
-  <div class="section">
-    <div class="title">User Details</div>
+  <div class="nk-page--inner-wrapper--standard">
+    <div class="section">
+      <div class="title">User Details</div>
 
-    <div class="item">
-      <div class="label">Username</div>
-      <div class="value">
-        {$storedUser.userName}
+      <div class="item">
+        <div class="label">Username</div>
+        <div class="value">
+          {$storedUser.userName}
+        </div>
       </div>
-    </div>
 
-    <div class="item">
-      <div class="label">UserID</div>
-      <div class="value">
-        {$storedUser.userId}
+      <div class="item">
+        <div class="label">UserID</div>
+        <div class="value">
+          {$storedUser.userId}
+        </div>
       </div>
-    </div>
 
-    <div class="item">
-      <div class="label">Display Name</div>
-      <div class="value">
-        {$storedUser.displayName}
+      <div class="item">
+        <div class="label">Display Name</div>
+        <div class="value">
+          {$storedUser.displayName}
+        </div>
       </div>
     </div>
   </div>
@@ -42,7 +44,6 @@
 
 <style>
   .profile {
-    padding: 8px;
   }
 
   .section {
