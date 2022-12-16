@@ -25,12 +25,10 @@
   export let refreshExplorePage = null;
   export let viewPropertiesOfChildFileClicked = null;
 
-  let menu: Menu;
-  let possibleChildFile = null;
+  // known and acceptable minor memory leak.
+  let menus = {};
 
   const renameClicked = async (childFile) => {
-    console.log("To rename", childFile);
-
     let answer = await showPrompt(
       "Renaming Directory",
       `Enter the new name for the directory "${childFile.name}"`
@@ -54,8 +52,6 @@
   };
 
   const deleteClicked = async (childFile) => {
-    console.log("To delete", childFile);
-
     let answer = await showConfirmation(
       "Confirm Deletion",
       `Are you sure you want to delete the file "${childFile.name}"? The file will be deleted permanently.`
@@ -78,8 +74,6 @@
   };
 
   const viewPropertiesClicked = async (childFile) => {
-    console.log("To view properties", childFile);
-
     await viewPropertiesOfChildFileClicked(childFile);
   };
 </script>
@@ -103,28 +97,24 @@
         <Icon
           class="material-icons"
           on:click={() => {
-            menu.setOpen(true);
-            // TODO improve upon this unfortunate hack
-            possibleChildFile = childFile;
+            menus[childFile._id].setOpen(true);
           }}
         >
           more_vert
         </Icon>
-        <Menu bind:this={menu} anchorCorner="TOP_RIGHT">
+        <Menu bind:this={menus[childFile._id]} anchorCorner="TOP_RIGHT">
           <List>
-            <Item on:SMUI:action={() => childFileClicked(possibleChildFile)}>
+            <Item on:SMUI:action={() => childFileClicked(childFile)}>
               <Text>Open</Text>
             </Item>
-            <Item on:SMUI:action={() => renameClicked(possibleChildFile)}>
+            <Item on:SMUI:action={() => renameClicked(childFile)}>
               <Text>Rename</Text>
             </Item>
-            <Item on:SMUI:action={() => deleteClicked(possibleChildFile)}>
+            <Item on:SMUI:action={() => deleteClicked(childFile)}>
               <Text>Delete</Text>
             </Item>
             <Separator />
-            <Item
-              on:SMUI:action={() => viewPropertiesClicked(possibleChildFile)}
-            >
+            <Item on:SMUI:action={() => viewPropertiesClicked(childFile)}>
               <Text>Properties</Text>
             </Item>
           </List>

@@ -23,12 +23,10 @@
   export let refreshExplorePage = null;
   export let viewPropertiesOfChildDirectoryClicked = null;
 
-  let menu: Menu;
-  let possibleChildDirectory = null;
+  // known and acceptable minor memory leak.
+  let menus = {};
 
   const renameClicked = async (childDirectory) => {
-    console.log("To rename", childDirectory);
-
     let answer = await showPrompt(
       "Renaming Directory",
       `Enter the new name for the directory "${childDirectory.name}"`
@@ -52,8 +50,6 @@
   };
 
   const deleteClicked = async (childDirectory) => {
-    console.log("To delete", childDirectory);
-
     let answer = await showConfirmation(
       "Confirm Deletion",
       `Are you sure you want to delete the directory "${childDirectory.name}"? The directory and every directory or file it contains will be deleted permanently.`
@@ -76,8 +72,6 @@
   };
 
   const viewPropertiesClicked = async (childDirectory) => {
-    console.log("To view properties", childDirectory);
-
     await viewPropertiesOfChildDirectoryClicked(childDirectory);
   };
 </script>
@@ -104,29 +98,24 @@
         <Icon
           class="material-icons"
           on:click={() => {
-            menu.setOpen(true);
-            // TODO improve upon this unfortunate hack
-            possibleChildDirectory = childDirectory;
+            menus[childDirectory._id].setOpen(true);
           }}
         >
           more_vert
         </Icon>
-        <Menu bind:this={menu} anchorCorner="TOP_RIGHT">
+        <Menu bind:this={menus[childDirectory._id]} anchorCorner="TOP_RIGHT">
           <List>
-            <Item on:SMUI:action={() => childDirectoryClicked(possibleChildDirectory)}>
+            <Item on:SMUI:action={() => childDirectoryClicked(childDirectory)}>
               <Text>Open</Text>
             </Item>
-            <Item on:SMUI:action={() => renameClicked(possibleChildDirectory)}>
+            <Item on:SMUI:action={() => renameClicked(childDirectory)}>
               <Text>Rename</Text>
             </Item>
-            <Item on:SMUI:action={() => deleteClicked(possibleChildDirectory)}>
+            <Item on:SMUI:action={() => deleteClicked(childDirectory)}>
               <Text>Delete</Text>
             </Item>
             <Separator />
-            <Item
-              on:SMUI:action={() =>
-                viewPropertiesClicked(possibleChildDirectory)}
-            >
+            <Item on:SMUI:action={() => viewPropertiesClicked(childDirectory)}>
               <Text>Properties</Text>
             </Item>
           </List>
