@@ -290,19 +290,16 @@
 
           <div class="spacer" />
 
-          <Button class="nk-left-bar-footer-button" on:click={profileClicked}>
+          <Button class="nk-left-bar-footer-button-small" on:click={profileClicked}>
             <Icon class="material-icons">person</Icon>
-            <Label>Profile</Label>
           </Button>
 
-          <Button class="nk-left-bar-footer-button" on:click={settingsClicked}>
+          <Button class="nk-left-bar-footer-button-small" on:click={settingsClicked}>
             <Icon class="material-icons">settings</Icon>
-            <Label>Settings</Label>
           </Button>
 
-          <Button class="nk-left-bar-footer-button" on:click={logoutClicked}>
+          <Button class="nk-left-bar-footer-button-small" on:click={logoutClicked}>
             <Icon class="material-icons">logout</Icon>
-            <Label>Logout</Label>
           </Button>
         </div>
       </Content>
@@ -347,7 +344,7 @@
   }
 
   .nk-main :global(.nk-bucket-list) {
-    height: calc(100% - 331px - 32px);
+    height: calc(100% - 245px - 32px);
     overflow: scroll;
   }
 
@@ -355,7 +352,7 @@
     padding-top: 8px;
     background-color: rgb(233, 245, 237);
     padding-bottom: 8px;
-    height: 331px;
+    /* height: 331px; */
   }
 
   .nk-main :global(.bucket-list-master-container) {
@@ -365,6 +362,10 @@
   .nk-main :global(.nk-left-bar-footer-button) {
     margin-left: 12px;
     display: block;
+  }
+
+  .nk-main :global(.nk-left-bar-footer-button-small) {
+    margin-left: 12px;
   }
 
   .logged-in-as {

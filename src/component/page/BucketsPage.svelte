@@ -22,7 +22,6 @@
       let response = await callBucketListApi({});
       decrementActiveGlobalObtrusiveTaskCount();
       ({ bucketList } = response);
-      console.log(bucketList);
       return response;
     } catch (ex) {
       return await handleAnyError(ex);
