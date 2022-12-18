@@ -10,6 +10,8 @@
   import { downloadAndDecryptFile } from "../../../lib/crypto-transit.js";
   import { showCommonErrorDialog } from "../../../store/ui.js";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
+  import { isLikelyPlainText } from "../../../lib/plain-text-editor-helper.js";
+  import { push } from "svelte-spa-router";
 
   const FileOperationModalState = {
     IDLE: "IDLE",
@@ -87,6 +89,15 @@
     state = FileOperationModalState.PROVIDE_OPTIONS;
   };
 
+  const shouldShowPlainTextEditorOption = (file) => {
+    if ($storedSettings.plainTextEditorNoRestrictions) return true;
+    return isLikelyPlainText(file);
+  };
+
+  const editAsPlainTextClicked = async () => {
+    push(`/edit-plain-text/${file.bucketId}/${file._id}`);
+  };
+
   let shouldShowDialog = false;
   let allowCancel = false;
   $: {
@@ -119,7 +130,9 @@
             </div>
             <div>
               <span class="title">Size before encryption: </span>
-              <span class="value">{expressBytesPrettified(file.metaData?.size)}</span>
+              <span class="value"
+                >{expressBytesPrettified(file.metaData?.size)}</span
+              >
             </div>
             <div>
               <span class="title">Type: </span>
@@ -135,6 +148,17 @@
             >
               <Label>Decrypt and download</Label>
             </Button>
+
+            {#if shouldShowPlainTextEditorOption(file)}
+              <br />
+              <Button
+                class="open-plain-text-editor-button"
+                variant="raised"
+                on:click={() => editAsPlainTextClicked()}
+              >
+                <Label>Edit as Plain Text</Label>
+              </Button>
+            {/if}
           {/if}
 
           {#if state === FileOperationModalState.FILE_DOWNLOAD}

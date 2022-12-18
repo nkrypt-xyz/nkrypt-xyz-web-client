@@ -88,16 +88,15 @@ const encryptBufferInTaggedChunks = async (
   return destinationBuffer;
 };
 
-export const encryptAndUploadFile = async (
+export const encryptAndUploadArrayBuffer = async (
   bucketId: string,
   fileId: string,
-  file: File,
+  buffer: ArrayBuffer,
   bucketPassword: string,
   progressNotifierFn: Function
 ) => {
   let cipherProps = await createCipherProperties(bucketPassword);
 
-  let buffer = await file.arrayBuffer();
   let encryptedBuffer = await encryptBufferInTaggedChunks(
     cipherProps,
     buffer,
@@ -111,13 +110,30 @@ export const encryptAndUploadFile = async (
   let response = await callBlobWriteBasicApi(
     bucketId,
     fileId,
-    file.size,
+    buffer.byteLength,
     encryptedBuffer.buffer,
     cryptoHeader,
     progressNotifierFn
   );
 
   return response;
+};
+
+export const encryptAndUploadFile = async (
+  bucketId: string,
+  fileId: string,
+  file: File,
+  bucketPassword: string,
+  progressNotifierFn: Function
+) => {
+  let buffer = await file.arrayBuffer();
+  return encryptAndUploadArrayBuffer(
+    bucketId,
+    fileId,
+    buffer,
+    bucketPassword,
+    progressNotifierFn
+  );
 };
 
 const initiateFileDownload = (buffer: ArrayBuffer, fileNameForDownloading) => {
@@ -202,10 +218,9 @@ const decryptBufferInTaggedChunks = async (
   return destinationBuffer;
 };
 
-export const downloadAndDecryptFile = async (
+export const downloadAndDecryptFileIntoArrayBuffer = async (
   bucketId: string,
   fileId: string,
-  fileNameForDownloading: string,
   bucketPassword: string,
   progressNotifierFn: Function
 ) => {
@@ -230,6 +245,23 @@ export const downloadAndDecryptFile = async (
   } catch (ex) {
     throw raiseCaughtClientError(ex, clientErrorDef.NKCE_DECRYPTION_FAILED);
   }
+
+  return decryptedArrayBuffer;
+};
+
+export const downloadAndDecryptFile = async (
+  bucketId: string,
+  fileId: string,
+  fileNameForDownloading: string,
+  bucketPassword: string,
+  progressNotifierFn: Function
+) => {
+  let decryptedArrayBuffer = await downloadAndDecryptFileIntoArrayBuffer(
+    bucketId,
+    fileId,
+    bucketPassword,
+    progressNotifierFn
+  );
 
   try {
     initiateFileDownload(decryptedArrayBuffer, fileNameForDownloading);

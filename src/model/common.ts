@@ -12,6 +12,7 @@ export type User = {
 export type Settings = {
   uploadMechanism: string;
   downloadMechanism: string;
+  plainTextEditorNoRestrictions: boolean;
 };
 
 export type Bucket = {
