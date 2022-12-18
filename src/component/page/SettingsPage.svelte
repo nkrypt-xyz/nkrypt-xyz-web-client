@@ -2,8 +2,8 @@
   // UI / Framework
   import Button, { Label } from "@smui/button";
   import Checkbox from "@smui/checkbox";
-  import Dialog, { Actions, Content, Title } from "@smui/dialog";
   import FormField from "@smui/form-field";
+  import Dialog, { Actions, Content, Title } from "@smui/dialog";
   import LinearProgress from "@smui/linear-progress";
   import Radio from "@smui/radio";
   import Textfield from "@smui/textfield";
@@ -106,7 +106,10 @@
         <Checkbox
           bind:checked={$storedSettings.plainTextEditorNoRestrictions}
         />
-        <span slot="label">Allow opening all (potentially unsupported) files with plain text editor.</span>
+        <span slot="label"
+          >Allow opening all (potentially unsupported) files with plain text
+          editor.</span
+        >
       </FormField>
     </div>
 

@@ -7,6 +7,7 @@ export type User = {
   userName: string;
   displayName: string;
   userId: string;
+  globalPermissions: Record<string, boolean>;
 };
 
 export type Settings = {

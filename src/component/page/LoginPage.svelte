@@ -30,9 +30,14 @@
       decrementActiveGlobalObtrusiveTaskCount();
 
       let { apiKey } = response;
-      let { userName, displayName, _id: userId } = response.user;
+      let {
+        userName,
+        displayName,
+        _id: userId,
+        globalPermissions,
+      } = response.user;
 
-      storedUser.set({ userName, displayName, userId });
+      storedUser.set({ userName, displayName, userId, globalPermissions });
       storedSession.set({ apiKey, serverUrl: $server.value });
 
       suggestedServerUrl.set($server.value);
@@ -78,7 +83,6 @@
         required
       >
         <Icon class="material-icons" slot="leadingIcon">password</Icon>
-        <!-- <HelperText slot="helper">Helper Text</HelperText> -->
       </Textfield>
 
       <br />

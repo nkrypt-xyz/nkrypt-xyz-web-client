@@ -21,6 +21,18 @@ export const callUserLogoutApi = async (data: { message }) => {
   );
 };
 
+export const callUserFindApi = async (data: {
+  filters: { by: string; userName: string; userId: string }[];
+  includeGlobalPermissions: boolean;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/user/find",
+    data
+  );
+};
+
 export const callUserUpdatePasswordApi = async (data: {
   currentPassword;
   newPassword;
