@@ -13,6 +13,7 @@
   } from "../../store/ui.js";
   import { callUserListApi } from "../../integration/user-apis.js";
   import type { User } from "src/model/common.js";
+  import { push } from "svelte-spa-router";
 
   let userList: User[] = [];
 
@@ -29,6 +30,14 @@
   };
 
   loadUserList();
+
+  const addUserClicked = async () => {
+    push("/user/save/new");
+  };
+
+  const userManageClicked = async (user) => {
+    push(`/user/save/${user._id}`);
+  };
 </script>
 
 <div class="nk-page users">
@@ -50,8 +59,26 @@
             {user.displayName}
           </div>
         </div>
+
+        <div class="item">
+          <Button
+            variant="outlined"
+            style="margin-left: 4px;"
+            on:click={() => userManageClicked(user)}
+          >
+            <Icon class="material-icons">tune</Icon>
+            <Label>Manage</Label>
+          </Button>
+        </div>
       </div>
     {/each}
+
+    <div class="nk--button-row">
+      <Button variant="raised" class="hero-button" on:click={addUserClicked}>
+        <Icon class="material-icons">person_add</Icon>
+        <Label>Add User</Label>
+      </Button>
+    </div>
   </div>
 </div>
 

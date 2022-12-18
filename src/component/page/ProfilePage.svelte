@@ -15,6 +15,7 @@
   } from "../../store/ui.js";
   import UpdateUserPasswordDialog from "./ProfilePage/UpdateUserPasswordDialog.svelte";
   import UpdateUserProfileDialog from "./ProfilePage/UpdateUserProfileDialog.svelte";
+  import { globalPermissionDetails } from "../../lib/permissions-helper.js";
 </script>
 
 <UpdateUserPasswordDialog />
@@ -45,6 +46,22 @@
         </div>
       </div>
     </div>
+
+    <div class="section">
+      <div class="title">Permissions</div>
+
+      {#each Object.keys($storedUser.globalPermissions || {}) as key}
+        <div class="item">
+          <div class="label" style="flex: 4">
+            {globalPermissionDetails[key]}
+          </div>
+          <div class="value">
+            {$storedUser.globalPermissions[key] ? "Allowed" : "Not allowed"}
+          </div>
+        </div>
+      {/each}
+    </div>
+
     <div class="nk--button-row">
       <Button
         variant="raised"
