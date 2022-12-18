@@ -10,6 +10,7 @@ const SETTINGS_LOCALSTORAGE_KEY = "--settings";
 const defaultSettings: Settings = {
   uploadMechanism: "chunkedStream",
   downloadMechanism: "stream",
+  plainTextEditorNoRestrictions: false,
 };
 
 export const storedSettings: Writable<Settings> = writable(

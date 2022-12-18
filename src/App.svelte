@@ -52,6 +52,7 @@
   import UsersPage from "./component/page/UsersPage.svelte";
   import BucketsPage from "./component/page/BucketsPage.svelte";
   import SettingsPage from "./component/page/SettingsPage.svelte";
+  import PlainTextEditorPage from "./component/page/PlainTextEditorPage.svelte";
 
   let topAppBar: TopAppBarComponentDev;
 
@@ -135,6 +136,14 @@
     conditions: [conditionRequiresAuthentication],
   });
 
+  const plainTextEditorRoute = wrap({
+    component: PlainTextEditorPage,
+    userData: {
+      requiresAuthentication: true,
+    },
+    conditions: [conditionRequiresAuthentication],
+  });
+
   const settingsRoute = wrap({
     component: SettingsPage,
     userData: {
@@ -157,6 +166,7 @@
     "/settings": settingsRoute,
     "/bucket/create": createBucketRoute,
     "/explore/*": exploreRoute,
+    "/edit-plain-text/*": plainTextEditorRoute,
   };
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
@@ -290,15 +300,24 @@
 
           <div class="spacer" />
 
-          <Button class="nk-left-bar-footer-button-small" on:click={profileClicked}>
+          <Button
+            class="nk-left-bar-footer-button-small"
+            on:click={profileClicked}
+          >
             <Icon class="material-icons">person</Icon>
           </Button>
 
-          <Button class="nk-left-bar-footer-button-small" on:click={settingsClicked}>
+          <Button
+            class="nk-left-bar-footer-button-small"
+            on:click={settingsClicked}
+          >
             <Icon class="material-icons">settings</Icon>
           </Button>
 
-          <Button class="nk-left-bar-footer-button-small" on:click={logoutClicked}>
+          <Button
+            class="nk-left-bar-footer-button-small"
+            on:click={logoutClicked}
+          >
             <Icon class="material-icons">logout</Icon>
           </Button>
         </div>

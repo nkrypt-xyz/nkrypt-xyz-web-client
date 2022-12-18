@@ -70,6 +70,15 @@ export const callDirectoryCreateApi = async (data: {
   );
 };
 
+export const callFileGetApi = async (data: { bucketId; fileId }) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/file/get",
+    data
+  );
+};
+
 export const callFileCreateApi = async (data: {
   name: string;
   bucketId: string;

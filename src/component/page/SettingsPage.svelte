@@ -1,12 +1,12 @@
 <script lang="ts">
   // UI / Framework
   import Button, { Label } from "@smui/button";
+  import Checkbox from "@smui/checkbox";
   import Dialog, { Actions, Content, Title } from "@smui/dialog";
   import FormField from "@smui/form-field";
   import LinearProgress from "@smui/linear-progress";
   import Radio from "@smui/radio";
   import Textfield from "@smui/textfield";
-  import HelperText from "@smui/textfield/helper-text";
   import { storedUser } from "../../store/user.js";
   import { callMetricsGetSummaryApi } from "../../integration/metrics-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
@@ -98,6 +98,16 @@
           <span slot="label">Direct File System</span>
         </FormField>
       </div>
+    </div>
+
+    <div class="section">
+      <div class="title">Plain Text Editor</div>
+      <FormField>
+        <Checkbox
+          bind:checked={$storedSettings.plainTextEditorNoRestrictions}
+        />
+        <span slot="label">Allow opening all (potentially unsupported) files with plain text editor.</span>
+      </FormField>
     </div>
 
     <div class="section">
