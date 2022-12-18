@@ -40,6 +40,7 @@
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
+    ThreeStateConfirmationState,
   } from "./store/ui.js";
   import { storedUser } from "./store/user.js";
   // Integrations
@@ -53,6 +54,7 @@
   import BucketsPage from "./component/page/BucketsPage.svelte";
   import SettingsPage from "./component/page/SettingsPage.svelte";
   import PlainTextEditorPage from "./component/page/PlainTextEditorPage.svelte";
+  import ConfirmationThreeStateDialog from "./component/dialog/ConfirmationThreeStateDialog.svelte";
 
   let topAppBar: TopAppBarComponentDev;
 
@@ -245,6 +247,7 @@
   <AlertDialog />
   <BucketPasswordDialog />
   <PromptDialog />
+  <ConfirmationThreeStateDialog />
   {#if $storedSession || $storedUser}
     <Drawer variant="modal" bind:open={isLeftDrawerOpen}>
       <Header>

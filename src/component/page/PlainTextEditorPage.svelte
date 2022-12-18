@@ -24,6 +24,8 @@
     showCommonErrorDialog,
     showConfirmation,
     showPrompt,
+    showThreeStateConfirmation,
+    ThreeStateConfirmationState,
   } from "../../store/ui.js";
   import { encryptObject } from "../../utility/crypto-utils.js";
   import Breadcrumbs from "./ExplorePage/Breadcrumbs.svelte";
@@ -181,6 +183,7 @@
     let encodedData = encoder.encode(textContent);
 
     try {
+      incrementActiveGlobalObtrusiveTaskCount();
       let response = await encryptAndUploadArrayBuffer(
         currentFile.bucketId,
         currentFile._id,
@@ -189,6 +192,7 @@
         () => {}
       );
       isDirty = false;
+      decrementActiveGlobalObtrusiveTaskCount();
       return true;
     } catch (ex) {
       await showCommonErrorDialog(ex);
@@ -202,13 +206,17 @@
 
   const closeClicked = async () => {
     if (isDirty) {
-      let answer = await showConfirmation(
+      let answer = await showThreeStateConfirmation(
         "Save changes",
         "Save your changed before you exit?"
       );
-      if (answer) {
+      if (answer === ThreeStateConfirmationState.YES) {
         let wasSuccessful = await saveFile();
         if (!wasSuccessful) return;
+      } else if (answer === ThreeStateConfirmationState.NO) {
+        ("pass");
+      } else if (answer === ThreeStateConfirmationState.CANCEL) {
+        return;
       }
     }
 
