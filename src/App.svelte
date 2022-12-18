@@ -19,6 +19,7 @@
     Section,
     Title,
   } from "@smui/top-app-bar";
+  import type { SvelteComponentDev } from "svelte/internal";
   // Routing
   import Router, { push, replace } from "svelte-spa-router";
   import { wrap } from "svelte-spa-router/wrap";
@@ -27,6 +28,13 @@
   import DashboardPage from "./component/page/DashboardPage.svelte";
   import ExplorePage from "./component/page/ExplorePage.svelte";
   import LoginPage from "./component/page/LoginPage.svelte";
+  import ProfilePage from "./component/page/ProfilePage.svelte";
+  import UsersPage from "./component/page/UsersPage.svelte";
+  import UserSavePage from "./component/page/UserSavePage.svelte";
+  import BucketsPage from "./component/page/BucketsPage.svelte";
+  import SettingsPage from "./component/page/SettingsPage.svelte";
+  import PlainTextEditorPage from "./component/page/PlainTextEditorPage.svelte";
+  import ConfirmationThreeStateDialog from "./component/dialog/ConfirmationThreeStateDialog.svelte";
   // Components
   import Footer from "./component/common/Footer.svelte";
   import ObtrusiveLoader from "./component/common/ObtrusiveLoader.svelte";
@@ -49,12 +57,6 @@
   import { handleAnyError } from "./lib/error-handling.js";
   import { performUserLogout } from "./lib/session.js";
   import { createDebouncedMethod } from "./utility/misc-utils.js";
-  import ProfilePage from "./component/page/ProfilePage.svelte";
-  import UsersPage from "./component/page/UsersPage.svelte";
-  import BucketsPage from "./component/page/BucketsPage.svelte";
-  import SettingsPage from "./component/page/SettingsPage.svelte";
-  import PlainTextEditorPage from "./component/page/PlainTextEditorPage.svelte";
-  import ConfirmationThreeStateDialog from "./component/dialog/ConfirmationThreeStateDialog.svelte";
 
   let topAppBar: TopAppBarComponentDev;
 
@@ -90,85 +92,34 @@
     return true;
   };
 
-  const dashboardRoute = wrap({
-    component: DashboardPage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
-
-  const createBucketRoute = wrap({
-    component: CreateBucketPage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
-
-  const exploreRoute = wrap({
-    component: ExplorePage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
-
-  const profileRoute = wrap({
-    component: ProfilePage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
-
-  const usersRoute = wrap({
-    component: UsersPage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
-
-  const bucketsRoute = wrap({
-    component: BucketsPage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
-
-  const plainTextEditorRoute = wrap({
-    component: PlainTextEditorPage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
-
-  const settingsRoute = wrap({
-    component: SettingsPage,
-    userData: {
-      requiresAuthentication: true,
-    },
-    conditions: [conditionRequiresAuthentication],
-  });
+  const makeAuthenticatedRoute = (component: typeof SvelteComponentDev) => {
+    return wrap({
+      component,
+      userData: {
+        requiresAuthentication: true,
+      },
+      conditions: [conditionRequiresAuthentication],
+    });
+  };
 
   const loginRoute = wrap({
     component: LoginPage,
   });
 
+  let dashboardRoute = makeAuthenticatedRoute(DashboardPage);
+
   const routes = {
     "/dashboard": dashboardRoute,
     "/": dashboardRoute,
     "/login": loginRoute,
-    "/profile": profileRoute,
-    "/users": usersRoute,
-    "/buckets": bucketsRoute,
-    "/settings": settingsRoute,
-    "/bucket/create": createBucketRoute,
-    "/explore/*": exploreRoute,
-    "/edit-plain-text/*": plainTextEditorRoute,
+    "/profile": makeAuthenticatedRoute(ProfilePage),
+    "/users": makeAuthenticatedRoute(UsersPage),
+    "/user/save/*": makeAuthenticatedRoute(UserSavePage),
+    "/buckets": makeAuthenticatedRoute(BucketsPage),
+    "/settings": makeAuthenticatedRoute(SettingsPage),
+    "/bucket/create": makeAuthenticatedRoute(CreateBucketPage),
+    "/explore/*": makeAuthenticatedRoute(ExplorePage),
+    "/edit-plain-text/*": makeAuthenticatedRoute(PlainTextEditorPage),
   };
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
@@ -205,28 +156,8 @@
     }
   });
 
-  const dashboardClicked = async () => {
-    push("/");
-    isLeftDrawerOpen = false;
-  };
-
-  const profileClicked = async () => {
-    push("/profile");
-    isLeftDrawerOpen = false;
-  };
-
-  const usersClicked = async () => {
-    push("/users");
-    isLeftDrawerOpen = false;
-  };
-
-  const bucketsClicked = async () => {
-    push("/buckets");
-    isLeftDrawerOpen = false;
-  };
-
-  const settingsClicked = async () => {
-    push("/settings");
+  const genericLinkClicked = async (path) => {
+    push(path);
     isLeftDrawerOpen = false;
   };
 
@@ -282,17 +213,26 @@
             <Label>Create a bucket</Label>
           </Button>
 
-          <Button class="nk-left-bar-footer-button" on:click={dashboardClicked}>
+          <Button
+            class="nk-left-bar-footer-button"
+            on:click={() => genericLinkClicked("/")}
+          >
             <Icon class="material-icons">home</Icon>
             <Label>Dashboad</Label>
           </Button>
 
-          <Button class="nk-left-bar-footer-button" on:click={usersClicked}>
+          <Button
+            class="nk-left-bar-footer-button"
+            on:click={() => genericLinkClicked("/users")}
+          >
             <Icon class="material-icons">group</Icon>
             <Label>Users</Label>
           </Button>
 
-          <Button class="nk-left-bar-footer-button" on:click={bucketsClicked}>
+          <Button
+            class="nk-left-bar-footer-button"
+            on:click={() => genericLinkClicked("/buckets")}
+          >
             <Icon class="material-icons">folder_zip</Icon>
             <Label>Buckets</Label>
           </Button>
@@ -305,14 +245,14 @@
 
           <Button
             class="nk-left-bar-footer-button-small"
-            on:click={profileClicked}
+            on:click={() => genericLinkClicked("/profile")}
           >
             <Icon class="material-icons">person</Icon>
           </Button>
 
           <Button
             class="nk-left-bar-footer-button-small"
-            on:click={settingsClicked}
+            on:click={() => genericLinkClicked("/settings")}
           >
             <Icon class="material-icons">settings</Icon>
           </Button>
