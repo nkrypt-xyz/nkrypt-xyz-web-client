@@ -64,6 +64,37 @@ export let showConfirmation = (title, message) => {
   });
 };
 
+// ---------------------------------------------- Confirmation Three State Dialog
+
+export const ThreeStateConfirmationState = {
+  YES: "YES",
+  NO: "NO",
+  CANCEL: "CANCEL",
+};
+
+export let confirmationThreeStateDialog: Writable<{
+  title: string;
+  message: string;
+}> = writable(null);
+
+export let confirmationThreeStateDialogResponse: Writable<boolean> =
+  writable(null);
+
+export let showThreeStateConfirmation = (title, message) => {
+  return new Promise((accept) => {
+    confirmationThreeStateDialogResponse.set(null);
+    let unsubscribe = confirmationThreeStateDialogResponse.subscribe(
+      (value) => {
+        if (value === null) return;
+        accept(value);
+        unsubscribe();
+      }
+    );
+    applyInflatingZIndexHack(".nk-confirmation-three-state-dialog");
+    confirmationThreeStateDialog.set({ title, message });
+  });
+};
+
 // ---------------------------------------------- Alert Dialog
 
 export let alertDialog: Writable<{ title: string; message: string }> =
