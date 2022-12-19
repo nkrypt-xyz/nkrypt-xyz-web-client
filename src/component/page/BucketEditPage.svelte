@@ -213,7 +213,7 @@
       {
         userId: user._id,
         user: user,
-        notes: `Authorized by ${$storedUser.userName}`,
+        notes: `Pending authorizion. Added by ${$storedUser.userName}`,
         permissions: JSON.parse(JSON.stringify(defaultBucketPermissions)),
         isExpanded: true,
       },
@@ -227,7 +227,6 @@
       for (let authorization of bucket.bucketAuthorizations) {
         let res = await callBucketSetAuthorizationApi({
           bucketId,
-          notes: authorization.notes || "Default",
           permissionsToSet: authorization.permissions,
           targetUserId: authorization.user._id,
         });
@@ -239,17 +238,6 @@
       let pathString = ($location as string).replace(ROUTE_PREFIX, "");
       loadPage(pathString);
 
-
-      // if (mode === MODES.CREATE) {
-      //   ({ userId } = await callAdminAddUserApi(<any>data));
-      // } else {
-      //   ("pass");
-      // }
-      // await callAdminSetGlobalPermissionsApi({
-      //   userId,
-      //   globalPermissions,
-      // });
-      // push("/users");
       decrementActiveGlobalObtrusiveTaskCount();
     } catch (ex) {
       return await handleAnyError(ex);
