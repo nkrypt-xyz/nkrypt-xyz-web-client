@@ -10,7 +10,7 @@ export const handleAnyError = async (
   reduceObtrusiveLoader: boolean = true
 ): Promise<boolean> => {
   if (!error || "object" !== typeof error || !(error instanceof Error)) {
-    console.log("Unknown type of error found.");
+    console.log("An unknown type of error found.");
     console.error(error);
     await showAlert("Error occurred", "An unknown type of error occurred.");
     return;

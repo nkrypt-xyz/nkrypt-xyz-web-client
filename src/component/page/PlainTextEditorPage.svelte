@@ -121,8 +121,6 @@
       return;
     }
 
-    console.log(currentFile);
-
     try {
       let uInt8Array = await downloadAndDecryptFileIntoArrayBuffer(
         currentFile.bucketId,
