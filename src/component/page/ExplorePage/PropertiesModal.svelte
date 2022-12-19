@@ -45,8 +45,6 @@
         bucketPassword
       );
 
-      console.log(temporarilyDecryptedEncryptedMetaData)
-
       acceptFn = accept;
       rejectFn = reject;
 

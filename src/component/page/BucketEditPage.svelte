@@ -146,7 +146,6 @@
     let bucketList = await getBucketList();
     if (!bucketList) return;
     bucket = bucketList.find((bucket) => bucket._id == bucketId);
-    console.log("Loaded bucket", bucket);
     if (!bucket) {
       handleInvalidParameter();
       return;
@@ -230,7 +229,6 @@
           permissionsToSet: authorization.permissions,
           targetUserId: authorization.user._id,
         });
-        console.log(res);
       }
 
       toast.push("Your changes have been saved.");

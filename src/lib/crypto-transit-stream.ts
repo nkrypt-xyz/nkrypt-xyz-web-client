@@ -135,7 +135,7 @@ const collectChunksAndUploadFromStream = async (
 
     let shouldEnd = packet.length < packetSize;
     const progressNotifierFnOverride = (total, encrypted, uploaded) => {
-      console.log("PACKET PROGRESS", total, encrypted, uploaded);
+      console.debug("PACKET PROGRESS", total, encrypted, uploaded);
     };
 
     let response = await callBlobWriteQuantizedApi(
@@ -286,7 +286,7 @@ export const downloadAndDecryptFile = async (
   });
 
   await decryptedReadableStream.pipeTo(fileStream);
-  
+
   try {
     await decryptedReadableStream.cancel();
   } catch (ex) {}
