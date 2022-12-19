@@ -28,6 +28,20 @@ export const callBucketCreateApi = async (data: {
   );
 };
 
+export const callBucketSetAuthorizationApi = async (data: {
+  targetUserId: string;
+  bucketId: string;
+  notes: string;
+  permissionsToSet: Record<string, boolean>;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/bucket/set-authorization",
+    data
+  );
+};
+
 export const callDirectoryGetApi = async (data: { bucketId; directoryId }) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
@@ -37,7 +51,11 @@ export const callDirectoryGetApi = async (data: { bucketId; directoryId }) => {
   );
 };
 
-export const callDirectoryRenameApi = async (data: { bucketId; directoryId; name }) => {
+export const callDirectoryRenameApi = async (data: {
+  bucketId;
+  directoryId;
+  name;
+}) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,
@@ -46,7 +64,10 @@ export const callDirectoryRenameApi = async (data: { bucketId; directoryId; name
   );
 };
 
-export const callDirectoryDeleteApi = async (data: { bucketId; directoryId }) => {
+export const callDirectoryDeleteApi = async (data: {
+  bucketId;
+  directoryId;
+}) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,
@@ -112,8 +133,11 @@ export const callFileRenameApi = async (data: { bucketId; fileId; name }) => {
   );
 };
 
-
-export const callFileSetMetaDataApi = async (data: { bucketId; fileId; metaData }) => {
+export const callFileSetMetaDataApi = async (data: {
+  bucketId;
+  fileId;
+  metaData;
+}) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,
@@ -122,7 +146,11 @@ export const callFileSetMetaDataApi = async (data: { bucketId; fileId; metaData 
   );
 };
 
-export const callFileSetEncryptedMetaDataApi = async (data: { bucketId; fileId; encryptedMetaData }) => {
+export const callFileSetEncryptedMetaDataApi = async (data: {
+  bucketId;
+  fileId;
+  encryptedMetaData;
+}) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,

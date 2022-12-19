@@ -35,7 +35,7 @@
   };
 
   const bucketManageClicked = async (bucket: Bucket) => {
-    push(`/manage-bucket/${bucket._id}`);
+    push(`/bucket/edit/${bucket._id}`);
   };
 </script>
 

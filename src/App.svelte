@@ -24,7 +24,8 @@
   import Router, { push, replace } from "svelte-spa-router";
   import { wrap } from "svelte-spa-router/wrap";
   // Pages
-  import CreateBucketPage from "./component/page/CreateBucketPage.svelte";
+  import BucketCreatePage from "./component/page/BucketCreatePage.svelte";
+  import BucketEditPage from "./component/page/BucketEditPage.svelte";
   import DashboardPage from "./component/page/DashboardPage.svelte";
   import ExplorePage from "./component/page/ExplorePage.svelte";
   import LoginPage from "./component/page/LoginPage.svelte";
@@ -57,6 +58,11 @@
   import { handleAnyError } from "./lib/error-handling.js";
   import { performUserLogout } from "./lib/session.js";
   import { createDebouncedMethod } from "./utility/misc-utils.js";
+  import { SvelteToast } from "@zerodevx/svelte-toast";
+
+  const svelteToastOptions = {
+
+  }
 
   let topAppBar: TopAppBarComponentDev;
 
@@ -117,7 +123,8 @@
     "/user/save/*": makeAuthenticatedRoute(UserSavePage),
     "/buckets": makeAuthenticatedRoute(BucketsPage),
     "/settings": makeAuthenticatedRoute(SettingsPage),
-    "/bucket/create": makeAuthenticatedRoute(CreateBucketPage),
+    "/bucket/create": makeAuthenticatedRoute(BucketCreatePage),
+    "/bucket/edit/*": makeAuthenticatedRoute(BucketEditPage),
     "/explore/*": makeAuthenticatedRoute(ExplorePage),
     "/edit-plain-text/*": makeAuthenticatedRoute(PlainTextEditorPage),
   };
@@ -173,6 +180,7 @@
 </script>
 
 <main class="nk-main">
+  <SvelteToast {svelteToastOptions} />
   <ObtrusiveLoader />
   <ConfirmationDialog />
   <AlertDialog />
