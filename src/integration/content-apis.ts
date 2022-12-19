@@ -31,7 +31,6 @@ export const callBucketCreateApi = async (data: {
 export const callBucketSetAuthorizationApi = async (data: {
   targetUserId: string;
   bucketId: string;
-  notes: string;
   permissionsToSet: Record<string, boolean>;
 }) => {
   return await callPostJsonApi(
