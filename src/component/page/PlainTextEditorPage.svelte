@@ -12,6 +12,7 @@
     callDirectoryCreateApi,
     callDirectoryGetApi,
     callFileGetApi,
+    callFileSetMetaDataApi,
   } from "../../integration/content-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
@@ -105,7 +106,7 @@
 
   const returnToPreviousPage = () => {
     resetData();
-    push("/dashboard");
+    history.back();
   };
 
   const loadFile = async (fileId: string) => {
@@ -191,6 +192,21 @@
       );
       isDirty = false;
       decrementActiveGlobalObtrusiveTaskCount();
+
+      {
+        incrementActiveGlobalObtrusiveTaskCount();
+        let metaData = {
+          size: encodedData.byteLength,
+          mimeType: currentFile.metaData.mimeType,
+        };
+        let response = await callFileSetMetaDataApi({
+          bucketId: currentBucket._id,
+          fileId: currentFile._id,
+          metaData,
+        });
+        decrementActiveGlobalObtrusiveTaskCount();
+      }
+
       return true;
     } catch (ex) {
       await showCommonErrorDialog(ex);
