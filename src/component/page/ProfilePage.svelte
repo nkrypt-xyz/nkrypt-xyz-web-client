@@ -16,6 +16,42 @@
   import UpdateUserPasswordDialog from "./ProfilePage/UpdateUserPasswordDialog.svelte";
   import UpdateUserProfileDialog from "./ProfilePage/UpdateUserProfileDialog.svelte";
   import { globalPermissionDetails } from "../../lib/permissions-helper.js";
+  import {
+    callUserListApi,
+    callUserSessionListApi,
+    callUserSessionLogoutAllApi,
+  } from "../../integration/user-apis.js";
+  import { epochToPrettyDateTime } from "../../lib/date-helper.js";
+  import { performUserLogout } from "../../lib/session.js";
+
+  let sessionList = [];
+
+  const loadSessionList = async () => {
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callUserSessionListApi({});
+      decrementActiveGlobalObtrusiveTaskCount();
+      ({ sessionList } = response);
+      return response;
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
+  };
+
+  loadSessionList();
+
+  const logoutFromAllDevicesClicked = async () => {
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      await callUserSessionLogoutAllApi({
+        message: "User initiated logout from all devices.",
+      });
+      decrementActiveGlobalObtrusiveTaskCount();
+      await performUserLogout();
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
+  };
 </script>
 
 <UpdateUserPasswordDialog />
@@ -78,6 +114,44 @@
       >
         <Icon class="material-icons">password</Icon>
         <Label>Change Login Password</Label>
+      </Button>
+    </div>
+
+    <div class="section">
+      <div class="title">Sessions (up to last 20)</div>
+
+      {#each sessionList as session}
+        <div
+          class="item"
+          style="padding-bottom: 8px; border-bottom: 1px solid #dddddd;"
+        >
+          <div class="label" style="flex: 4; font-size: 12px;">
+            Login: {epochToPrettyDateTime(session.createdAt)}
+            {#if session.hasExpired}
+              <br />
+              Expiry: {epochToPrettyDateTime(session.expiredAt)}
+              <br />
+              <div style="font-style: italic;">
+                ({session.expireReason})
+              </div>
+            {/if}
+          </div>
+          <div class="value" style="flex: 1; font-size: 12px;">
+            {session.isCurrentSession ? "(Current session)" : ""}
+            {session.hasExpired ? "(Expired)" : ""}
+          </div>
+        </div>
+      {/each}
+    </div>
+
+    <div class="nk--button-row">
+      <Button
+        variant="raised"
+        class="hero-button"
+        on:click={logoutFromAllDevicesClicked}
+      >
+        <Icon class="material-icons">person</Icon>
+        <Label>Logout from all Sessions</Label>
       </Button>
     </div>
   </div>
