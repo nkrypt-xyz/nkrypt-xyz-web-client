@@ -65,7 +65,7 @@
 
   const returnToPreviousPage = () => {
     resetData();
-    push("/dashboard");
+    history.back();
   };
 
   const getUser = async (userName: string) => {

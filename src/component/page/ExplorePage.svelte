@@ -1,12 +1,16 @@
 <script lang="ts">
   // UI / Framework
   import IconButton from "@smui/icon-button";
+  import { encryptAndUploadArrayBuffer } from "../../lib/crypto-transit-basic.js";
   import { location, push } from "svelte-spa-router";
   import { derived } from "svelte/store";
   // Other imports
   import {
     callDirectoryCreateApi,
     callDirectoryGetApi,
+    callFileCreateApi,
+    callFileSetEncryptedMetaDataApi,
+    callFileSetMetaDataApi,
   } from "../../integration/content-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
@@ -25,6 +29,8 @@
   import FileSection from "./ExplorePage/FileSection.svelte";
   import FileUploadModal from "./ExplorePage/FileUploadModal.svelte";
   import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
+  import { MiscConstant } from "../../constant/misc-constants.js";
+  import { createTextFile } from "./ExplorePage/create-text-file.js";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -161,7 +167,11 @@
 
   const createDirectoryClicked = async () => {
     try {
-      let name = await showPrompt("Create directory", "Enter directory name", "");
+      let name = await showPrompt(
+        "Create directory",
+        "Enter directory name",
+        ""
+      );
       if (!name) return;
 
       incrementActiveGlobalObtrusiveTaskCount();
@@ -174,6 +184,23 @@
       });
       decrementActiveGlobalObtrusiveTaskCount();
 
+      explorePath(currentPath);
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
+  };
+
+  const createFileClicked = async () => {
+    try {
+      let name = await showPrompt("Create a text file", "Enter file name", "");
+      if (!name) return;
+
+      await createTextFile(
+        currentBucket,
+        currentDirectory,
+        currentBucketPassword,
+        name
+      );
       explorePath(currentPath);
     } catch (ex) {
       return await handleAnyError(ex);
@@ -305,6 +332,13 @@
           class="material-icons control-row-icon-button"
           on:click={createDirectoryClicked}
           >create_new_folder
+        </IconButton>
+
+        <IconButton
+          size="mini"
+          class="material-icons control-row-icon-button"
+          on:click={createFileClicked}
+          >post_add
         </IconButton>
 
         <IconButton
