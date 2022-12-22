@@ -12,6 +12,7 @@
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
   import { isLikelyPlainText } from "../../../lib/plain-text-editor-helper.js";
   import { push } from "svelte-spa-router";
+  import { isLikelyImage } from "../../../lib/image-viewer-helper.js";
 
   const FileOperationModalState = {
     IDLE: "IDLE",
@@ -94,8 +95,16 @@
     return isLikelyPlainText(file);
   };
 
+  const shouldShowImageViewerOption = (file) => {
+    return isLikelyImage(file);
+  };
+
   const editAsPlainTextClicked = async () => {
     push(`/edit-plain-text/${file.bucketId}/${file._id}`);
+  };
+
+  const openInImageViewerClicked = async () => {
+    push(`/view-image/${file.bucketId}/${file._id}`);
   };
 
   let shouldShowDialog = false;
@@ -154,9 +163,22 @@
               <Button
                 class="open-plain-text-editor-button"
                 variant="raised"
+                color="secondary"
                 on:click={() => editAsPlainTextClicked()}
               >
                 <Label>Edit as Plain Text</Label>
+              </Button>
+            {/if}
+
+            {#if shouldShowImageViewerOption(file)}
+              <br />
+              <Button
+                class="open-image-viewer-button"
+                variant="raised"
+                color="secondary"
+                on:click={() => openInImageViewerClicked()}
+              >
+                <Label>Open in Image viewer</Label>
               </Button>
             {/if}
           {/if}
