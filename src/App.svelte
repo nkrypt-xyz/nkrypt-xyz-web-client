@@ -35,6 +35,7 @@
   import BucketsPage from "./component/page/BucketsPage.svelte";
   import SettingsPage from "./component/page/SettingsPage.svelte";
   import PlainTextEditorPage from "./component/page/PlainTextEditorPage.svelte";
+  import ImageViewerPage from "./component/page/ImageViewerPage.svelte";
   import ConfirmationThreeStateDialog from "./component/dialog/ConfirmationThreeStateDialog.svelte";
   // Components
   import Footer from "./component/common/Footer.svelte";
@@ -127,6 +128,7 @@
     "/bucket/edit/*": makeAuthenticatedRoute(BucketEditPage),
     "/explore/*": makeAuthenticatedRoute(ExplorePage),
     "/edit-plain-text/*": makeAuthenticatedRoute(PlainTextEditorPage),
+    "/view-image/*": makeAuthenticatedRoute(ImageViewerPage),
   };
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
