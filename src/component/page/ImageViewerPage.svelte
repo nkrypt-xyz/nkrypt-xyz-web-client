@@ -187,7 +187,7 @@
         <Icon class="file-name-icon material-icons">image</Icon>
       </div>
 
-      <img class="preview-image" src={imageDataUrl} alt="" />
+      <img class="preview-image" src={imageDataUrl} alt="Actual content" />
 
       <div class="button-row">
         <Button

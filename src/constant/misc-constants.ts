@@ -2,4 +2,7 @@ export const MiscConstant = {
   NEW_ID_PLACEHOLDER: "new",
   BLANK_TEXT_FILE_SIZE: 0,
   TEXT_FILE_MIME: "text/plain",
+  IMAGE_THUMBNAIL_SIZE_PX: 200,
+  IMAGE_THUMBNAIL_MIME_TYPE: "image/jpeg",
+  IMAGE_THUMBNAIL_QUALITY: 0.4
 };

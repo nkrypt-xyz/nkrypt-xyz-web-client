@@ -13,6 +13,7 @@
   import { isLikelyPlainText } from "../../../lib/plain-text-editor-helper.js";
   import { push } from "svelte-spa-router";
   import { isLikelyImage } from "../../../lib/image-viewer-helper.js";
+  import { decryptToObject } from "../../../utility/crypto-utils.js";
 
   const FileOperationModalState = {
     IDLE: "IDLE",
@@ -33,6 +34,8 @@
   let warningMessage = null;
   let downloadProgress = null;
 
+  let temporarilyDecryptedEncryptedMetaData = null;
+
   let selectedDownloadMethod = "basic";
 
   $: selectedDownloadMethod = $storedSettings.downloadMechanism;
@@ -40,14 +43,24 @@
   export function showModal(params: { file; bucketPassword }): Promise<string> {
     return new Promise<string>((accept, reject) => {
       ({ file, bucketPassword } = params);
+
       acceptFn = accept;
       rejectFn = reject;
+
+      processMetaData();
 
       // start the show
       state = FileOperationModalState.PROVIDE_OPTIONS;
       warningMessage = null;
     });
   }
+
+  const processMetaData = async () => {
+    temporarilyDecryptedEncryptedMetaData = await decryptToObject(
+      file.encryptedMetaData,
+      bucketPassword
+    );
+  };
 
   const setAnswer = (answer) => {
     state = FileOperationModalState.IDLE;
@@ -88,6 +101,15 @@
       await showCommonErrorDialog(ex);
     }
     state = FileOperationModalState.PROVIDE_OPTIONS;
+  };
+
+  const getImageThumbnailContent = (
+    file,
+    temporarilyDecryptedEncryptedMetaData
+  ) => {
+    if (!file) return;
+    if (!temporarilyDecryptedEncryptedMetaData) return;
+    return temporarilyDecryptedEncryptedMetaData.imageThumbnailContent;
   };
 
   const shouldShowPlainTextEditorOption = (file) => {
@@ -150,6 +172,20 @@
           </div>
 
           {#if state === FileOperationModalState.PROVIDE_OPTIONS}
+            <!-- thumbnail - start -->
+            {#if shouldShowImageViewerOption(file) && getImageThumbnailContent(file, temporarilyDecryptedEncryptedMetaData)}
+              <br />
+              <img
+                src={getImageThumbnailContent(
+                  file,
+                  temporarilyDecryptedEncryptedMetaData
+                )}
+                alt="Thumbnail of content"
+              />
+              <br />
+            {/if}
+            <!-- thumbnail - end -->
+
             <Button
               class="start-download-button"
               variant="raised"
