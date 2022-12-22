@@ -13,7 +13,7 @@ export const performUserLogout = async ({
   incrementActiveGlobalObtrusiveTaskCount();
   try {
     let response = await callUserLogoutApi({
-      message: "Manually pressed logout button",
+      message: "User initiated logout.",
     });
   } catch (_) {
     ("pass");

@@ -62,3 +62,23 @@ export const callUserListApi = async (data: {}) => {
     data
   );
 };
+
+export const callUserSessionListApi = async (data: {}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/user/list-all-sessions",
+    data
+  );
+};
+
+export const callUserSessionLogoutAllApi = async (data: {
+  message: string;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/user/logout-all-sessions",
+    data
+  );
+};
