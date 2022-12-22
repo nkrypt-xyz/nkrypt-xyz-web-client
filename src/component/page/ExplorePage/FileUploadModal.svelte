@@ -22,6 +22,11 @@
   } from "../../../store/ui.js";
   import { encryptObject } from "../../../utility/crypto-utils.js";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
+  import {
+    generateThumbnail,
+    isLikelyImage,
+    isUploadCandidateLikelyAnImage,
+  } from "../../../lib/image-viewer-helper.js";
 
   const FileUploadModalState = {
     IDLE: "IDLE",
@@ -46,6 +51,8 @@
   let warningMessage = null;
   let uploadProgress = null;
 
+  let imageThumbnailContent = null;
+
   let selectedUploadMethod = "basic";
 
   $: selectedUploadMethod = $storedSettings.uploadMechanism;
@@ -62,6 +69,7 @@
       acceptFn = accept;
       rejectFn = reject;
 
+      imageThumbnailContent = null;
       uploadCandidate = null;
       fileName = "";
 
@@ -104,6 +112,13 @@
     if (fileName.length === 0) {
       allowUpload = false;
       return;
+    }
+
+    if (isUploadCandidateLikelyAnImage(uploadCandidate.type)) {
+      generateThumbnail(uploadCandidate).then((thumb) => {
+        console.debug("Image thumbnail", thumb);
+        imageThumbnailContent = thumb;
+      });
     }
 
     // directories can not be overwritten
@@ -206,6 +221,14 @@
         let encryptedMetaData = {
           originalName: uploadCandidate.name,
         };
+
+        if (
+          isUploadCandidateLikelyAnImage(uploadCandidate.type) &&
+          imageThumbnailContent
+        ) {
+          encryptedMetaData["imageThumbnailContent"] = imageThumbnailContent;
+        }
+
         let response = await callFileSetEncryptedMetaDataApi({
           bucketId,
           fileId,
@@ -314,6 +337,12 @@
                 <Label>Select again</Label>
               </Button>
             </div>
+
+            {#if isUploadCandidateLikelyAnImage(uploadCandidate.type) && imageThumbnailContent}
+              <div>
+                <img src={imageThumbnailContent} alt="Thumbnail of content" />
+              </div>
+            {/if}
           {:else}
             <div>
               <Button
