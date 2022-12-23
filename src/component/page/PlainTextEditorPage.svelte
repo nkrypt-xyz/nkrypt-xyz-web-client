@@ -41,6 +41,7 @@
   import HelperText from "@smui/textfield/helper-text";
   import Button, { Label, Icon } from "@smui/button";
   import { text } from "svelte/internal";
+  import { MetaDataConstant } from "../../constant/meta-data-constants.js";
 
   const ROUTE_PREFIX = "/edit-plain-text/";
 
@@ -196,8 +197,12 @@
       {
         incrementActiveGlobalObtrusiveTaskCount();
         let metaData = {
-          size: encodedData.byteLength,
-          mimeType: currentFile.metaData.mimeType,
+          ...currentFile.metaData,
+          [MetaDataConstant.CORE_GROUP_NAME]: {
+            ...currentFile.metaData[MetaDataConstant.CORE_GROUP_NAME],
+            [MetaDataConstant.CORE.SIZE_BEFORE_ENCRYPTION]:
+              encodedData.byteLength,
+          },
         };
         let response = await callFileSetMetaDataApi({
           bucketId: currentBucket._id,

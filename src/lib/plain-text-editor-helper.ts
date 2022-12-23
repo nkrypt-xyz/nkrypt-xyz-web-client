@@ -12,7 +12,7 @@ const supportedMimeTypeList = [
 
 const isLikelyPlainText = (file) => {
   try {
-    let { mimeType } = file.metaData;
+    let { mimeType } = file.metaData?.core;
     return supportedMimeTypeList.indexOf(mimeType) > -1;
   } catch (ex) {
     console.warn(ex);

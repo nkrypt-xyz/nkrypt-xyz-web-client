@@ -109,7 +109,7 @@
   ) => {
     if (!file) return;
     if (!temporarilyDecryptedEncryptedMetaData) return;
-    return temporarilyDecryptedEncryptedMetaData.imageThumbnailContent;
+    return temporarilyDecryptedEncryptedMetaData.image?.imageThumbnailContent;
   };
 
   const shouldShowPlainTextEditorOption = (file) => {
@@ -162,12 +162,12 @@
             <div>
               <span class="title">Size before encryption: </span>
               <span class="value"
-                >{expressBytesPrettified(file.metaData?.size)}</span
+                >{expressBytesPrettified(file.metaData?.core?.sizeBeforeEncryption)}</span
               >
             </div>
             <div>
               <span class="title">Type: </span>
-              <span class="value">{file.metaData?.mimeType}</span>
+              <span class="value">{file.metaData?.core?.mimeType}</span>
             </div>
           </div>
 

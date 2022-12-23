@@ -11,6 +11,49 @@
   import { showCommonErrorDialog } from "../../../store/ui.js";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
   import { decryptToObject } from "../../../utility/crypto-utils.js";
+  import { arrayDistinct, deepMerge } from "../../../lib/misc-utils.js";
+
+  const prettifyGroupName = (key) => {
+    const map = {
+      core: "Core",
+      origin: "Origin",
+      image: "Image",
+    };
+    if (key in map) {
+      return map[key];
+    }
+    return key;
+  };
+
+  const prettifyEntryName = (key) => {
+    const map = {
+      sizeBeforeEncryption: "Size",
+      mimeType: "Type",
+      originalName: "Original Name",
+      originationSource: "Source",
+      originationDate: "Date Originated",
+      imageThumbnailContent: "Thumnail",
+    };
+    if (key in map) {
+      return map[key];
+    }
+    if (key.replace(LOCK_EMOJI, "") in map) {
+      return map[key.replace(LOCK_EMOJI, "")] + LOCK_EMOJI;
+    }
+    return key;
+  };
+
+  const prettifyEntryValue = (groupName, key, value) => {
+    key = key.replace(LOCK_EMOJI, "");
+    if (groupName === "image" && key === "imageThumbnailContent") {
+      return (String(value) || "").substring(0, 16) + "...";
+    }
+
+    return value;
+  };
+
+  const preferredGroupOrder = ["core", "origin"];
+  const LOCK_EMOJI = "🔒";
 
   const PropertiesModalState = {
     IDLE: "IDLE",
@@ -32,6 +75,9 @@
 
   let temporarilyDecryptedEncryptedMetaData = {};
 
+  let combinedMetaData = [];
+  let combinedGroupNames = [];
+
   export function showModal(params: {
     entity;
     isDirectory;
@@ -44,6 +90,34 @@
         entity.encryptedMetaData,
         bucketPassword
       );
+
+      for (let key in temporarilyDecryptedEncryptedMetaData) {
+        for (let keyInner in temporarilyDecryptedEncryptedMetaData[key]) {
+          temporarilyDecryptedEncryptedMetaData[key][keyInner + LOCK_EMOJI] =
+            temporarilyDecryptedEncryptedMetaData[key][keyInner];
+          delete temporarilyDecryptedEncryptedMetaData[key][keyInner];
+        }
+      }
+
+      combinedMetaData = deepMerge(
+        entity.metaData,
+        temporarilyDecryptedEncryptedMetaData
+      );
+      combinedGroupNames = arrayDistinct(
+        [].concat(
+          preferredGroupOrder.filter((name) =>
+            Object.hasOwn(combinedMetaData, name)
+          ),
+          Object.keys(combinedMetaData)
+        )
+      );
+
+      console.debug("Inspecting metaData of entity", {
+        entity,
+        isDirectory,
+        metaData: entity.metaData,
+        temporarilyDecryptedEncryptedMetaData,
+      });
 
       acceptFn = accept;
       rejectFn = reject;
@@ -65,11 +139,6 @@
   $: {
     shouldShowDialog = state !== PropertiesModalState.IDLE;
   }
-
-  const listMetaDataKeys = (metaData) => {
-    const ignoredList = ["size", "mimeType"];
-    return Object.keys(metaData).filter((key) => !ignoredList.includes(key));
-  };
 </script>
 
 {#if shouldShowDialog}
@@ -85,56 +154,27 @@
 
       <Content id="mandatory-content">
         {#if entity}
-          <div class="section">
-            <div class="title">Essentials</div>
+          {#if combinedGroupNames.length === 0}
+            <div class="no-metadata">This file/directory has no MetaData.</div>
+          {/if}
+          {#each combinedGroupNames as groupName}
+            <div class="section">
+              <div class="title">{prettifyGroupName(groupName)}</div>
 
-            <div class="item">
-              <div class="label">Name</div>
-              <div class="value">
-                {entity.name}
-              </div>
-            </div>
-
-            <div class="item">
-              <div class="label">Size</div>
-              <div class="value">
-                {expressBytesPrettified(entity.metaData.size)}
-              </div>
-            </div>
-
-            <div class="item">
-              <div class="label">Type</div>
-              <div class="value">
-                {entity.metaData.mimeType}
-              </div>
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="title">Meta Data</div>
-
-            {#each listMetaDataKeys(entity.metaData) as key}
-              <div class="item">
-                <div class="label">{key}</div>
-                <div class="value">
-                  {entity.metaData[key]}
+              {#each Object.keys(combinedMetaData[groupName]) as entryName}
+                <div class="item">
+                  <div class="label">{prettifyEntryName(entryName)}</div>
+                  <div class="value">
+                    {prettifyEntryValue(
+                      groupName,
+                      entryName,
+                      combinedMetaData[groupName][entryName]
+                    )}
+                  </div>
                 </div>
-              </div>
-            {/each}
-          </div>
-
-          <div class="section">
-            <div class="title">Encrypted Meta Data</div>
-
-            {#each listMetaDataKeys(temporarilyDecryptedEncryptedMetaData) as key}
-              <div class="item">
-                <div class="label">{key}</div>
-                <div class="value">
-                  {temporarilyDecryptedEncryptedMetaData[key]}
-                </div>
-              </div>
-            {/each}
-          </div>
+              {/each}
+            </div>
+          {/each}
         {/if}
       </Content>
       <Actions>
@@ -154,6 +194,7 @@
 <style>
   .section {
     margin-top: 6px;
+    font-size: 12px;
   }
 
   .section .title {
