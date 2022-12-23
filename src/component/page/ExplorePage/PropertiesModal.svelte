@@ -12,12 +12,14 @@
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
   import { decryptToObject } from "../../../utility/crypto-utils.js";
   import { arrayDistinct, deepMerge } from "../../../lib/misc-utils.js";
+  import { epochToPrettyDateTime } from "../../../lib/date-helper.js";
 
   const prettifyGroupName = (key) => {
     const map = {
       core: "Core",
       origin: "Origin",
       image: "Image",
+      serverSpecified: "Specified by Server",
     };
     if (key in map) {
       return map[key];
@@ -33,6 +35,10 @@
       originationSource: "Source",
       originationDate: "Date Originated",
       imageThumbnailContent: "Thumnail",
+      createdAt: "Created",
+      updatedAt: "Updated",
+      contentUpdatedAt: "Content Updated",
+      name: "Name",
     };
     if (key in map) {
       return map[key];
@@ -44,12 +50,32 @@
   };
 
   const prettifyEntryValue = (groupName, key, value) => {
-    key = key.replace(LOCK_EMOJI, "");
-    if (groupName === "image" && key === "imageThumbnailContent") {
-      return (String(value) || "").substring(0, 16) + "...";
-    }
+    try {
+      key = key.replace(LOCK_EMOJI, "");
+      if (groupName === "image" && key === "imageThumbnailContent") {
+        return (String(value) || "").substring(0, 16) + "...";
+      } else if (
+        (groupName === "origin" && key === "originationDate") ||
+        (groupName === "serverSpecified" &&
+          ["createdAt", "updatedAt", "contentUpdatedAt"].includes(key))
+      ) {
+        return value ? epochToPrettyDateTime(value) : "Never";
+      } else if (groupName === "origin" && key === "originationSource") {
+        return (
+          {
+            upload: "Upload",
+            createFile: "File created by user",
+            createDirectory: "Directory created by user",
+          }[value] || value
+        );
+      } else if (value === null) {
+        return "Null";
+      }
 
-    return value;
+      return value;
+    } catch (ex) {
+      return value;
+    }
   };
 
   const preferredGroupOrder = ["core", "origin"];
@@ -99,9 +125,21 @@
         }
       }
 
+      let serverSpecified = {
+        name: entity.name,
+        createdAt: entity.createdAt,
+        updatedAt: entity.updatedAt,
+      };
+      if (!isDirectory) {
+        (<any>serverSpecified).contentUpdatedAt = entity.contentUpdatedAt;
+      }
+
       combinedMetaData = deepMerge(
         entity.metaData,
-        temporarilyDecryptedEncryptedMetaData
+        temporarilyDecryptedEncryptedMetaData,
+        {
+          serverSpecified: serverSpecified,
+        }
       );
       combinedGroupNames = arrayDistinct(
         [].concat(
