@@ -6,4 +6,5 @@ export const CommonConstant = {
   COPYRIGHT_HREF: "https://ishafayet.me",
   DEFAULT_SERVER_URL: "http://localhost:9041",
   PACKET_SIZE_FOR_QUANTIZED_STREAMS: 100 * BLOB_CHUNK_SIZE_INCLUDING_TAG_BYTES,
+  CLIENT_NAME: "Self-hosted official web client",
 };

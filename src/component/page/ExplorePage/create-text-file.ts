@@ -1,3 +1,4 @@
+import { MetaDataConstant } from "../../../constant/meta-data-constants.js";
 import { MiscConstant } from "../../../constant/misc-constants.js";
 import {
   callFileCreateApi,
@@ -39,8 +40,16 @@ const createTextFile = async (
   {
     incrementActiveGlobalObtrusiveTaskCount();
     let metaData = {
-      size: MiscConstant.BLANK_TEXT_FILE_SIZE,
-      mimeType: MiscConstant.TEXT_FILE_MIME,
+      [MetaDataConstant.ORIGIN_GROUP_NAME]: {
+        [MetaDataConstant.ORIGIN.ORIGINATION_SOURCE]:
+          MiscConstant.ORIGINATION_SOURCE_CREATE_FILE,
+        [MetaDataConstant.ORIGIN.ORIGINATION_DATE]: Date.now(),
+      },
+      [MetaDataConstant.CORE_GROUP_NAME]: {
+        [MetaDataConstant.CORE.SIZE_BEFORE_ENCRYPTION]:
+          MiscConstant.BLANK_TEXT_FILE_SIZE,
+        [MetaDataConstant.CORE.MIME_TYPE]: MiscConstant.TEXT_FILE_MIME,
+      },
     };
     let response = await callFileSetMetaDataApi({
       bucketId: currentBucket._id,
@@ -53,7 +62,9 @@ const createTextFile = async (
   {
     incrementActiveGlobalObtrusiveTaskCount();
     let encryptedMetaData = {
-      originalName: null,
+      [MetaDataConstant.ORIGIN_GROUP_NAME]: {
+        [MetaDataConstant.ORIGIN.ORIGINAL_NAME]: null,
+      },
     };
     let response = await callFileSetEncryptedMetaDataApi({
       bucketId: currentBucket._id,

@@ -31,6 +31,7 @@
   import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
   import { MiscConstant } from "../../constant/misc-constants.js";
   import { createTextFile } from "./ExplorePage/create-text-file.js";
+  import { MetaDataConstant } from "../../constant/meta-data-constants.js";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -179,7 +180,13 @@
         bucketId: currentBucket._id,
         name,
         parentDirectoryId: (currentDirectory as any)._id,
-        metaData: {},
+        metaData: {
+          [MetaDataConstant.ORIGIN_GROUP_NAME]: {
+            [MetaDataConstant.ORIGIN.ORIGINATION_SOURCE]:
+              MiscConstant.ORIGINATION_SOURCE_CREATE_DIRECTORY,
+            [MetaDataConstant.ORIGIN.ORIGINATION_DATE]: Date.now(),
+          },
+        },
         encryptedMetaData: await encryptObject({}, currentBucketPassword),
       });
       decrementActiveGlobalObtrusiveTaskCount();

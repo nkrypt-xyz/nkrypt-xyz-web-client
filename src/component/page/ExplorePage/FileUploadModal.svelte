@@ -27,6 +27,8 @@
     isLikelyImage,
     isUploadCandidateLikelyAnImage,
   } from "../../../lib/image-viewer-helper.js";
+  import { MetaDataConstant } from "../../../constant/meta-data-constants.js";
+  import { MiscConstant } from "../../../constant/misc-constants.js";
 
   const FileUploadModalState = {
     IDLE: "IDLE",
@@ -205,8 +207,16 @@
       {
         incrementActiveGlobalObtrusiveTaskCount();
         let metaData = {
-          size: uploadCandidate.size,
-          mimeType: uploadCandidate.type,
+          [MetaDataConstant.ORIGIN_GROUP_NAME]: {
+            [MetaDataConstant.ORIGIN.ORIGINATION_SOURCE]:
+              MiscConstant.ORIGINATION_SOURCE_UPLOAD,
+            [MetaDataConstant.ORIGIN.ORIGINATION_DATE]: Date.now(),
+          },
+          [MetaDataConstant.CORE_GROUP_NAME]: {
+            [MetaDataConstant.CORE.SIZE_BEFORE_ENCRYPTION]:
+              uploadCandidate.size,
+            [MetaDataConstant.CORE.MIME_TYPE]: uploadCandidate.type,
+          },
         };
         let response = await callFileSetMetaDataApi({
           bucketId,
@@ -219,14 +229,19 @@
       {
         incrementActiveGlobalObtrusiveTaskCount();
         let encryptedMetaData = {
-          originalName: uploadCandidate.name,
+          [MetaDataConstant.ORIGIN_GROUP_NAME]: {
+            [MetaDataConstant.ORIGIN.ORIGINAL_NAME]: uploadCandidate.name,
+          },
         };
 
         if (
           isUploadCandidateLikelyAnImage(uploadCandidate.type) &&
           imageThumbnailContent
         ) {
-          encryptedMetaData["imageThumbnailContent"] = imageThumbnailContent;
+          encryptedMetaData[MetaDataConstant.IMAGE_GROUP_NAME] = {
+            [MetaDataConstant.IMAGE.IMAGE_THUMBNAIL_CONTENT]:
+              imageThumbnailContent,
+          };
         }
 
         let response = await callFileSetEncryptedMetaDataApi({

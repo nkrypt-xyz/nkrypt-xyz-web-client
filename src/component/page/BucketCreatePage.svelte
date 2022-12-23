@@ -23,6 +23,8 @@
   } from "../../store/ui.js";
   import { encryptText } from "../../utility/crypto-utils.js";
   import { testConstants } from "../../constant/test-constants.js";
+  import { MetaDataConstant } from "../../constant/meta-data-constants.js";
+  import { CommonConstant } from "../../constant/common-constants.js";
 
   const NEW_BUCKET_ID = "new";
 
@@ -52,7 +54,9 @@
         cryptSpec: BUCKET_CRYPTO_SPEC,
         cryptData,
         metaData: {
-          createFrom: "nkrypt.xyz app",
+          [MetaDataConstant.ORIGIN_GROUP_NAME]: {
+            [MetaDataConstant.ORIGIN.CLIENT_NAME]: CommonConstant.CLIENT_NAME,
+          },
         },
       });
 
