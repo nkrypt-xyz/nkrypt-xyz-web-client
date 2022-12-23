@@ -24,6 +24,7 @@
   export let childFileClicked = null;
   export let refreshExplorePage = null;
   export let viewPropertiesOfChildFileClicked = null;
+  export let initiateMoveFn = null;
 
   // known and acceptable minor memory leak.
   let menus = {};
@@ -74,6 +75,10 @@
     await refreshExplorePage();
   };
 
+  const cutClicked = async (childFile) => {
+    initiateMoveFn(childFile, false);
+  };
+
   const viewPropertiesClicked = async (childFile) => {
     await viewPropertiesOfChildFileClicked(childFile);
   };
@@ -110,6 +115,9 @@
             </Item>
             <Item on:SMUI:action={() => renameClicked(childFile)}>
               <Text>Rename</Text>
+            </Item>
+            <Item on:SMUI:action={() => cutClicked(childFile)}>
+              <Text>Cut</Text>
             </Item>
             <Item on:SMUI:action={() => deleteClicked(childFile)}>
               <Text>Delete</Text>

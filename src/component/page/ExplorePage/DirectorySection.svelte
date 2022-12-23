@@ -22,6 +22,7 @@
   export let childDirectoryClicked = null;
   export let refreshExplorePage = null;
   export let viewPropertiesOfChildDirectoryClicked = null;
+  export let initiateMoveFn = null;
 
   // known and acceptable minor memory leak.
   let menus = {};
@@ -72,6 +73,10 @@
     await refreshExplorePage();
   };
 
+  const cutClicked = async (childDirectory) => {
+    initiateMoveFn(childDirectory, true);
+  };
+
   const viewPropertiesClicked = async (childDirectory) => {
     await viewPropertiesOfChildDirectoryClicked(childDirectory);
   };
@@ -111,6 +116,9 @@
             </Item>
             <Item on:SMUI:action={() => renameClicked(childDirectory)}>
               <Text>Rename</Text>
+            </Item>
+            <Item on:SMUI:action={() => cutClicked(childDirectory)}>
+              <Text>Cut</Text>
             </Item>
             <Item on:SMUI:action={() => deleteClicked(childDirectory)}>
               <Text>Delete</Text>

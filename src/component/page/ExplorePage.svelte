@@ -8,7 +8,10 @@
   import {
     callDirectoryCreateApi,
     callDirectoryGetApi,
+    callDirectoryMoveApi,
     callFileCreateApi,
+    callFileMoveApi,
+    callFileRenameApi,
     callFileSetEncryptedMetaDataApi,
     callFileSetMetaDataApi,
   } from "../../integration/content-apis.js";
@@ -32,6 +35,8 @@
   import { MiscConstant } from "../../constant/misc-constants.js";
   import { createTextFile } from "./ExplorePage/create-text-file.js";
   import { MetaDataConstant } from "../../constant/meta-data-constants.js";
+  import { ClipboardAction } from "./ExplorePage/clipboard-helper.js";
+  import Clipboard from "./ExplorePage/Clipboard.svelte";
 
   const ROUTE_PREFIX = "/explore/";
 
@@ -45,6 +50,8 @@
   let childDirectoryList = [];
   let childFileList = [];
   let currentDirectory = null;
+
+  let clipboard = null;
 
   const handleInvalidParameter = async () => {
     await showAlert(
@@ -165,6 +172,56 @@
       explorePath(pathString);
     }
   });
+
+  const initiateMoveFn = async (childEntity, isDirectory: boolean) => {
+    clipboard = {
+      action: ClipboardAction.CUT,
+      isDirectory,
+      childEntity,
+      entityStack: JSON.parse(JSON.stringify(entityStack)),
+    };
+    console.debug("Putting in clipboard", clipboard);
+  };
+
+  const performClipboardActionFn = async (affirmative: boolean) => {
+    if (!affirmative) {
+      clipboard = null;
+      return;
+    }
+
+    if (clipboard.isDirectory) {
+      try {
+        incrementActiveGlobalObtrusiveTaskCount();
+        let data = {
+          bucketId: currentBucket._id,
+          directoryId: clipboard.childEntity._id,
+          newName: clipboard.childEntity.name,
+          newParentDirectoryId: currentDirectory._id,
+        };
+        await callDirectoryMoveApi(data);
+        decrementActiveGlobalObtrusiveTaskCount();
+      } catch (ex) {
+        await handleAnyError(ex);
+      }
+    } else {
+      try {
+        incrementActiveGlobalObtrusiveTaskCount();
+        let data = {
+          bucketId: currentBucket._id,
+          fileId: clipboard.childEntity._id,
+          newName: clipboard.childEntity.name,
+          newParentDirectoryId: currentDirectory._id,
+        };
+        await callFileMoveApi(data);
+        decrementActiveGlobalObtrusiveTaskCount();
+      } catch (ex) {
+        await handleAnyError(ex);
+      }
+    }
+
+    clipboard = null;
+    await refreshExplorePage();
+  };
 
   const createDirectoryClicked = async () => {
     try {
@@ -356,10 +413,13 @@
         </IconButton>
       </div>
 
+      <Clipboard {performClipboardActionFn} {clipboard} />
+
       <DirectorySection
         {childDirectoryList}
         {childDirectoryClicked}
         {refreshExplorePage}
+        {initiateMoveFn}
         {viewPropertiesOfChildDirectoryClicked}
       />
 
@@ -367,6 +427,7 @@
         {childFileList}
         {childFileClicked}
         {refreshExplorePage}
+        {initiateMoveFn}
         {viewPropertiesOfChildFileClicked}
       />
     {/if}
