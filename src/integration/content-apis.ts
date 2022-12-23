@@ -63,6 +63,20 @@ export const callDirectoryRenameApi = async (data: {
   );
 };
 
+export const callDirectoryMoveApi = async (data: {
+  bucketId: string;
+  directoryId: string;
+  newParentDirectoryId: string;
+  newName: string;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/directory/move",
+    data
+  );
+};
+
 export const callDirectoryDeleteApi = async (data: {
   bucketId;
   directoryId;
@@ -128,6 +142,20 @@ export const callFileRenameApi = async (data: { bucketId; fileId; name }) => {
     _storedSession.serverUrl,
     _storedSession.apiKey,
     "/api/file/rename",
+    data
+  );
+};
+
+export const callFileMoveApi = async (data: {
+  bucketId: string;
+  fileId: string;
+  newParentDirectoryId: string;
+  newName: string;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/file/move",
     data
   );
 };
