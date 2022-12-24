@@ -62,7 +62,7 @@ function resizeImageToSpecificWidth(file, max, cb) {
   reader.readAsDataURL(file);
 }
 
-const generateThumbnail = (file) => {
+const generateThumbnail = (file): Promise<string> => {
   return new Promise((accept) => {
     resizeImageToSpecificWidth(
       file,

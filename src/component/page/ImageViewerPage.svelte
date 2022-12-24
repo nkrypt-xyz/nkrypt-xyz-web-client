@@ -33,7 +33,6 @@
   import DirectorySection from "./ExplorePage/DirectorySection.svelte";
   import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
   import FileSection from "./ExplorePage/FileSection.svelte";
-  import FileUploadModal from "./ExplorePage/FileUploadModal.svelte";
   import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
   import { convertSmallUint8ArrayToString } from "../../utility/buffer-utils.js";
   import CircularProgress from "@smui/circular-progress";
