@@ -264,19 +264,21 @@
         </div>
       </div>
 
-      <div class="section">
-        <div class="title">MetaData</div>
-        {#each Object.keys(bucket.metaData) as key}
-          <div class="item">
-            <div class="label">
-              {key}
+      {#each Object.keys(bucket.metaData) as groupName}
+        <div class="section">
+          <div class="title">MetaData ({groupName})</div>
+          {#each Object.keys(bucket.metaData[groupName]) as key}
+            <div class="item">
+              <div class="label">
+                {key}
+              </div>
+              <div class="value">
+                {bucket.metaData[groupName][key]}
+              </div>
             </div>
-            <div class="value">
-              {bucket.metaData[key]}
-            </div>
-          </div>
-        {/each}
-      </div>
+          {/each}
+        </div>
+      {/each}
 
       <Card>
         <Content class="content">
