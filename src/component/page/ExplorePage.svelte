@@ -38,6 +38,11 @@
   import { ClipboardAction } from "./ExplorePage/clipboard-helper.js";
   import Clipboard from "./ExplorePage/Clipboard.svelte";
 
+  let _bucketList = [];
+  bucketList.subscribe((value) => {
+    _bucketList = value;
+  });
+
   const ROUTE_PREFIX = "/explore/";
 
   let currentPath: string = null;
@@ -63,7 +68,7 @@
   };
 
   const loadBucket = async (bucketId): Promise<void> => {
-    let bucket = $bucketList.find((bucket) => bucket._id == bucketId);
+    let bucket = _bucketList.find((bucket) => bucket._id == bucketId);
     if (!bucket) {
       handleInvalidParameter();
       return;

@@ -64,7 +64,10 @@
 
       bucketList.set(response2.bucketList);
 
-      replace("/dashboard");
+      setTimeout(() => {
+        replace("/dashboard");
+      }, 100);
+
       decrementActiveGlobalObtrusiveTaskCount();
     } catch (ex) {
       return await handleAnyError(ex);
