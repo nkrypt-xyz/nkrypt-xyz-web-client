@@ -4,7 +4,7 @@ const internationalNumberFormat = new Intl.NumberFormat("en-US", {
 
 export const expressBytesPrettified = (byteCount) => {
   if (byteCount < 1000) {
-    return byteCount;
+    return `(${internationalNumberFormat.format(byteCount)} B)`;
   }
 
   let message = "";
