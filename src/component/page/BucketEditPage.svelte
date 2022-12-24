@@ -16,6 +16,7 @@
   import { BUCKET_CRYPTO_SPEC } from "../../constant/crypto-specs.js";
   import {
     callBucketCreateApi,
+    callBucketDestroyApi,
     callBucketListApi,
     callBucketSetAuthorizationApi,
   } from "../../integration/content-apis.js";
@@ -25,6 +26,8 @@
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
     showAlert,
+    showConfirmation,
+    showPrompt,
   } from "../../store/ui.js";
   import { encryptText } from "../../utility/crypto-utils.js";
   import { testConstants } from "../../constant/test-constants.js";
@@ -219,6 +222,58 @@
     ];
   };
 
+  const loadBucketList = async () => {
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      let response = await callBucketListApi({});
+      decrementActiveGlobalObtrusiveTaskCount();
+      bucketList.set(response.bucketList);
+      return response;
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
+  };
+
+  const destroyBucketClicked = async () => {
+    let answer = await showConfirmation(
+      "Confirm Destruction",
+      `Are you sure you want to destory the bucket "${bucket.name}"? The bucket and every directory or file it contains will be deleted permanently.`
+    );
+    if (!answer) return;
+
+    let answer2 = await showPrompt(
+      "Confirm Destruction",
+      `Type the name ("${bucket.name}") to continue`,
+      ""
+    );
+    if (!answer2) return;
+    if (answer2 !== bucket.name) {
+      await showAlert(
+        "Invalid name",
+        "You entered the name incorrectly. The bucket will not be destroyed"
+      );
+      return;
+    }
+
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+
+      let res = await callBucketDestroyApi({
+        name: bucket.name,
+        bucketId,
+      });
+
+      toast.push("The bucket has destroyed.");
+
+      await loadBucketList();
+      push("/dashboard");
+
+      decrementActiveGlobalObtrusiveTaskCount();
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
+  };
+
   const saveClicked = async () => {
     try {
       incrementActiveGlobalObtrusiveTaskCount();
@@ -352,6 +407,18 @@
           </div>
         </Content>
       </Card>
+
+      <div class="nk--button-row">
+        <Button
+          on:click={destroyBucketClicked}
+          variant="raised"
+          class="hero-button"
+          style="background-color: orange"
+        >
+          <Icon class="material-icons">delete_forever</Icon>
+          <Label>Destroy Bucket</Label>
+        </Button>
+      </div>
     {/if}
   </div>
 </div>
