@@ -31,3 +31,5 @@ export const setPasswordForBucket = (bucketId, encryptionPassword) => {
     return map;
   });
 };
+
+export { storedPassword };
