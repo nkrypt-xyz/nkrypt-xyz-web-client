@@ -23,6 +23,7 @@
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
+    showPrompt,
   } from "../../store/ui.js";
   import { encryptText } from "../../utility/crypto-utils.js";
   import { testConstants } from "../../constant/test-constants.js";
@@ -32,6 +33,7 @@
   import { callUserFindApi } from "../../integration/user-apis.js";
   import {
     callAdminAddUserApi,
+    callAdminOverwriteUserPasswordApi,
     callAdminSetBanningStatusApi,
     callAdminSetGlobalPermissionsApi,
   } from "../../integration/admin-apis.js";
@@ -39,6 +41,7 @@
     defaultGlobalPermissions,
     globalPermissionDetails,
   } from "../../lib/permissions-helper.js";
+  import { toast } from "@zerodevx/svelte-toast";
 
   const MODES = {
     CREATE: "CREATE",
@@ -157,6 +160,28 @@
     }
   };
 
+  const overwriteLoginPassword = async () => {
+    let newPassword = await showPrompt(
+      "Overwrite Password",
+      "Enter a new password",
+      "",
+      true
+    );
+    if (!newPassword) return;
+
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      await callAdminOverwriteUserPasswordApi({
+        userId,
+        newPassword,
+      });
+      toast.push("You have overwritten the user's login password.");
+      decrementActiveGlobalObtrusiveTaskCount();
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
+  };
+
   const titleText = (mode) =>
     mode == MODES.CREATE ? "Adding user" : "Updating user";
   const updateButtonText = (mode) =>
@@ -264,6 +289,27 @@
               {user.isBanned ? "thumb_up_off_alt" : "cancel"}
             </Icon>
             <Label>{user.isBanned ? "Unban User" : "Ban User"}</Label>
+          </Button>
+        </Content>
+      </Card>
+    {/if}
+
+    {#if mode == MODES.UPDATE && user}
+      <Card style="margin-top:12px;">
+        <Content class="content">
+          <div>
+            You can overwrite user's password if they cannot log in. This does
+            not affect their encryption password.
+          </div>
+
+          <Button
+            on:click={overwriteLoginPassword}
+            variant="raised"
+            class="hero-button"
+            style="background-color: darkorange; margin-top: 8px"
+          >
+            <Icon class="material-icons">password</Icon>
+            <Label>Overwrite Login Password</Label>
           </Button>
         </Content>
       </Card>

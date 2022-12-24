@@ -48,3 +48,15 @@ export const callAdminSetBanningStatusApi = async (data: {
     data
   );
 };
+
+export const callAdminOverwriteUserPasswordApi = async (data: {
+  userId: string;
+  newPassword: string;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/admin/iam/overwrite-user-password",
+    data
+  );
+};
