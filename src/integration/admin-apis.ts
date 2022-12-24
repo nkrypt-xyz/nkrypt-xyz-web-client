@@ -26,13 +26,25 @@ export const callAdminAddUserApi = async (data: {
 };
 
 export const callAdminSetGlobalPermissionsApi = async (data: {
-  userId: string,
-  globalPermissions: Record<string, boolean>,
+  userId: string;
+  globalPermissions: Record<string, boolean>;
 }) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,
     "/api/admin/iam/set-global-permissions",
+    data
+  );
+};
+
+export const callAdminSetBanningStatusApi = async (data: {
+  userId: string;
+  isBanned: boolean;
+}) => {
+  return await callPostJsonApi(
+    _storedSession.serverUrl,
+    _storedSession.apiKey,
+    "/api/admin/iam/set-banning-status",
     data
   );
 };

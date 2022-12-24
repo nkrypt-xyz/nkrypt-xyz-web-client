@@ -32,6 +32,7 @@
   import { callUserFindApi } from "../../integration/user-apis.js";
   import {
     callAdminAddUserApi,
+    callAdminSetBanningStatusApi,
     callAdminSetGlobalPermissionsApi,
   } from "../../integration/admin-apis.js";
   import {
@@ -47,6 +48,7 @@
   let mode = null;
   let userId = null;
   let globalPermissions = null;
+  let user = null;
 
   const ROUTE_PREFIX = "/user/save/";
 
@@ -89,7 +91,7 @@
 
   const loadUser = async () => {
     if (mode === MODES.UPDATE) {
-      let user = await getUser(userId);
+      user = await getUser(userId);
       if (!user) return;
       assingUser(user);
     } else {
@@ -134,6 +136,21 @@
         globalPermissions,
       });
       push("/users");
+      decrementActiveGlobalObtrusiveTaskCount();
+    } catch (ex) {
+      return await handleAnyError(ex);
+    }
+  };
+
+  const toggleUserBanningStatus = async () => {
+    try {
+      incrementActiveGlobalObtrusiveTaskCount();
+      await callAdminSetBanningStatusApi({
+        userId,
+        isBanned: !user.isBanned,
+      });
+      let pathString = ($location as string).replace(ROUTE_PREFIX, "");
+      loadPage(pathString);
       decrementActiveGlobalObtrusiveTaskCount();
     } catch (ex) {
       return await handleAnyError(ex);
@@ -227,6 +244,30 @@
         <Label>{updateButtonText(mode)}</Label>
       </Button>
     </div>
+
+    {#if mode == MODES.UPDATE && user}
+      <Card>
+        <Content class="content">
+          <div>
+            {user.isBanned
+              ? "User is banned and cannot log in"
+              : "User is not banned."}
+          </div>
+
+          <Button
+            on:click={toggleUserBanningStatus}
+            variant="raised"
+            class="hero-button"
+            style="background-color: orange; margin-top: 8px"
+          >
+            <Icon class="material-icons">
+              {user.isBanned ? "thumb_up_off_alt" : "cancel"}
+            </Icon>
+            <Label>{user.isBanned ? "Unban User" : "Ban User"}</Label>
+          </Button>
+        </Content>
+      </Card>
+    {/if}
   </div>
 </div>
 
