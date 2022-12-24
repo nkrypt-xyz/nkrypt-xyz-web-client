@@ -1,3 +1,4 @@
+import { storedPassword } from "../store/password.js";
 import { replace } from "svelte-spa-router";
 import { callUserLogoutApi } from "../integration/user-apis.js";
 import { storedSession } from "../store/session.js";
@@ -20,6 +21,7 @@ export const performUserLogout = async ({
   }
   storedUser.set(null);
   storedSession.set(null);
+  storedPassword.set({});
   if (navigateToDashboard) {
     replace("/");
   }
