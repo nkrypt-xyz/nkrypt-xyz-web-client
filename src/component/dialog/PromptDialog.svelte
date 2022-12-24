@@ -25,6 +25,10 @@
     promptDialog.set(null);
     promptDialogResponse.set(answer);
   };
+
+  const getType = (_promptDialog) => {
+    return _promptDialog.masked ? "password" : "text";
+  };
 </script>
 
 {#if _promptDialog}
@@ -44,6 +48,7 @@
         bind:value={$inputText.value}
         label={_promptDialog.message}
         required
+        type={getType(_promptDialog)}
       />
     </Content>
     <Actions>
