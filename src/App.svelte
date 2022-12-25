@@ -1,6 +1,5 @@
 <script lang="ts">
   // Core
-  import { onMount } from "svelte";
   import Button, { Icon, Label } from "@smui/button";
   import Drawer, {
     Content,
@@ -18,24 +17,24 @@
     Section,
     Title,
   } from "@smui/top-app-bar";
-  import type { SvelteComponentDev } from "svelte/internal";
-  // Routing
-  import Router, { push, replace } from "svelte-spa-router";
+  import { onMount } from "svelte";
+  import Router from "svelte-spa-router";
   import { wrap } from "svelte-spa-router/wrap";
+  import type { SvelteComponentDev } from "svelte/internal";
   // Pages
+  import ConfirmationThreeStateDialog from "./component/dialog/ConfirmationThreeStateDialog.svelte";
   import BucketCreatePage from "./component/page/BucketCreatePage.svelte";
   import BucketEditPage from "./component/page/BucketEditPage.svelte";
+  import BucketsPage from "./component/page/BucketsPage.svelte";
   import DashboardPage from "./component/page/DashboardPage.svelte";
   import ExplorePage from "./component/page/ExplorePage.svelte";
-  import LoginPage from "./component/page/LoginPage.svelte";
-  import ProfilePage from "./component/page/ProfilePage.svelte";
-  import UsersPage from "./component/page/UsersPage.svelte";
-  import UserSavePage from "./component/page/UserSavePage.svelte";
-  import BucketsPage from "./component/page/BucketsPage.svelte";
-  import SettingsPage from "./component/page/SettingsPage.svelte";
-  import PlainTextEditorPage from "./component/page/PlainTextEditorPage.svelte";
   import ImageViewerPage from "./component/page/ImageViewerPage.svelte";
-  import ConfirmationThreeStateDialog from "./component/dialog/ConfirmationThreeStateDialog.svelte";
+  import LoginPage from "./component/page/LoginPage.svelte";
+  import PlainTextEditorPage from "./component/page/PlainTextEditorPage.svelte";
+  import ProfilePage from "./component/page/ProfilePage.svelte";
+  import SettingsPage from "./component/page/SettingsPage.svelte";
+  import UserSavePage from "./component/page/UserSavePage.svelte";
+  import UsersPage from "./component/page/UsersPage.svelte";
   // Components
   import Footer from "./component/common/Footer.svelte";
   import ObtrusiveLoader from "./component/common/ObtrusiveLoader.svelte";
@@ -49,17 +48,16 @@
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
-    ThreeStateConfirmationState,
   } from "./store/ui.js";
   import { storedUser } from "./store/user.js";
   // Integrations
   import { callBucketListApi } from "./integration/content-apis.js";
   // Local Misc
+  import { SvelteToast } from "@zerodevx/svelte-toast";
   import { handleAnyError } from "./lib/error-handling.js";
+  import { navigateToRoute } from "./lib/navigation-helper.js";
   import { performUserLogout } from "./lib/session.js";
   import { createDebouncedMethod } from "./utility/misc-utils.js";
-  import { SvelteToast } from "@zerodevx/svelte-toast";
-  import { navigateToRoute } from "./lib/navigation-helper.js";
 
   const svelteToastOptions = {};
 

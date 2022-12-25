@@ -1,4 +1,4 @@
-export const convertSmallBufferToString = (buffer: Buffer) => {
+export const convertSmallBufferToString = (buffer: ArrayBuffer) => {
   return window.btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)));
 };
 
