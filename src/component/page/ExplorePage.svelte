@@ -37,6 +37,7 @@
   import { MetaDataConstant } from "../../constant/meta-data-constants.js";
   import { ClipboardAction } from "./ExplorePage/clipboard-helper.js";
   import Clipboard from "./ExplorePage/Clipboard.svelte";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   let _bucketList = [];
   bucketList.subscribe((value) => {
@@ -63,7 +64,7 @@
       "Invalid parameters",
       "The link you are using is invalid. Redirecting you to the dashboard."
     );
-    push("/dashboard");
+    navigateToRoute("/dashboard");
     return;
   };
 
@@ -84,7 +85,7 @@
         "Password required",
         "The correct encryption password is required to access this bucket."
       );
-      push("/dashboard");
+      navigateToRoute("/dashboard");
       return;
     }
     setPasswordForBucket(currentBucket._id, bucketPassword);
@@ -289,7 +290,7 @@
           .join("/");
     }
     path += `/${childDirectory._id}`;
-    push(path);
+    navigateToRoute(path);
   };
 
   let fileOperationModal;
@@ -316,7 +317,7 @@
         if (targetEntity.directory._id === entity.directory._id) break;
       }
     }
-    push(path);
+    navigateToRoute(path);
   };
 
   const goUpClicked = async () => {

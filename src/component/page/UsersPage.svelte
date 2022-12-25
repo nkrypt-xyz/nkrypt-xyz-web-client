@@ -14,6 +14,7 @@
   import { callUserListApi } from "../../integration/user-apis.js";
   import type { User } from "src/model/common.js";
   import { push } from "svelte-spa-router";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   let userList: User[] = [];
 
@@ -32,11 +33,11 @@
   loadUserList();
 
   const addUserClicked = async () => {
-    push("/user/save/new");
+    navigateToRoute("/user/save/new");
   };
 
   const userManageClicked = async (user) => {
-    push(`/user/save/${user._id}`);
+    navigateToRoute(`/user/save/${user._id}`);
   };
 </script>
 

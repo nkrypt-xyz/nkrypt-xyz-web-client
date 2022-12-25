@@ -42,6 +42,8 @@
     globalPermissionDetails,
   } from "../../lib/permissions-helper.js";
   import { toast } from "@zerodevx/svelte-toast";
+  import { showToast } from "../../lib/notification-helper.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const MODES = {
     CREATE: "CREATE",
@@ -138,7 +140,7 @@
         userId,
         globalPermissions,
       });
-      push("/users");
+      navigateToRoute("/users");
       decrementActiveGlobalObtrusiveTaskCount();
     } catch (ex) {
       return await handleAnyError(ex);
@@ -175,7 +177,7 @@
         userId,
         newPassword,
       });
-      toast.push("You have overwritten the user's login password.");
+      showToast("You have overwritten the user's login password.");
       decrementActiveGlobalObtrusiveTaskCount();
     } catch (ex) {
       return await handleAnyError(ex);

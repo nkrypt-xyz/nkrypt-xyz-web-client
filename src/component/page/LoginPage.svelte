@@ -21,6 +21,7 @@
   import { storedUser } from "../../store/user.js";
   import { extract } from "../../utility/misc-utils.js";
   import { testConstants } from "../../constant/test-constants.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const loginClicked = async () => {
     try {
@@ -42,7 +43,7 @@
 
       suggestedServerUrl.set($server.value);
 
-      replace("/dashboard");
+      navigateToRoute("/dashboard", { replaceCurrentRoute: true });
     } catch (ex) {
       return await handleAnyError(ex);
     }

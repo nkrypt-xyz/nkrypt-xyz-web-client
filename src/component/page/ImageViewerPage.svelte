@@ -40,6 +40,7 @@
   import HelperText from "@smui/textfield/helper-text";
   import Button, { Label, Icon } from "@smui/button";
   import { text } from "svelte/internal";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const ROUTE_PREFIX = "/view-image/";
 
@@ -79,7 +80,7 @@
         "Password required",
         "The correct encryption password is required to access this bucket."
       );
-      push("/dashboard");
+      navigateToRoute("/dashboard");
       return;
     }
     setPasswordForBucket(currentBucket._id, bucketPassword);

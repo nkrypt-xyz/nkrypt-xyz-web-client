@@ -49,6 +49,8 @@
   import IconButton from "@smui/icon-button";
   import { storedUser } from "../../store/user.js";
   import { toast } from "@zerodevx/svelte-toast";
+  import { showToast } from "../../lib/notification-helper.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const ROUTE_PREFIX = "/bucket/edit/";
 
@@ -263,10 +265,10 @@
         bucketId,
       });
 
-      toast.push("The bucket has destroyed.");
+      showToast("The bucket has destroyed.");
 
       await loadBucketList();
-      push("/dashboard");
+      navigateToRoute("/dashboard");
 
       decrementActiveGlobalObtrusiveTaskCount();
     } catch (ex) {
@@ -286,7 +288,7 @@
         });
       }
 
-      toast.push("Your changes have been saved.");
+      showToast("Your changes have been saved.");
 
       let pathString = ($location as string).replace(ROUTE_PREFIX, "");
       loadPage(pathString);
