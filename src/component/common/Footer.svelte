@@ -4,7 +4,7 @@
 
 <div class="copyright">
   <div>
-    2022 © <a href={CommonConstant.COPYRIGHT_HREF} target="_blank">
+    2022 © <a href={CommonConstant.COPYRIGHT_HREF} target="_blank" rel="noreferrer">
       {CommonConstant.COPYRIGHT_HREF}
     </a>
   </div>

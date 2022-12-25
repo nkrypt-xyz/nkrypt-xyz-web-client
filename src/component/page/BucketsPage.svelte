@@ -1,19 +1,13 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Icon, Label } from "@smui/button";
-  import { callMetricsGetSummaryApi } from "../../integration/metrics-apis.js";
+  import type { Bucket } from "src/model/common.js";
+  import { callBucketListApi } from "../../integration/content-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
-  // Other imports
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-    showAlert,
-    showConfirmation,
+    incrementActiveGlobalObtrusiveTaskCount
   } from "../../store/ui.js";
-  import { callBucketListApi } from "../../integration/content-apis.js";
-  import type { Bucket } from "src/model/common.js";
-  import { push } from "svelte-spa-router";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   let bucketList: Bucket[] = [];
 

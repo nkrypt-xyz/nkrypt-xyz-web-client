@@ -1,20 +1,15 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Dialog, { Actions, Content, Title } from "@smui/dialog";
-  import FormField from "@smui/form-field";
   import LinearProgress from "@smui/linear-progress";
-  import Radio from "@smui/radio";
-  // Other imports
-  import { storedSettings } from "../../../store/settings.js";
   import { downloadAndDecryptFile } from "../../../lib/crypto-transit.js";
-  import { showCommonErrorDialog } from "../../../store/ui.js";
-  import { expressBytesPrettified } from "../../../utility/value-utils.js";
-  import { isLikelyPlainText } from "../../../lib/plain-text-editor-helper.js";
-  import { push } from "svelte-spa-router";
   import { isLikelyImage } from "../../../lib/image-viewer-helper.js";
-  import { decryptToObject } from "../../../utility/crypto-utils.js";
   import { navigateToRoute } from "../../../lib/navigation-helper.js";
+  import { isLikelyPlainText } from "../../../lib/plain-text-editor-helper.js";
+  import { storedSettings } from "../../../store/settings.js";
+  import { showCommonErrorDialog } from "../../../store/ui.js";
+  import { decryptToObject } from "../../../utility/crypto-utils.js";
+  import { expressBytesPrettified } from "../../../utility/value-utils.js";
 
   const FileOperationModalState = {
     IDLE: "IDLE",

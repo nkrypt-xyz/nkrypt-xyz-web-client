@@ -1,15 +1,13 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Dialog, { Actions, Content, Title } from "@smui/dialog";
   import Textfield from "@smui/textfield";
   import HelperText from "@smui/textfield/helper-text";
   import Icon from "@smui/textfield/icon";
   import { form } from "svelte-forms";
+  import { testConstants } from "../../constant/test-constants.js";
   import { standardField } from "../../lib/validations.js";
   import { minlength } from "../../lib/validators.js";
-  import { testConstants } from "../../constant/test-constants.js";
-  // Other imports
   import {
     bucketPasswordDialog,
     bucketPasswordDialogResponse,

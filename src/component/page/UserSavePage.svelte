@@ -1,6 +1,4 @@
 <script lang="ts">
-  // UI / Framework
-  import { location, push } from "svelte-spa-router";
   import Button, { Label } from "@smui/button";
   import Card, { Content } from "@smui/card";
   import Checkbox from "@smui/checkbox";
@@ -9,41 +7,29 @@
   import HelperText from "@smui/textfield/helper-text";
   import Icon from "@smui/textfield/icon";
   import { form } from "svelte-forms";
-  import { replace } from "svelte-spa-router";
-  import { ClientError, handleAnyError } from "../../lib/error-handling.js";
-  import { standardField } from "../../lib/validations.js";
-  // Other imports
-  import { BUCKET_CRYPTO_SPEC } from "../../constant/crypto-specs.js";
-  import {
-    callBucketCreateApi,
-    callBucketListApi,
-  } from "../../integration/content-apis.js";
-  import { minlength } from "../../lib/validators.js";
-  import { bucketList } from "../../store/content.js";
-  import {
-    decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-    showPrompt,
-  } from "../../store/ui.js";
-  import { encryptText } from "../../utility/crypto-utils.js";
-  import { testConstants } from "../../constant/test-constants.js";
-  import { onMount } from "svelte";
-  import { derived } from "svelte/store";
+  import { location } from "svelte-spa-router";
   import { MiscConstant } from "../../constant/misc-constants.js";
-  import { callUserFindApi } from "../../integration/user-apis.js";
   import {
     callAdminAddUserApi,
     callAdminOverwriteUserPasswordApi,
     callAdminSetBanningStatusApi,
     callAdminSetGlobalPermissionsApi,
   } from "../../integration/admin-apis.js";
+  import { callUserFindApi } from "../../integration/user-apis.js";
+  import { ClientError, handleAnyError } from "../../lib/error-handling.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import { showToast } from "../../lib/notification-helper.js";
   import {
     defaultGlobalPermissions,
     globalPermissionDetails,
   } from "../../lib/permissions-helper.js";
-  import { toast } from "@zerodevx/svelte-toast";
-  import { showToast } from "../../lib/notification-helper.js";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import { standardField } from "../../lib/validations.js";
+  import { minlength } from "../../lib/validators.js";
+  import {
+    decrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount,
+    showPrompt,
+  } from "../../store/ui.js";
 
   const MODES = {
     CREATE: "CREATE",

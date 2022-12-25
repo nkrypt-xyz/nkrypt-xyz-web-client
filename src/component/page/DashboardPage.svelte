@@ -1,16 +1,11 @@
 <script lang="ts">
-  // UI / Framework
-  import Button, { Icon, Label } from "@smui/button";
-  import { storedUser } from "../../store/user.js";
   import { callMetricsGetSummaryApi } from "../../integration/metrics-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
-  // Other imports
   import {
     decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-    showAlert,
-    showConfirmation,
+    incrementActiveGlobalObtrusiveTaskCount
   } from "../../store/ui.js";
+  import { storedUser } from "../../store/user.js";
 
   let metrics = null;
 

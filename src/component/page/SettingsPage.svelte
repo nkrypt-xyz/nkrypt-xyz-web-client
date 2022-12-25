@@ -1,24 +1,10 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Checkbox from "@smui/checkbox";
   import FormField from "@smui/form-field";
-  import Dialog, { Actions, Content, Title } from "@smui/dialog";
-  import LinearProgress from "@smui/linear-progress";
   import Radio from "@smui/radio";
-  import Textfield from "@smui/textfield";
-  import { storedUser } from "../../store/user.js";
-  import { callMetricsGetSummaryApi } from "../../integration/metrics-apis.js";
-  import { handleAnyError } from "../../lib/error-handling.js";
-  // Other imports
-  import {
-    decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-    showAlert,
-    showConfirmation,
-  } from "../../store/ui.js";
-  import { storedSettings } from "../../store/settings.js";
   import { performUserLogout } from "../../lib/session.js";
+  import { storedSettings } from "../../store/settings.js";
 
   const hardWipeClicked = () => {
     setTimeout(async () => {

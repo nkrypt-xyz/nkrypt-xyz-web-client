@@ -1,24 +1,19 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Dialog, { Actions, Content, Title } from "@smui/dialog";
   import Textfield from "@smui/textfield";
-  import HelperText from "@smui/textfield/helper-text";
   import Icon from "@smui/textfield/icon";
-  import { handleAnyError } from "../../../lib/error-handling.js";
   import { form } from "svelte-forms";
+  import { callUserUpdateProfileApi } from "../../../integration/user-apis.js";
+  import { handleAnyError } from "../../../lib/error-handling.js";
   import { standardField } from "../../../lib/validations.js";
   import { minlength } from "../../../lib/validators.js";
-  // Other imports
   import {
-    updateUserProfileDialog,
-    updateUserProfileDialogResponse,
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
-    showAlert,
+    updateUserProfileDialog,
+    updateUserProfileDialogResponse,
   } from "../../../store/ui.js";
-  import { callUserUpdateProfileApi } from "../../../integration/user-apis.js";
-  import { performUserLogout } from "../../../lib/session.js";
   import { storedUser } from "../../../store/user.js";
 
   const displayName = standardField("displayName", "", [minlength(4)]);

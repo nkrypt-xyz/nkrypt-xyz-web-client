@@ -1,56 +1,35 @@
 <script lang="ts">
-  // UI / Framework
-  import { location, push } from "svelte-spa-router";
   import Button, { Label } from "@smui/button";
   import Card, { Content } from "@smui/card";
   import Checkbox from "@smui/checkbox";
   import FormField from "@smui/form-field";
+  import IconButton from "@smui/icon-button";
   import Textfield from "@smui/textfield";
-  import HelperText from "@smui/textfield/helper-text";
   import Icon from "@smui/textfield/icon";
-  import { form } from "svelte-forms";
-  import { replace } from "svelte-spa-router";
-  import { ClientError, handleAnyError } from "../../lib/error-handling.js";
-  import { standardField } from "../../lib/validations.js";
-  // Other imports
-  import { BUCKET_CRYPTO_SPEC } from "../../constant/crypto-specs.js";
+  import { location } from "svelte-spa-router";
   import {
-    callBucketCreateApi,
     callBucketDestroyApi,
     callBucketListApi,
-    callBucketSetAuthorizationApi,
+    callBucketSetAuthorizationApi
   } from "../../integration/content-apis.js";
-  import { minlength } from "../../lib/validators.js";
+  import { callUserFindApi } from "../../integration/user-apis.js";
+  import { ClientError, handleAnyError } from "../../lib/error-handling.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import { showToast } from "../../lib/notification-helper.js";
+  import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
+  import {
+    bucketPermissionDetails,
+    defaultBucketPermissions
+  } from "../../lib/permissions-helper.js";
   import { bucketList } from "../../store/content.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
     showAlert,
     showConfirmation,
-    showPrompt,
+    showPrompt
   } from "../../store/ui.js";
-  import { encryptText } from "../../utility/crypto-utils.js";
-  import { testConstants } from "../../constant/test-constants.js";
-  import { onMount } from "svelte";
-  import { derived } from "svelte/store";
-  import { MiscConstant } from "../../constant/misc-constants.js";
-  import { callUserFindApi } from "../../integration/user-apis.js";
-  import {
-    callAdminAddUserApi,
-    callAdminSetGlobalPermissionsApi,
-  } from "../../integration/admin-apis.js";
-  import {
-    bucketPermissionDetails,
-    defaultBucketPermissions,
-    defaultGlobalPermissions,
-    globalPermissionDetails,
-  } from "../../lib/permissions-helper.js";
-  import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
-  import IconButton from "@smui/icon-button";
   import { storedUser } from "../../store/user.js";
-  import { toast } from "@zerodevx/svelte-toast";
-  import { showToast } from "../../lib/notification-helper.js";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const ROUTE_PREFIX = "/bucket/edit/";
 

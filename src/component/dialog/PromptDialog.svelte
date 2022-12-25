@@ -1,12 +1,10 @@
 <script lang="ts">
-  // UI / Framework
+  import Button, { Label } from "@smui/button";
+  import Dialog, { Actions, Content, Title } from "@smui/dialog";
   import Textfield from "@smui/textfield";
   import { form } from "svelte-forms";
   import { standardField } from "../../lib/validations.js";
   import { minlength } from "../../lib/validators.js";
-  import Button, { Label } from "@smui/button";
-  import Dialog, { Actions, Content, Title } from "@smui/dialog";
-  // Other imports
   import { promptDialog, promptDialogResponse } from "../../store/ui.js";
 
   const inputText = standardField("inputText", "", [minlength(8)]);

@@ -1,15 +1,13 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Card, { Content } from "@smui/card";
   import Textfield from "@smui/textfield";
   import Icon from "@smui/textfield/icon";
-  import Footer from "../common/Footer.svelte";
-  // Other imports
   import { form } from "svelte-forms";
-  import { replace } from "svelte-spa-router";
+  import { testConstants } from "../../constant/test-constants.js";
   import { callUserLoginApi } from "../../integration/user-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
   import { standardField } from "../../lib/validations.js";
   import { minlength } from "../../lib/validators.js";
   import { suggestedServerUrl } from "../../store/cache.js";
@@ -20,8 +18,7 @@
   } from "../../store/ui.js";
   import { storedUser } from "../../store/user.js";
   import { extract } from "../../utility/misc-utils.js";
-  import { testConstants } from "../../constant/test-constants.js";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import Footer from "../common/Footer.svelte";
 
   const loginClicked = async () => {
     try {
