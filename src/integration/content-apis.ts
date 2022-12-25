@@ -41,7 +41,10 @@ export const callBucketSetAuthorizationApi = async (data: {
   );
 };
 
-export const callBucketDestroyApi = async (data: { bucketId: string; name: string }) => {
+export const callBucketDestroyApi = async (data: {
+  bucketId: string;
+  name: string;
+}) => {
   return await callPostJsonApi(
     _storedSession.serverUrl,
     _storedSession.apiKey,

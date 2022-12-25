@@ -1,6 +1,5 @@
-import { storedPassword } from "../store/password.js";
-import { replace } from "svelte-spa-router";
 import { callUserLogoutApi } from "../integration/user-apis.js";
+import { storedPassword } from "../store/password.js";
 import { storedSession } from "../store/session.js";
 import {
   decrementActiveGlobalObtrusiveTaskCount,

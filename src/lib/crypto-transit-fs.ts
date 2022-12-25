@@ -1,32 +1,13 @@
-import streamSaver from "streamsaver";
-import { clientErrorDef } from "../constant/client-errors.js";
-import { CommonConstant } from "../constant/common-constants.js";
-import {
-  BLOB_CHUNK_SIZE_BYTES,
-  BLOB_CHUNK_SIZE_INCLUDING_TAG_BYTES,
-  ENCRYPTION_TAGLENGTH_IN_BITS,
-} from "../constant/crypto-specs.js";
-import {
-  callBlobReadStreamApi,
-  callBlobWriteQuantizedApi,
-  callBlobWriteStreamApi,
-} from "../integration/blob-apis.js";
-import { _storedSession } from "../store/session.js";
-import { joinUrlPathFragments } from "../utility/api-utils.js";
-import { convertSmallUint8ArrayToString } from "../utility/buffer-utils.js";
-import {
-  buildCryptoHeader,
-  unbuildCryptoHeader,
-} from "../utility/crypto-api-utils.js";
+import { BLOB_CHUNK_SIZE_INCLUDING_TAG_BYTES } from "../constant/crypto-specs.js";
+import { callBlobReadStreamApi } from "../integration/blob-apis.js";
+import { unbuildCryptoHeader } from "../utility/crypto-api-utils.js";
 import {
   createEncryptionKeyFromPassword,
   decryptBuffer,
-  encryptBuffer,
   makeRandomIv,
   makeRandomSalt,
 } from "../utility/crypto-utils.js";
 import { MeteredByteStreamReader } from "../utility/stream-and-buffer-utils.js";
-import { raiseClientError } from "./error-handling.js";
 import { features, requireFeature } from "./feature-detection.js";
 
 const createCipherProperties = async (bucketPassword: string) => {
