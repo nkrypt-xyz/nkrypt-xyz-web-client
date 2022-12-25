@@ -60,6 +60,7 @@
   import { performUserLogout } from "./lib/session.js";
   import { createDebouncedMethod } from "./utility/misc-utils.js";
   import { SvelteToast } from "@zerodevx/svelte-toast";
+  import { navigateToRoute } from "./lib/navigation-helper.js";
 
   const svelteToastOptions = {};
 
@@ -136,7 +137,7 @@
 
     if (data.requiresAuthentication && !data.isUserLoggedIn) {
       delete data.isUserLoggedIn;
-      replace("/login");
+      navigateToRoute("/login", { replaceCurrentRoute: true });
     }
   }
 
@@ -164,17 +165,17 @@
   });
 
   const genericLinkClicked = async (path) => {
-    push(path);
+    navigateToRoute(path);
     isLeftDrawerOpen = false;
   };
 
   const createBucketClicked = async () => {
-    push("/bucket/create");
+    navigateToRoute("/bucket/create");
     isLeftDrawerOpen = false;
   };
 
   const bucketClicked = async (bucketId: string) => {
-    push(`/explore/${bucketId}`);
+    navigateToRoute(`/explore/${bucketId}`);
     isLeftDrawerOpen = false;
   };
 </script>

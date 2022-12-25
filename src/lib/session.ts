@@ -7,6 +7,7 @@ import {
   incrementActiveGlobalObtrusiveTaskCount,
 } from "../store/ui.js";
 import { storedUser } from "../store/user.js";
+import { navigateToRoute } from "./navigation-helper.js";
 
 export const performUserLogout = async ({
   navigateToDashboard = true,
@@ -23,7 +24,7 @@ export const performUserLogout = async ({
   storedSession.set(null);
   storedPassword.set({});
   if (navigateToDashboard) {
-    replace("/");
+    navigateToRoute("/", { replaceCurrentRoute: true });
   }
   decrementActiveGlobalObtrusiveTaskCount();
 };

@@ -13,6 +13,7 @@
   import { callBucketListApi } from "../../integration/content-apis.js";
   import type { Bucket } from "src/model/common.js";
   import { push } from "svelte-spa-router";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   let bucketList: Bucket[] = [];
 
@@ -31,11 +32,11 @@
   loadBucketList();
 
   const bucketOpenClicked = async (bucket: Bucket) => {
-    push(`/explore/${bucket._id}`);
+    navigateToRoute(`/explore/${bucket._id}`);
   };
 
   const bucketManageClicked = async (bucket: Bucket) => {
-    push(`/bucket/edit/${bucket._id}`);
+    navigateToRoute(`/bucket/edit/${bucket._id}`);
   };
 </script>
 

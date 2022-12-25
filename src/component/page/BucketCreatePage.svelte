@@ -25,6 +25,7 @@
   import { testConstants } from "../../constant/test-constants.js";
   import { MetaDataConstant } from "../../constant/meta-data-constants.js";
   import { CommonConstant } from "../../constant/common-constants.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const NEW_BUCKET_ID = "new";
 
@@ -65,7 +66,7 @@
       bucketList.set(response2.bucketList);
 
       setTimeout(() => {
-        replace("/dashboard");
+        navigateToRoute("/dashboard", { replaceCurrentRoute: true });
       }, 100);
 
       decrementActiveGlobalObtrusiveTaskCount();

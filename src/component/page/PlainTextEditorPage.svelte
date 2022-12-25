@@ -41,6 +41,7 @@
   import Button, { Label, Icon } from "@smui/button";
   import { text } from "svelte/internal";
   import { MetaDataConstant } from "../../constant/meta-data-constants.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const ROUTE_PREFIX = "/edit-plain-text/";
 
@@ -83,7 +84,7 @@
         "Password required",
         "The correct encryption password is required to access this bucket."
       );
-      push("/dashboard");
+      navigateToRoute("/dashboard");
       return;
     }
     setPasswordForBucket(currentBucket._id, bucketPassword);

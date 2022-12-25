@@ -14,6 +14,7 @@
   import { push } from "svelte-spa-router";
   import { isLikelyImage } from "../../../lib/image-viewer-helper.js";
   import { decryptToObject } from "../../../utility/crypto-utils.js";
+  import { navigateToRoute } from "../../../lib/navigation-helper.js";
 
   const FileOperationModalState = {
     IDLE: "IDLE",
@@ -122,11 +123,11 @@
   };
 
   const editAsPlainTextClicked = async () => {
-    push(`/edit-plain-text/${file.bucketId}/${file._id}`);
+    navigateToRoute(`/edit-plain-text/${file.bucketId}/${file._id}`);
   };
 
   const openInImageViewerClicked = async () => {
-    push(`/view-image/${file.bucketId}/${file._id}`);
+    navigateToRoute(`/view-image/${file.bucketId}/${file._id}`);
   };
 
   let shouldShowDialog = false;
@@ -162,7 +163,9 @@
             <div>
               <span class="title">Size before encryption: </span>
               <span class="value"
-                >{expressBytesPrettified(file.metaData?.core?.sizeBeforeEncryption)}</span
+                >{expressBytesPrettified(
+                  file.metaData?.core?.sizeBeforeEncryption
+                )}</span
               >
             </div>
             <div>
