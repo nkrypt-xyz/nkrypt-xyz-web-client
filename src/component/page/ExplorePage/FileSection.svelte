@@ -95,6 +95,7 @@
       <Icon class="material-icons" on:click={() => childFileClicked(childFile)}>
         file_present
       </Icon>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="title" on:click={() => childFileClicked(childFile)}>
         {childFile.name}
       </div>
