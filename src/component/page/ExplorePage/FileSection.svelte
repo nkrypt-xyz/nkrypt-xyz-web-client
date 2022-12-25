@@ -169,6 +169,8 @@
     margin-top: 2px;
     cursor: pointer;
     flex: 1;
+    white-space: break-spaces;
+    overflow-wrap: anywhere;
   }
 
   .file .action-menu-trigger {
