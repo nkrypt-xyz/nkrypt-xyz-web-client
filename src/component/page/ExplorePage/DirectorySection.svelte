@@ -96,6 +96,7 @@
       >
         folder
       </Icon>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="title" on:click={() => childDirectoryClicked(childDirectory)}>
         {childDirectory.name}
       </div>
