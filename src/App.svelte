@@ -61,9 +61,7 @@
   import { createDebouncedMethod } from "./utility/misc-utils.js";
   import { SvelteToast } from "@zerodevx/svelte-toast";
 
-  const svelteToastOptions = {
-
-  }
+  const svelteToastOptions = {};
 
   let topAppBar: TopAppBarComponentDev;
 
@@ -316,7 +314,7 @@
   }
 
   .nk-main :global(.nk-bucket-list) {
-    height: calc(100% - 245px - 32px);
+    height: calc(100% - 248px - 32px);
     overflow: scroll;
   }
 

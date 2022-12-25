@@ -78,7 +78,7 @@ button:focus {
 }
 
 .nk-page {
-  min-height: calc(100vh - 64px - 0px - 50px);
+  min-height: calc(100vh - 64px - 50px - 8px)
 }
 
 .nk-page--inner-wrapper--standard {
@@ -103,7 +103,7 @@ button:focus {
 
 @media only screen and (max-width: 599px) {
   .nk-page {
-    min-height: calc(100vh - 56px - 50px);
+    min-height: calc(100vh - 64px - 50px - 0px);
   }
 
   .gb--no-padding-on-mobile {
