@@ -30,7 +30,7 @@
   import DirectorySection from "./ExplorePage/DirectorySection.svelte";
   import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
   import FileSection from "./ExplorePage/FileSection.svelte";
-  import FileUploadModal from "./ExplorePage/FileUploadModal.svelte";
+  import FileBulkUploadModal from "./ExplorePage/FileBulkUploadModal.svelte";
   import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
   import { MiscConstant } from "../../constant/misc-constants.js";
   import { createTextFile } from "./ExplorePage/create-text-file.js";
@@ -371,7 +371,7 @@
   };
 </script>
 
-<FileUploadModal bind:this={fileUploadModal} />
+<FileBulkUploadModal bind:this={fileUploadModal} />
 <FileOperationModal bind:this={fileOperationModal} />
 <PropertiesModal bind:this={propertiesModal} />
 

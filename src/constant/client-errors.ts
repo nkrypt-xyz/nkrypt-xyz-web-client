@@ -25,6 +25,11 @@ export const clientErrorDef = {
     message: "Server returned a malformatted response.",
     shorthand: "Malformatted response",
   },
+  NKRE_UNEXPECTED_RESPONSE: {
+    code: "NKRE_UNEXPECTED_RESPONSE",
+    message: "Server returned an unexpected response.",
+    shorthand: "Unexpected response",
+  },
   NKRE_CONNECTIVITY_ISSUE: {
     code: "NKRE_CONNECTIVITY_ISSUE",
     message:
