@@ -55,7 +55,10 @@
   // Local Misc
   import { SvelteToast } from "@zerodevx/svelte-toast";
   import { handleAnyError } from "./lib/error-handling.js";
-  import { navigateToRoute } from "./lib/navigation-helper.js";
+  import {
+    navigateToPreviousPageOrDashboard,
+    navigateToRoute,
+  } from "./lib/navigation-helper.js";
   import { performUserLogout } from "./lib/session.js";
   import { createDebouncedMethod } from "./utility/misc-utils.js";
 
@@ -69,6 +72,8 @@
   activeBucket.subscribe((value) => {
     _activeBucket = value;
   });
+
+  let activeRouteAdditionalData = null;
 
   const loadBucketList = createDebouncedMethod(async () => {
     incrementActiveGlobalObtrusiveTaskCount();
@@ -95,11 +100,15 @@
     return true;
   };
 
-  const makeAuthenticatedRoute = (component: typeof SvelteComponentDev) => {
+  const makeAuthenticatedRoute = (
+    component: typeof SvelteComponentDev,
+    options: { backButton: boolean } = { backButton: false }
+  ) => {
     return wrap({
       component,
       userData: {
         requiresAuthentication: true,
+        backButton: options.backButton,
       },
       conditions: [conditionRequiresAuthentication],
     });
@@ -117,7 +126,7 @@
     "/login": loginRoute,
     "/profile": makeAuthenticatedRoute(ProfilePage),
     "/users": makeAuthenticatedRoute(UsersPage),
-    "/user/save/*": makeAuthenticatedRoute(UserSavePage),
+    "/user/save/*": makeAuthenticatedRoute(UserSavePage, { backButton: true }),
     "/buckets": makeAuthenticatedRoute(BucketsPage),
     "/settings": makeAuthenticatedRoute(SettingsPage),
     "/bucket/create": makeAuthenticatedRoute(BucketCreatePage),
@@ -142,6 +151,9 @@
   function routeLoaded(event) {
     let { detail } = event;
     console.debug("routeLoaded:", event);
+    let data = event.detail.userData as any;
+
+    activeRouteAdditionalData = data;
 
     // housekeeping
     if (detail.route !== "/explore/*") {
@@ -278,11 +290,21 @@
     <TopAppBar bind:this={topAppBar} variant="standard" class="nk-top-bar">
       <Row>
         <Section>
-          <IconButton
-            class="material-icons"
-            on:click={() => (isLeftDrawerOpen = !isLeftDrawerOpen)}
-            >menu</IconButton
-          >
+          {#if !activeRouteAdditionalData || !activeRouteAdditionalData.backButton}
+            <IconButton
+              class="material-icons"
+              on:click={() => (isLeftDrawerOpen = !isLeftDrawerOpen)}
+              >menu
+            </IconButton>
+          {/if}
+
+          {#if activeRouteAdditionalData && activeRouteAdditionalData.backButton}
+            <IconButton
+              class="material-icons"
+              on:click={() => navigateToPreviousPageOrDashboard()}
+              >arrow_back
+            </IconButton>
+          {/if}
           <Title>nkrypt.xyz</Title>
         </Section>
         <Section align="end" toolbar />

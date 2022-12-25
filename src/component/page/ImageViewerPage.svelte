@@ -6,7 +6,10 @@
   import { callFileGetApi } from "../../integration/content-apis.js";
   import { downloadAndDecryptFileIntoArrayBuffer } from "../../lib/crypto-transit-basic.js";
   import { handleAnyError } from "../../lib/error-handling.js";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import {
+    navigateToPreviousPageOrDashboard,
+    navigateToRoute,
+  } from "../../lib/navigation-helper.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
   import { bucketList } from "../../store/content.js";
   import { setPasswordForBucket } from "../../store/password.js";
@@ -78,7 +81,7 @@
 
   const returnToPreviousPage = () => {
     resetData();
-    history.back();
+    navigateToPreviousPageOrDashboard();
   };
 
   const loadFile = async (fileId: string) => {

@@ -10,16 +10,19 @@
   import {
     callBucketDestroyApi,
     callBucketListApi,
-    callBucketSetAuthorizationApi
+    callBucketSetAuthorizationApi,
   } from "../../integration/content-apis.js";
   import { callUserFindApi } from "../../integration/user-apis.js";
   import { ClientError, handleAnyError } from "../../lib/error-handling.js";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import {
+    navigateToPreviousPageOrDashboard,
+    navigateToRoute,
+  } from "../../lib/navigation-helper.js";
   import { showToast } from "../../lib/notification-helper.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
   import {
     bucketPermissionDetails,
-    defaultBucketPermissions
+    defaultBucketPermissions,
   } from "../../lib/permissions-helper.js";
   import { bucketList } from "../../store/content.js";
   import {
@@ -27,7 +30,7 @@
     incrementActiveGlobalObtrusiveTaskCount,
     showAlert,
     showConfirmation,
-    showPrompt
+    showPrompt,
   } from "../../store/ui.js";
   import { storedUser } from "../../store/user.js";
 
@@ -49,7 +52,7 @@
 
   const returnToPreviousPage = () => {
     resetData();
-    history.back();
+    navigateToPreviousPageOrDashboard();
   };
 
   const getUser = async (userName: string) => {
