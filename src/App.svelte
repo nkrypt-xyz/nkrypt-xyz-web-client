@@ -130,10 +130,16 @@
     "/buckets": makeAuthenticatedRoute(BucketsPage),
     "/settings": makeAuthenticatedRoute(SettingsPage),
     "/bucket/create": makeAuthenticatedRoute(BucketCreatePage),
-    "/bucket/edit/*": makeAuthenticatedRoute(BucketEditPage),
+    "/bucket/edit/*": makeAuthenticatedRoute(BucketEditPage, {
+      backButton: true,
+    }),
     "/explore/*": makeAuthenticatedRoute(ExplorePage),
-    "/edit-plain-text/*": makeAuthenticatedRoute(PlainTextEditorPage),
-    "/view-image/*": makeAuthenticatedRoute(ImageViewerPage),
+    "/edit-plain-text/*": makeAuthenticatedRoute(PlainTextEditorPage, {
+      backButton: true,
+    }),
+    "/view-image/*": makeAuthenticatedRoute(ImageViewerPage, {
+      backButton: true,
+    }),
   };
 
   // Handles the "conditionsFailed" event dispatched by the router when a component can't be loaded because one of its pre-condition failed
