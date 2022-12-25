@@ -1,20 +1,21 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Card, { Content } from "@smui/card";
   import Textfield from "@smui/textfield";
   import HelperText from "@smui/textfield/helper-text";
   import Icon from "@smui/textfield/icon";
   import { form } from "svelte-forms";
-  import { replace } from "svelte-spa-router";
-  import { handleAnyError } from "../../lib/error-handling.js";
-  import { standardField } from "../../lib/validations.js";
-  // Other imports
+  import { CommonConstant } from "../../constant/common-constants.js";
   import { BUCKET_CRYPTO_SPEC } from "../../constant/crypto-specs.js";
+  import { MetaDataConstant } from "../../constant/meta-data-constants.js";
+  import { testConstants } from "../../constant/test-constants.js";
   import {
     callBucketCreateApi,
     callBucketListApi,
   } from "../../integration/content-apis.js";
+  import { handleAnyError } from "../../lib/error-handling.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import { standardField } from "../../lib/validations.js";
   import { minlength } from "../../lib/validators.js";
   import { bucketList } from "../../store/content.js";
   import {
@@ -22,10 +23,6 @@
     incrementActiveGlobalObtrusiveTaskCount,
   } from "../../store/ui.js";
   import { encryptText } from "../../utility/crypto-utils.js";
-  import { testConstants } from "../../constant/test-constants.js";
-  import { MetaDataConstant } from "../../constant/meta-data-constants.js";
-  import { CommonConstant } from "../../constant/common-constants.js";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const NEW_BUCKET_ID = "new";
 

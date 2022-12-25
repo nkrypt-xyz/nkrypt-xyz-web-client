@@ -1,22 +1,18 @@
 <script lang="ts">
-  // UI / Framework
   import { Icon } from "@smui/button";
-  import Menu from "@smui/menu";
   import List, { Item, Separator, Text } from "@smui/list";
-  import Button, { Label } from "@smui/button";
+  import Menu from "@smui/menu";
+  import {
+    callDirectoryDeleteApi,
+    callDirectoryRenameApi,
+  } from "../../../integration/content-apis.js";
+  import { handleAnyError } from "../../../lib/error-handling.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
     showConfirmation,
     showPrompt,
   } from "../../../store/ui.js";
-  import {
-    callDirectoryDeleteApi,
-    callDirectoryGetApi,
-    callDirectoryRenameApi,
-  } from "../../../integration/content-apis.js";
-  import { handleAnyError } from "../../../lib/error-handling.js";
-  // Other imports
 
   export let childDirectoryList = [];
   export let childDirectoryClicked = null;

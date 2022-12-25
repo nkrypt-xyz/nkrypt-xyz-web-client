@@ -1,7 +1,6 @@
 <script lang="ts">
   // Core
   import { onMount } from "svelte";
-  // UI / Framework Library Item
   import Button, { Icon, Label } from "@smui/button";
   import Drawer, {
     Content,

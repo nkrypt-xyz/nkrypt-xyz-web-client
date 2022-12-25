@@ -1,20 +1,13 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Icon, Label } from "@smui/button";
-  import { storedUser } from "../../store/user.js";
-  import { callMetricsGetSummaryApi } from "../../integration/metrics-apis.js";
+  import type { User } from "src/model/common.js";
+  import { callUserListApi } from "../../integration/user-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
-  // Other imports
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
-    showAlert,
-    showConfirmation,
   } from "../../store/ui.js";
-  import { callUserListApi } from "../../integration/user-apis.js";
-  import type { User } from "src/model/common.js";
-  import { push } from "svelte-spa-router";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   let userList: User[] = [];
 

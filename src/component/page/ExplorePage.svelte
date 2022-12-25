@@ -1,21 +1,17 @@
 <script lang="ts">
-  // UI / Framework
   import IconButton from "@smui/icon-button";
-  import { encryptAndUploadArrayBuffer } from "../../lib/crypto-transit-basic.js";
-  import { location, push } from "svelte-spa-router";
+  import { location } from "svelte-spa-router";
   import { derived } from "svelte/store";
-  // Other imports
+  import { MetaDataConstant } from "../../constant/meta-data-constants.js";
+  import { MiscConstant } from "../../constant/misc-constants.js";
   import {
     callDirectoryCreateApi,
     callDirectoryGetApi,
     callDirectoryMoveApi,
-    callFileCreateApi,
     callFileMoveApi,
-    callFileRenameApi,
-    callFileSetEncryptedMetaDataApi,
-    callFileSetMetaDataApi,
   } from "../../integration/content-apis.js";
   import { handleAnyError } from "../../lib/error-handling.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
   import { activeBucket, bucketList } from "../../store/content.js";
   import { setPasswordForBucket } from "../../store/password.js";
@@ -27,17 +23,14 @@
   } from "../../store/ui.js";
   import { encryptObject } from "../../utility/crypto-utils.js";
   import Breadcrumbs from "./ExplorePage/Breadcrumbs.svelte";
-  import DirectorySection from "./ExplorePage/DirectorySection.svelte";
-  import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
-  import FileSection from "./ExplorePage/FileSection.svelte";
-  import FileBulkUploadModal from "./ExplorePage/FileBulkUploadModal.svelte";
-  import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
-  import { MiscConstant } from "../../constant/misc-constants.js";
-  import { createTextFile } from "./ExplorePage/create-text-file.js";
-  import { MetaDataConstant } from "../../constant/meta-data-constants.js";
   import { ClipboardAction } from "./ExplorePage/clipboard-helper.js";
   import Clipboard from "./ExplorePage/Clipboard.svelte";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
+  import { createTextFile } from "./ExplorePage/create-text-file.js";
+  import DirectorySection from "./ExplorePage/DirectorySection.svelte";
+  import FileBulkUploadModal from "./ExplorePage/FileBulkUploadModal.svelte";
+  import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
+  import FileSection from "./ExplorePage/FileSection.svelte";
+  import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
 
   let _bucketList = [];
   bucketList.subscribe((value) => {

@@ -1,18 +1,9 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Dialog, { Actions, Content, Title } from "@smui/dialog";
-  import FormField from "@smui/form-field";
-  import LinearProgress from "@smui/linear-progress";
-  import Radio from "@smui/radio";
-  // Other imports
-  import { storedSettings } from "../../../store/settings.js";
-  import { downloadAndDecryptFile } from "../../../lib/crypto-transit.js";
-  import { showCommonErrorDialog } from "../../../store/ui.js";
-  import { expressBytesPrettified } from "../../../utility/value-utils.js";
-  import { decryptToObject } from "../../../utility/crypto-utils.js";
-  import { arrayDistinct, deepMerge } from "../../../lib/misc-utils.js";
   import { epochToPrettyDateTime } from "../../../lib/date-helper.js";
+  import { arrayDistinct, deepMerge } from "../../../lib/misc-utils.js";
+  import { decryptToObject } from "../../../utility/crypto-utils.js";
 
   const prettifyGroupName = (key) => {
     const map = {

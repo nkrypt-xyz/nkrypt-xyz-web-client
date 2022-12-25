@@ -1,37 +1,32 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Dialog, { Actions, Content, Title } from "@smui/dialog";
-  import FormField from "@smui/form-field";
+  import IconButton from "@smui/icon-button";
   import LinearProgress from "@smui/linear-progress";
-  import Radio from "@smui/radio";
   import Textfield from "@smui/textfield";
   import HelperText from "@smui/textfield/helper-text";
-  import { storedSettings } from "../../../store/settings.js";
-  // Other imports
+  import { clientErrorDef } from "../../../constant/client-errors.js";
+  import { MetaDataConstant } from "../../../constant/meta-data-constants.js";
+  import { MiscConstant } from "../../../constant/misc-constants.js";
   import {
     callFileCreateApi,
     callFileSetEncryptedMetaDataApi,
-    callFileSetMetaDataApi,
+    callFileSetMetaDataApi
   } from "../../../integration/content-apis.js";
   import { encryptAndUploadFile } from "../../../lib/crypto-transit.js";
   import { ClientError, handleAnyError } from "../../../lib/error-handling.js";
   import {
+    generateThumbnail,
+    isUploadCandidateLikelyAnImage
+  } from "../../../lib/image-viewer-helper.js";
+  import { sanitizeFileName } from "../../../lib/sanitization-utils.js";
+  import { storedSettings } from "../../../store/settings.js";
+  import {
     decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
+    incrementActiveGlobalObtrusiveTaskCount
   } from "../../../store/ui.js";
   import { encryptObject } from "../../../utility/crypto-utils.js";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
-  import {
-    generateThumbnail,
-    isLikelyImage,
-    isUploadCandidateLikelyAnImage,
-  } from "../../../lib/image-viewer-helper.js";
-  import { MetaDataConstant } from "../../../constant/meta-data-constants.js";
-  import { MiscConstant } from "../../../constant/misc-constants.js";
-  import { sanitizeFileName } from "../../../lib/sanitization-utils.js";
-  import IconButton from "@smui/icon-button";
-  import { clientErrorDef } from "../../../constant/client-errors.js";
 
   let wrapper;
 

@@ -3,13 +3,12 @@ import { MiscConstant } from "../../../constant/misc-constants.js";
 import {
   callFileCreateApi,
   callFileSetEncryptedMetaDataApi,
-  callFileSetMetaDataApi,
+  callFileSetMetaDataApi
 } from "../../../integration/content-apis.js";
 import { encryptAndUploadArrayBuffer } from "../../../lib/crypto-transit-basic.js";
 import {
   decrementActiveGlobalObtrusiveTaskCount,
-  incrementActiveGlobalObtrusiveTaskCount,
-  showPrompt,
+  incrementActiveGlobalObtrusiveTaskCount
 } from "../../../store/ui.js";
 import { encryptObject } from "../../../utility/crypto-utils.js";
 
@@ -79,3 +78,4 @@ const createTextFile = async (
 };
 
 export { createTextFile };
+

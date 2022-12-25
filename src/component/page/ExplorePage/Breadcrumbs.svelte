@@ -5,6 +5,7 @@
 </script>
 
 <div class="breadcrumb-container">
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
     class="breadcrumb breadcrumb-bucket"
     draggable="true"
@@ -14,6 +15,7 @@
   </div>
   {#each entityStack.slice(1) as entity, i}
     <div class="breadcrumb-divider">&gt;</div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
       class="breadcrumb breadcrumb-directory"
       draggable="true"

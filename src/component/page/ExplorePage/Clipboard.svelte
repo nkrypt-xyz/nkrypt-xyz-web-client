@@ -1,26 +1,6 @@
 <script lang="ts">
-  // UI / Framework
-  import { Icon } from "@smui/button";
-  import Menu from "@smui/menu";
-  import List, { Item, Separator, Text } from "@smui/list";
-  import Button, { Label } from "@smui/button";
-  import {
-    decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount,
-    showConfirmation,
-    showPrompt,
-  } from "../../../store/ui.js";
-  import {
-    callDirectoryDeleteApi,
-    callDirectoryGetApi,
-    callDirectoryRenameApi,
-    callFileDeleteApi,
-    callFileRenameApi,
-  } from "../../../integration/content-apis.js";
-  import { handleAnyError } from "../../../lib/error-handling.js";
-  import { ClipboardAction } from "./clipboard-helper.js";
   import IconButton from "@smui/icon-button";
-  // Other imports
+  import { ClipboardAction } from "./clipboard-helper.js";
 
   export let clipboard = null;
   export let performClipboardActionFn = null;

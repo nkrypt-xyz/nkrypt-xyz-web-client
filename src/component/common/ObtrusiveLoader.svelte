@@ -1,8 +1,6 @@
 <script lang="ts">
-  // UI / Framework
   import CircularProgress from "@smui/circular-progress";
   import Dialog, { Content } from "@smui/dialog";
-  // Other imports
   import { activeGlobalObtrusiveTaskCount } from "../../store/ui.js";
 
   let isOpen = false;

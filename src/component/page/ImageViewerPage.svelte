@@ -1,46 +1,21 @@
 <script lang="ts">
-  // UI / Framework
-  import IconButton from "@smui/icon-button";
-  import {
-    downloadAndDecryptFileIntoArrayBuffer,
-    encryptAndUploadArrayBuffer,
-  } from "../../lib/crypto-transit-basic.js";
-  import { location, push } from "svelte-spa-router";
+  import Button, { Icon, Label } from "@smui/button";
+  import CircularProgress from "@smui/circular-progress";
+  import { location } from "svelte-spa-router";
   import { derived } from "svelte/store";
-  // Other imports
-  import {
-    callDirectoryCreateApi,
-    callDirectoryGetApi,
-    callFileGetApi,
-    callFileSetMetaDataApi,
-  } from "../../integration/content-apis.js";
+  import { callFileGetApi } from "../../integration/content-apis.js";
+  import { downloadAndDecryptFileIntoArrayBuffer } from "../../lib/crypto-transit-basic.js";
   import { handleAnyError } from "../../lib/error-handling.js";
+  import { navigateToRoute } from "../../lib/navigation-helper.js";
   import { getOrCollectPasswordForBucket } from "../../lib/password-provider.js";
-  import { activeBucket, bucketList } from "../../store/content.js";
+  import { bucketList } from "../../store/content.js";
   import { setPasswordForBucket } from "../../store/password.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
     incrementActiveGlobalObtrusiveTaskCount,
     showAlert,
     showCommonErrorDialog,
-    showConfirmation,
-    showPrompt,
-    showThreeStateConfirmation,
-    ThreeStateConfirmationState,
   } from "../../store/ui.js";
-  import { encryptObject } from "../../utility/crypto-utils.js";
-  import Breadcrumbs from "./ExplorePage/Breadcrumbs.svelte";
-  import DirectorySection from "./ExplorePage/DirectorySection.svelte";
-  import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
-  import FileSection from "./ExplorePage/FileSection.svelte";
-  import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
-  import { convertSmallUint8ArrayToString } from "../../utility/buffer-utils.js";
-  import CircularProgress from "@smui/circular-progress";
-  import Textfield from "@smui/textfield";
-  import HelperText from "@smui/textfield/helper-text";
-  import Button, { Label, Icon } from "@smui/button";
-  import { text } from "svelte/internal";
-  import { navigateToRoute } from "../../lib/navigation-helper.js";
 
   const ROUTE_PREFIX = "/view-image/";
 

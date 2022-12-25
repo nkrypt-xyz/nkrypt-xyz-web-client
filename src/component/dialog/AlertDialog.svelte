@@ -1,8 +1,6 @@
 <script lang="ts">
-  // UI / Framework
   import Button, { Label } from "@smui/button";
   import Dialog, { Actions, Content, Title } from "@smui/dialog";
-  // Other imports
   import { alertDialog, alertDialogResponse } from "../../store/ui.js";
 
   let _alertDialog = null;
