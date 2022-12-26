@@ -100,15 +100,30 @@
     return true;
   };
 
+  function sayName({
+    first = "Bob",
+    last = "Smith",
+  }: { first?: string; last?: string } = {}) {
+    var name = first + " " + last;
+    alert(name);
+  }
+
   const makeAuthenticatedRoute = (
     component: typeof SvelteComponentDev,
-    options: { backButton: boolean } = { backButton: false }
+    {
+      backButton = false,
+      title = null,
+    }: {
+      backButton?: boolean;
+      title?: string;
+    } = {}
   ) => {
     return wrap({
       component,
       userData: {
         requiresAuthentication: true,
-        backButton: options.backButton,
+        backButton: backButton,
+        title: title,
       },
       conditions: [conditionRequiresAuthentication],
     });
@@ -124,14 +139,20 @@
     "/dashboard": dashboardRoute,
     "/": dashboardRoute,
     "/login": loginRoute,
-    "/profile": makeAuthenticatedRoute(ProfilePage),
-    "/users": makeAuthenticatedRoute(UsersPage),
-    "/user/save/*": makeAuthenticatedRoute(UserSavePage, { backButton: true }),
-    "/buckets": makeAuthenticatedRoute(BucketsPage),
-    "/settings": makeAuthenticatedRoute(SettingsPage),
-    "/bucket/create": makeAuthenticatedRoute(BucketCreatePage),
+    "/profile": makeAuthenticatedRoute(ProfilePage, { title: "Profile" }),
+    "/users": makeAuthenticatedRoute(UsersPage, { title: "Users" }),
+    "/user/save/*": makeAuthenticatedRoute(UserSavePage, {
+      backButton: true,
+      title: "User",
+    }),
+    "/buckets": makeAuthenticatedRoute(BucketsPage, { title: "Buckets" }),
+    "/settings": makeAuthenticatedRoute(SettingsPage, { title: "Settings" }),
+    "/bucket/create": makeAuthenticatedRoute(BucketCreatePage, {
+      title: "Create Bucket",
+    }),
     "/bucket/edit/*": makeAuthenticatedRoute(BucketEditPage, {
       backButton: true,
+      title: "Bucket",
     }),
     "/explore/*": makeAuthenticatedRoute(ExplorePage),
     "/edit-plain-text/*": makeAuthenticatedRoute(PlainTextEditorPage, {
@@ -311,7 +332,11 @@
               >arrow_back
             </IconButton>
           {/if}
-          <Title>nkrypt.xyz</Title>
+          <Title>
+            {activeRouteAdditionalData && activeRouteAdditionalData.title
+              ? activeRouteAdditionalData.title
+              : "nkrypt.xyz"}
+          </Title>
         </Section>
         <Section align="end" toolbar />
       </Row>
