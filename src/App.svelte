@@ -100,14 +100,6 @@
     return true;
   };
 
-  function sayName({
-    first = "Bob",
-    last = "Smith",
-  }: { first?: string; last?: string } = {}) {
-    var name = first + " " + last;
-    alert(name);
-  }
-
   const makeAuthenticatedRoute = (
     component: typeof SvelteComponentDev,
     {
