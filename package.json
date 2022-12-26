@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "docker-dev-build": "docker build -t nkrypt-xyz-web-client-mvp-dev-1 -f ./Dockerfile-Dev .",
+    "docker-dev-run": "docker run -it --rm -p 3000:3000 nkrypt-xyz-web-client-mvp-dev-1",
+    "docker-dev": "npm run docker-dev-build && npm run docker-dev-run"
   },
   "devDependencies": {
     "@smui/button": "^6.0.0-beta.16",

@@ -3,7 +3,7 @@
   import { handleAnyError } from "../../lib/error-handling.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount
+    incrementActiveGlobalObtrusiveTaskCount,
   } from "../../store/ui.js";
   import { storedUser } from "../../store/user.js";
 
