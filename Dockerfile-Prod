@@ -1,0 +1,14 @@
+FROM node:16 as clientbuild
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+
+FROM node:16 as base
+WORKDIR /
+COPY --from=clientbuild /app/dist/ /dist/
+CMD [ "cp", "-R", "/dist", "/var/nkrypt-xyz-client-output" ]
