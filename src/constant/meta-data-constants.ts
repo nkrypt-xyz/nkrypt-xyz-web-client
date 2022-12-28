@@ -9,7 +9,8 @@ export const MetaDataConstant = {
     CLIENT_NAME: "clientName",
     ORIGINAL_NAME: "originalName",
     ORIGINATION_SOURCE: "originationSource",
-    ORIGINATION_DATE: "originationDate"
+    ORIGINATION_DATE: "originationDate",
+    LAST_MODIFIED_DURING_ORIGINATION: "lastModifiedDuringOrigination"
   },
   IMAGE_GROUP_NAME: "image",
   IMAGE: {
