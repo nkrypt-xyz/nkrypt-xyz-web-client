@@ -11,19 +11,19 @@
   import {
     callFileCreateApi,
     callFileSetEncryptedMetaDataApi,
-    callFileSetMetaDataApi
+    callFileSetMetaDataApi,
   } from "../../../integration/content-apis.js";
   import { encryptAndUploadFile } from "../../../lib/crypto-transit.js";
   import { ClientError, handleAnyError } from "../../../lib/error-handling.js";
   import {
     generateThumbnail,
-    isUploadCandidateLikelyAnImage
+    isUploadCandidateLikelyAnImage,
   } from "../../../lib/image-viewer-helper.js";
   import { sanitizeFileName } from "../../../lib/sanitization-utils.js";
   import { storedSettings } from "../../../store/settings.js";
   import {
     decrementActiveGlobalObtrusiveTaskCount,
-    incrementActiveGlobalObtrusiveTaskCount
+    incrementActiveGlobalObtrusiveTaskCount,
   } from "../../../store/ui.js";
   import { encryptObject } from "../../../utility/crypto-utils.js";
   import { expressBytesPrettified } from "../../../utility/value-utils.js";
@@ -290,6 +290,8 @@
           [MetaDataConstant.ORIGIN.ORIGINATION_SOURCE]:
             MiscConstant.ORIGINATION_SOURCE_UPLOAD,
           [MetaDataConstant.ORIGIN.ORIGINATION_DATE]: Date.now(),
+          [MetaDataConstant.ORIGIN.LAST_MODIFIED_DURING_ORIGINATION]:
+            uploadCandidateBlock.domFile.lastModified,
         },
         [MetaDataConstant.CORE_GROUP_NAME]: {
           [MetaDataConstant.CORE.SIZE_BEFORE_ENCRYPTION]:
