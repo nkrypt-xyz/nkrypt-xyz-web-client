@@ -29,6 +29,7 @@
       createdAt: "Created",
       updatedAt: "Updated",
       contentUpdatedAt: "Content Updated",
+      lastModifiedDuringOrigination: "Last Modified (Before Upload)",
       name: "Name",
     };
     if (key in map) {
@@ -48,7 +49,8 @@
       } else if (
         (groupName === "origin" && key === "originationDate") ||
         (groupName === "serverSpecified" &&
-          ["createdAt", "updatedAt", "contentUpdatedAt"].includes(key))
+          ["createdAt", "updatedAt", "contentUpdatedAt"].includes(key)) ||
+        (groupName === "origin" && key === "lastModifiedDuringOrigination")
       ) {
         return value ? epochToPrettyDateTime(value) : "Never";
       } else if (groupName === "origin" && key === "originationSource") {
