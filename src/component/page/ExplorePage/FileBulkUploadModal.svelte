@@ -5,6 +5,7 @@
   import LinearProgress from "@smui/linear-progress";
   import Textfield from "@smui/textfield";
   import HelperText from "@smui/textfield/helper-text";
+  import { sleep } from "../../../lib/misc-utils.js";
   import { clientErrorDef } from "../../../constant/client-errors.js";
   import { MetaDataConstant } from "../../../constant/meta-data-constants.js";
   import { MiscConstant } from "../../../constant/misc-constants.js";
@@ -70,12 +71,16 @@
 
   let uploadCandidateBlockList: UploadCandiateBlock[] = [];
 
+  let isAborted = false;
+
   export function showAndUploadFile(params: {
     directory;
     childDirectoryList;
     childFileList;
     bucketPassword;
   }): Promise<string> {
+    isAborted = false;
+
     return new Promise<string>((accept, reject) => {
       ({ directory, childDirectoryList, childFileList, bucketPassword } =
         params);
@@ -197,6 +202,7 @@
   };
 
   const setAnswer = (answer) => {
+    isAborted = true;
     state = FileUploadModalState.IDLE;
     acceptFn(answer || null);
     return;
@@ -343,6 +349,7 @@
       state = FileUploadModalState.FILE_UPLOAD;
 
       for (let uploadCandidateBlock of uploadCandidateBlockList) {
+        if (isAborted) return;
         await uploadUploadCandidate(uploadCandidateBlock);
       }
 
@@ -459,50 +466,79 @@
             </div>
           {/each}
         {/if}
-
-        {#if state === FileUploadModalState.FILE_SELECTION}
-          {#if uploadCandidateBlockList.length > 0}
-            <div style="margin-top: 8px;">
-              <Button
-                class="start-upload-button"
-                variant="raised"
-                on:click={() => startUploadClicked()}
-                disabled={!allowUpload}
-              >
-                <Label>{"Start Upload"}</Label>
-              </Button>
-              <Button
-                class="select-file-button"
-                variant="outlined"
-                on:click={() => selectFileToUploadClicked()}
-              >
-                <Label>Select again</Label>
-              </Button>
-            </div>
-          {:else}
-            <div>
-              <Button
-                class="select-file-button {hideFileSelectionTemporarily
-                  ? 'force-hidden'
-                  : ''}"
-                variant="raised"
-                on:click={() => selectFileToUploadClicked()}
-              >
-                <Label>Select files</Label>
-              </Button>
-            </div>
-          {/if}
-        {/if}
       </Content>
       <Actions>
+        {#if state === FileUploadModalState.FILE_SELECTION}
+          {#if uploadCandidateBlockList.length > 0}
+            <Button
+              class="start-upload-button"
+              variant="raised"
+              on:click={(e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                startUploadClicked();
+              }}
+              disabled={!allowUpload}
+            >
+              <Label>{"Upload"}</Label>
+            </Button>
+            <Button
+              class="select-file-button"
+              variant="outlined"
+              on:click={(e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                selectFileToUploadClicked();
+              }}
+            >
+              <Label>Re-Select</Label>
+            </Button>
+          {:else}
+            <Button
+              class="select-file-button {hideFileSelectionTemporarily
+                ? 'force-hidden'
+                : ''}"
+              variant="raised"
+              on:click={(e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                selectFileToUploadClicked();
+              }}
+            >
+              <Label>Select files</Label>
+            </Button>
+          {/if}
+        {/if}
+
         {#if allowCancel}
           <Button
+            variant="outlined"
             on:click={(e) => {
               e.preventDefault();
+              e.stopImmediatePropagation();
+              e.stopPropagation();
               setAnswer(false);
             }}
           >
             <Label>Cancel</Label>
+          </Button>
+        {:else}
+          <Button
+            style="color: red !important"
+            variant="outlined"
+            on:click={async (e) => {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              e.stopPropagation();
+              setAnswer(false);
+              sleep(100);
+              window.location.reload();
+            }}
+          >
+            <Label>Abort</Label>
           </Button>
         {/if}
       </Actions>
@@ -562,5 +598,9 @@
 
   * :global(.force-hidden) {
     display: none;
+  }
+
+  * :global(.mdc-dialog--stacked .mdc-dialog__actions) {
+    flex-direction: row;
   }
 </style>

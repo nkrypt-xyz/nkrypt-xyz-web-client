@@ -25,3 +25,9 @@ export function arrayDistinct(array) {
     return self.indexOf(value) === index;
   });
 }
+
+export function sleep(timeout) {
+  return new Promise((accept) => {
+    setTimeout(accept, timeout);
+  });
+}
