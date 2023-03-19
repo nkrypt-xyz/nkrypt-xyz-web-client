@@ -18,6 +18,7 @@
   export let childDirectoryClicked = null;
   export let refreshExplorePage = null;
   export let viewPropertiesOfChildDirectoryClicked = null;
+  export let accessMoreOfChildDirectoryClicked = null;
   export let initiateMoveFn = null;
 
   // known and acceptable minor memory leak.
@@ -76,6 +77,10 @@
   const viewPropertiesClicked = async (childDirectory) => {
     await viewPropertiesOfChildDirectoryClicked(childDirectory);
   };
+
+  const accessMoreClicked = async (childDirectory) => {
+    await accessMoreOfChildDirectoryClicked(childDirectory);
+  };
 </script>
 
 <div class="directory-section-header">Directories</div>
@@ -121,6 +126,9 @@
               <Text>Delete</Text>
             </Item>
             <Separator />
+            <Item on:SMUI:action={() => accessMoreClicked(childDirectory)}>
+              <Text>More</Text>
+            </Item>      
             <Item on:SMUI:action={() => viewPropertiesClicked(childDirectory)}>
               <Text>Properties</Text>
             </Item>

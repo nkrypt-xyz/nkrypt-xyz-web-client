@@ -18,6 +18,7 @@
   export let childFileClicked = null;
   export let refreshExplorePage = null;
   export let viewPropertiesOfChildFileClicked = null;
+  export let accessMoreOfChildFileClicked = null;
   export let initiateMoveFn = null;
 
   // known and acceptable minor memory leak.
@@ -76,6 +77,10 @@
   const viewPropertiesClicked = async (childFile) => {
     await viewPropertiesOfChildFileClicked(childFile);
   };
+
+  const accessMoreClicked = async (childFile) => {
+    await accessMoreOfChildFileClicked(childFile);
+  };
 </script>
 
 <div class="file-section-header">Files</div>
@@ -118,6 +123,9 @@
               <Text>Delete</Text>
             </Item>
             <Separator />
+            <Item on:SMUI:action={() => accessMoreClicked(childFile)}>
+              <Text>More</Text>
+            </Item>            
             <Item on:SMUI:action={() => viewPropertiesClicked(childFile)}>
               <Text>Properties</Text>
             </Item>

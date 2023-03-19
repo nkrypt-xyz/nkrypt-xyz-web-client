@@ -30,6 +30,7 @@
   import FileBulkUploadModal from "./ExplorePage/FileBulkUploadModal.svelte";
   import FileOperationModal from "./ExplorePage/FileOperationModal.svelte";
   import FileSection from "./ExplorePage/FileSection.svelte";
+  import MoreFeaturesModal from "./ExplorePage/MoreFeaturesModal.svelte";
   import PropertiesModal from "./ExplorePage/PropertiesModal.svelte";
 
   let _bucketList = [];
@@ -347,6 +348,7 @@
   };
 
   let propertiesModal;
+  let moreFeaturesModal;
 
   const viewPropertiesOfChildDirectoryClicked = async (childDirectory) => {
     let nullableResponse = await propertiesModal.showModal({
@@ -363,11 +365,28 @@
       bucketPassword: currentBucketPassword,
     });
   };
+
+  const accessMoreOfChildDirectoryClicked = async (childDirectory) => {
+    let nullableResponse = await moreFeaturesModal.showModal({
+      entity: childDirectory,
+      isDirectory: true,
+      bucketPassword: currentBucketPassword,
+    });
+  };
+
+  const accessMoreOfChildFileClicked = async (childFile) => {
+    let nullableResponse = await moreFeaturesModal.showModal({
+      entity: childFile,
+      isDirectory: false,
+      bucketPassword: currentBucketPassword,
+    });
+  };
 </script>
 
 <FileBulkUploadModal bind:this={fileUploadModal} />
 <FileOperationModal bind:this={fileOperationModal} />
 <PropertiesModal bind:this={propertiesModal} />
+<MoreFeaturesModal bind:this={moreFeaturesModal} />
 
 <div class="nk-page">
   <div class="nk-page--inner-wrapper--standard gb--no-padding-on-mobile">
@@ -420,6 +439,7 @@
         {refreshExplorePage}
         {initiateMoveFn}
         {viewPropertiesOfChildDirectoryClicked}
+        {accessMoreOfChildDirectoryClicked}
       />
 
       <FileSection
@@ -428,6 +448,7 @@
         {refreshExplorePage}
         {initiateMoveFn}
         {viewPropertiesOfChildFileClicked}
+        {accessMoreOfChildFileClicked}
       />
     {/if}
   </div>
