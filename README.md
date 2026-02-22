@@ -1,3 +1,11 @@
+# Obsolete
+
+This repo has been made redundant by the rewrite in our monorepo.
+
+Monorepo (including the new client): [https://github.com/nkrypt-xyz/nkrypt-xyz](https://github.com/nkrypt-xyz/nkrypt-xyz)
+
+
+
 # nkrypt-xyz-web-client
 
 User deployable browser client for nkrypt.xyz community edition.
